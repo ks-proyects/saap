@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('home');">
+			<p:galleria value="#{imagesView.images}" style="" var="image"
+				showOverlays="true" panelWidth="900" panelHeight="540"
+				showFilmstrip="true">
+				<p:graphicImage value="/tools/imagenes/galery/#{image}"
+					alt="Image Description for #{image}" title="#{image}" />
+			</p:galleria>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

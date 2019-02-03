@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<ui:define name="body">
+		<h:form id="WorkPage">
+			<rich:accordion>
+				<rich:accordionItem switchType="ajax" header="Objetivo">
+					<h:outputText
+						value="La JAAP tiene por objetivo ofrecer a los beneficiarios un servicio de optima calidad y con ello acrecentar la confianza en la misma." />
+					<br />
+					<h:outputText
+						value="Para ofrecer un mejor servicio se ha desarollado un sistema para la gestion de la JAAP el cual se ha de llamar SAAP(Sistema de Administracion de Agua Potable) " />
+				</rich:accordionItem>
+				<rich:accordionItem switchType="ajax" header="Meta"></rich:accordionItem>
+			</rich:accordion>
+		</h:form>
+	</ui:define>
+</ui:composition>

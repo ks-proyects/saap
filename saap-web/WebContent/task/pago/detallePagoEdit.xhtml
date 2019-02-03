@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('detallePagoEdit');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{detallePagoEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value,label,value">
+					<h:outputLabel value="* Descripción:" />
+					<h:inputText readonly="#{detallePagoEditBean.readOnly1}"
+						value="#{detallePagoEditBean.registroEconomico.descripcion}" />
+					<h:outputLabel for="txtEstado" value="Estado:" />
+					<h:commandLink id="txtEstado"
+						onclick="javascript:AbrirPagina('../data/entidadCambioEstadoList.jsf',550,420);"
+						disabled="true" value="#{detallePagoEditBean.descripcionEstado}">
+						<f:ajax event="click" />
+					</h:commandLink>
+					<h:outputText value="Periodo:" />
+					<h:outputText
+						value="#{detallePagoEditBean.periodoPago.descripcion}" />
+					<h:outputText value="* Valor:" />
+					<h:inputText readonly="#{detallePagoEditBean.readOnly1}"
+						onkeypress="return ValidarNumerico('%f',this,event);"
+						value="#{detallePagoEditBean.registroEconomico.valor}" />
+				</h:panelGrid>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<h:form id="HomeForm" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<script type="text/javascript">
+		function clickConf(ele){
+			if (jQuery('#divCnfig').is(':hidden')) {
+		    	  jQuery('#divCnfig').slideDown('slow');
+		      } else {
+		    	  jQuery('#divCnfig').slideUp('slow');
+		      }	
+		}
+		function help()
+		{
+			window.open("Ayuda.pdf",null,"top=100,left=300,height=500,width=1000");
+			return;
+		}
+	</script>
+	<rich:tabPanel rendered="false">
+		<rich:tab render="false">
+			<rich:panelMenu render="false">
+				<rich:panelMenuGroup render="false">
+					<rich:panelMenuItem render="false"></rich:panelMenuItem>
+				</rich:panelMenuGroup>
+			</rich:panelMenu>
+		</rich:tab>
+	</rich:tabPanel>
+	<div id="divCnfig"
+		style="right: 0px; margin: 0px; float: left; z-index: 999999; padding: 3px 0 0; position: absolute; top: 41px; display: none;">
+		<rich:panel>
+			<ul>
+
+
+				<li class="link"><a4j:commandLink
+						style="height: 21px;vertical-align: middle; background-image:url('../tools/imagenes/sistema04.png');background-color: transparent;background-repeat: no-repeat;padding: 5px 0px 0 30px;background-position: left; display:inline-block;text-decoration:none;"
+						title="Clave"
+						oncomplete="jQuery('#divCnfig').slideUp('slow');#{rich:component('idModalChangePass')}.show();">
+						<h:outputText value="Cambiar la Clave" />
+						<div style="height: 21px; width: 100px;"></div>
+					</a4j:commandLink></li>
+				<li class="link"><a4j:commandLink
+						style="height: 21px;vertical-align: middle; background-image:url('../tools/imagenes/sistema05.png');background-color: transparent;background-repeat: no-repeat;padding: 5px 0px 0 30px;background-position: left; display:inline-block;text-decoration:none;"
+						oncomplete="jQuery('#divCnfig').slideUp('slow');#{rich:component('idModalAcercaDe')}.show();"
+						title="Acerca de Saap">
+						<h:outputText value="Acerca De" />
+						<div style="height: 21px; width: 100px;"></div>
+					</a4j:commandLink></li>
+				<li class="link"><a4j:commandLink
+						style="height: 21px;vertical-align: middle; background-image:url('../tools/imagenes/sistema07.png');background-color: transparent;background-repeat: no-repeat;padding: 5px 0px 0 30px;background-position: left; display:inline-block;text-decoration:none;"
+						oncomplete="help();" title="Ayuda">
+						<h:outputText value="Ayuda" />
+						<div style="height: 21px; width: 100px;"></div>
+					</a4j:commandLink></li>
+				<li class="link"><h:commandLink
+						style="height: 21px;vertical-align: middle; background-image:url('../tools/imagenes/sistema08.png');background-color: transparent;background-repeat: no-repeat;padding: 5px 0px 0 30px;background-position: left; display:inline-block;text-decoration:none;"
+						title="Salir" action="#{skinBean.exit}">
+						<h:outputText value="Salir" />
+						<div style="height: 21px; width: 100px;"></div>
+					</h:commandLink></li>
+			</ul>
+		</rich:panel>
+	</div>
+	<rich:toolbar height="40px" styleClass="toolbarHeader">
+		<rich:toolbarGroup location="left" id="tgHome">
+			<a4j:commandLink styleClass="linkOptions" onclick=""
+				title="M&#243;dulos">
+				<h:graphicImage style="border:0px;" width="40"
+					value="/tools/imagenes/sistema01.png" />
+			</a4j:commandLink>
+		</rich:toolbarGroup>
+		<rich:toolbarGroup location="left" id="tgItems">
+			<ui:repeat var="opt" value="#{pageBean.listModulos}">
+				<h:commandLink styleClass="linkOptionLNK"
+					style="display:inline-block;text-decoration:none;vertical-align: bottom;"
+					value="#{opt.nombre}" title="#{opt.nombre}"
+					actionListener="#{pageBean.clickOption}">
+					<f:param name="idOption" value="#{opt.idElementoSistema}" />
+				</h:commandLink>
+			</ui:repeat>
+		</rich:toolbarGroup>
+		<rich:toolbarGroup location="right">
+
+			<a4j:commandLink actionListener="#{skinBean.clickStyle}" title="Saap"
+				style="display:inline-block;padding: 0 3px;text-decoration:none;"
+				oncomplete="window.location.href=window.location.href">
+				<f:param name="skin" value="saap" />
+				<f:param name="skinPrime" value="saap" />
+				<div style="background-color: #FFFFFF;" class="iconTheme"></div>
+			</a4j:commandLink>
+			<a4j:commandLink actionListener="#{skinBean.clickStyle}" title="Cafe"
+				style="display:inline-block;padding: 0 3px;text-decoration:none;"
+				oncomplete="window.location.href=window.location.href">
+				<f:param name="skin" value="cafe" />
+				<f:param name="skinPrime" value="smoothness" />
+				<div style="background-color: #DCAD87;" class="iconTheme"></div>
+			</a4j:commandLink>
+			<a4j:commandLink actionListener="#{skinBean.clickStyle}"
+				title="Winne"
+				style="display:inline-block;padding: 0 3px;text-decoration:none;"
+				oncomplete="window.location.href=window.location.href">
+				<f:param name="skin" value="winne" />
+				<f:param name="skinPrime" value="smoothness" />
+				<div style="background-color: #4A7C59;" class="iconTheme"></div>
+			</a4j:commandLink>
+			<a4j:commandLink actionListener="#{skinBean.clickStyle}"
+				title="Chicle"
+				style="display:inline-block;padding: 0 3px;text-decoration:none;"
+				oncomplete="window.location.href=window.location.href">
+				<f:param name="skin" value="blueS" />
+				<f:param name="skinPrime" value="smoothness" />
+				<div style="background-color: #73B195;" class="iconTheme"></div>
+			</a4j:commandLink>
+			<a4j:commandLink actionListener="#{skinBean.clickStyle}"
+				title="Azul Marino"
+				style="display:inline-block;padding: 0 3px;text-decoration:none;"
+				oncomplete="window.location.href=window.location.href">
+				<f:param name="skin" value="emerald" />
+				<f:param name="skinPrime" value="smoothness" />
+				<div style="background-color: #6F8DA6;" class="iconTheme"></div>
+			</a4j:commandLink>
+			<a4j:commandLink actionListener="#{skinBean.clickStyle}"
+				title="Rojo Oscuro"
+				style="display:inline-block;padding: 0 3px;text-decoration:none;"
+				oncomplete="window.location.href=window.location.href">
+				<f:param name="skin" value="rojoOscuro" />
+				<f:param name="skinPrime" value="smoothness" />
+				<div style="background-color: #FFA5A5;" class="iconTheme"></div>
+			</a4j:commandLink>
+			<a4j:commandLink actionListener="#{skinBean.clickStyle}"
+				title="Violeta"
+				style="display:inline-block;padding: 0 3px;text-decoration:none;"
+				oncomplete="window.location.href=window.location.href">
+				<f:param name="skin" value="violeta" />
+				<f:param name="skinPrime" value="smoothness" />
+				<div style="background-color: #CD85AE;" class="iconTheme"></div>
+			</a4j:commandLink>
+			<a4j:commandLink actionListener="#{skinBean.clickStyle}" title="Taxo"
+				style="display:inline-block;padding: 0 3px;text-decoration:none;"
+				oncomplete="window.location.href=window.location.href">
+				<f:param name="skin" value="taxo" />
+				<f:param name="skinPrime" value="smoothness" />
+				<div style="background-color: #FFD5A5;" class="iconTheme"></div>
+			</a4j:commandLink>
+			<a4j:commandLink actionListener="#{skinBean.clickStyle}"
+				title="Verde"
+				style="display:inline-block;padding: 0 3px;text-decoration:none;"
+				oncomplete="window.location.href=window.location.href">
+				<f:param name="skin" value="verde" />
+				<f:param name="skinPrime" value="smoothness" />
+				<div style="background-color: #EBF8D1;" class="iconTheme"></div>
+			</a4j:commandLink>
+			<h:outputText id="divRelog" value="" />
+			<h:outputText
+				style="display:inline-block;text-decoration:none;vertical-align: bottom;"
+				value="Usuario: #{pageBean.usuarioCurrent.nombres}  #{pageBean.usuarioCurrent.apellidos}"
+				styleClass="linkOptionLNK" />
+
+		</rich:toolbarGroup>
+		<rich:toolbarGroup location="right" id="tgOption">
+			<a4j:commandLink id="linkConfig" onclick="" styleClass="compHeader"
+				title="Clave">
+				<h:graphicImage id="imgConfig" style="border: 0px" width="40"
+					value="/tools/imagenes/sistema09.png" />
+			</a4j:commandLink>
+		</rich:toolbarGroup>
+	</rich:toolbar>
+	<rich:jQuery selector="#linkConfig"
+		query="click(function(){clickConf(this);})" />
+</h:form>

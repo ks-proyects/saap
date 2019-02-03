@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('pagoEdit');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{pagoEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value,label,value">
+					<h:outputLabel value="Valor Pendiente:" />
+					<h:inputText id="txtValorPendiente" readonly="true" disabled="true"
+						value="#{pagoEditBean.valorPendiente}">
+					</h:inputText>
+					<h:outputLabel for="txtAbonoAnterior" value="Abono Anterior:" />
+					<h:inputText id="txtAbonoAnterior" disabled="true"
+						value="#{pagoEditBean.anterior.abonoUsd}" readonly="true" />
+					<h:outputLabel style="color: #F00;" value="Valor A Pagar:" />
+					<h:inputText id="txtValorAPagar"
+						value="#{pagoEditBean.valorAPagar}"
+						onkeypress="return ValidarNumerico('%f',this,event);">
+					</h:inputText>
+					<h:outputLabel value="Valor Pagado:" />
+					<h:inputText id="txtCambio" value="#{pagoEditBean.valorPagado}" disabled="true"
+						readonly="true" />
+					<h:outputLabel value="Abono:" />
+					<h:inputText id="txtAbono" value="#{pagoEditBean.valorAbono}"
+						onkeypress="return ValidarNumerico('%f',this,event);" />
+					<h:outputLabel value="Observacón:" />
+					<h:inputTextarea value="#{pagoEditBean.cp.observacion1}" rows="3" />
+				</h:panelGrid>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

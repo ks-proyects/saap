@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<h:head>
+		<title>saap</title>
+		<link rel="shortcut icon" href="#{request.contextPath}/favicon.ico" />
+		<script type="text/javascript"
+			src="#{request.contextPath}/tools/js/pageTools.js" />
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet"
+			href="#{request.contextPath}/resources/bootstrap/css/bootstrap.min.css" />
+
+		<!-- Optional theme -->
+		<link rel="stylesheet"
+			href="#{request.contextPath}/resources/bootstrap/css/bootstrap-theme.min.css" />
+
+		<!-- Latest compiled and minified JavaScript -->
+		<script
+			src="#{request.contextPath}/resources/bootstrap/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+		<!--
+		window.onresize=calcHeight;
+		window.onload=calcHeight;
+		function calcHeight()
+		{
+			var isExplorer=navigator.userAgent.toLowerCase().indexOf('msie')!=-1;
+			var _height=window.innerHeight-document.getElementById('top').offsetHeight;
+			var _width=Math.min(document.body.clientWidth,document.getElementById('top').offsetWidth);
+			var _widthMenu=0;
+			if(isExplorer){_widthMenu=document.getElementById('divMenu').offsetWidth+17;}
+			else{_widthMenu=document.getElementById('divMenu').offsetWidth;}
+			document.getElementById('conteiner').style.height=_height+'px';
+			document.getElementById('WorkFrame').style.height=(_height-2)+'px';
+			document.getElementById('WorkFrame').style.width=(_width-_widthMenu)+'px';
+		}
+		function setPage(page){
+			var frame=document.getElementById('WorkFrame');
+			frame.contentWindow.location.href =page;
+		}
+		function onload(){
+			setInterval(muestraReloj, 1000);
+			document.getElementById('btnShowModal').click();
+		}
+		//-->
+		</script>
+	</h:head>
+	<h:body onload="onload();">
+		<link rel="stylesheet" type="text/css"
+			href="#{request.contextPath}/tools/css/estilo.css" />
+		<link rel="stylesheet" type="text/css"
+			href="#{request.contextPath}/tools/css/skin.css" />
+		<div id="top">
+			<ui:include src="/home/top.xhtml" />
+		</div>
+		<p:growl autoUpdate="true" />
+		<p:growl id="messages" autoUpdate="true" life="10000" />
+		<div id="conteiner" style="width: 100%;">
+			<div id="divMenu" style="float: left;">
+				<h:form id="HomeFormMenu">
+					<ul id="navigation" style="z-index: 999999;">
+						<li class="home"><a href="" class="rf-tb"> <rich:tabPanel
+									id="tabPanel" styleClass="tabPanel"
+									binding="#{pageBean.tabPanel}" />
+						</a></li>
+					</ul>
+				</h:form>
+			</div>
+			<div style="float: right;" id="divWorkFrame">
+				<iframe src="../task/index/home.html" style="" id="WorkFrame"
+					name="WorkFrame" onLoad="calcHeight();" frameborder="0"
+					marginheight="0" marginwidth="0" scrolling="no"></iframe>
+			</div>
+		</div>
+		<rich:popupPanel autosized="false" resizeable="false" rendered="true"
+			modal="true" id="idModalChangePass" width="370" height="180">
+			<f:facet name="header">Cambie su Contraseña</f:facet>
+			<h:form id="formPass">
+				<h:panelGrid columns="3" columnClasses="label,value">
+					<h:outputText value="* Cédula" />
+					<h:inputText value="#{skinBean.cedula}" id="txtCedula"
+						required="true" requiredMessage="Ingrese!!" />
+					<rich:message for="txtCedula" title="Este campo es obligatorio" />
+					<h:outputText value="* Contraseña Anterior" />
+					<h:inputSecret value="#{skinBean.contraseniaAnterior}" id="txtCA"
+						required="true" requiredMessage="Ingrese!!" />
+					<rich:message for="txtCA" title="Este campo es obligatorio" />
+					<h:outputText value="* Contraseña Nueva" />
+					<h:inputSecret value="#{skinBean.contraseniaNueva}" id="txtCN"
+						required="true" requiredMessage="Ingrese!!" />
+					<rich:message for="txtCN" title="Este campo es obligatorio" />
+					<h:outputText value=" * Confirme Contraseña" />
+					<h:inputSecret value="#{skinBean.contraseniaNuevaConf}" id="txtCNC"
+						required="true" requiredMessage="Ingrese!!" />
+					<rich:message for="txtCNC" title="Este campo es obligatorio" />
+					<a4j:commandButton value="Guardar" action="#{skinBean.savePass}"
+						render="formPass:chkBox, formPass:txtCedula, formPass:txtCA, formPass:txtCN, formPass:txtCNC" />
+					<h:panelGroup>
+						<a4j:commandButton value="Cancelar" id="btnCancelar"
+							immediate="true" disabled="#{pageBean.mostrarCancelar}"
+							oncomplete="#{rich:component('idModalChangePass')}.hide();" />
+						<a4j:commandButton rendered="#{pageBean.mostrarCancelar}"
+							immediate="true" value="Login" action="#{skinBean.exitPass}" />
+					</h:panelGroup>
+				</h:panelGrid>
+				<rich:messages globalOnly="true" />
+				<div style="display: none;">
+					<h:selectBooleanCheckbox id="chkBoxUser"
+						value="#{pageBean.mostrarCancelar}" />
+					<h:selectBooleanCheckbox id="chkBox"
+						value="#{skinBean.disableButon}" />
+					<h:commandLink id="btnExit" value="" action="#{skinBean.exit()}" />
+				</div>
+			</h:form>
+		</rich:popupPanel>
+		<rich:popupPanel autosized="false" resizeable="false" rendered="true"
+			top="20" moveable="false" visualOptions="true" modal="true"
+			id="idModalAcercaDe" width="300" height="390">
+			<f:facet name="header">Acerca de</f:facet>
+			<table class="SheetPage" id="Table1" cellspacing="0" cellpadding="0"
+				border="0">
+				<tr>
+					<td class="TopBrowser"
+						style="PADDING-LEFT: 5px; FONT-SIZE: 12pt; FONT-FAMILY: 'Microsoft Sans Serif'; text-align: left; padding-top: 10px;"
+						colspan="3"><strong>SAAP Versión 1.0.</strong></td>
+				</tr>
+				<tr>
+					<td class="TopBrowser"
+						style="PADDING-LEFT: 5px; FONT-SIZE: 7.5pt; FONT-FAMILY: 'Microsoft Sans Serif'; text-align: left; height: 20px;"
+						colspan="3">Copyright 2014 Comunidad Juridica Chaupiloma.</td>
+				</tr>
+				<tr>
+					<td class="TopBrowser"
+						style="PADDING-LEFT: 5px; FONT-SIZE: 7.5pt; FONT-FAMILY: 'Microsoft Sans Serif'; text-align: left; vertical-align: top;"
+						colspan="3">Reservados todos los derechos.</td>
+				</tr>
+				<tr>
+					<td class="TopBrowser"
+						style="PADDING-LEFT: 5px; FONT-SIZE: 7.5pt; FONT-FAMILY: 'Microsoft Sans Serif'; text-align: left; vertical-align: top;"
+						colspan="3">Realizado por <a
+						href="http://www.fin.uce.edu.ec/" target="_new">Universidad
+							Central del Ecuador</a>
+					</td>
+				</tr>
+				<tr>
+					<td class="TopBrowser"
+						style="font-weight: bold; PADDING: 20px 1px 0px 5px; FONT-SIZE: 7.5pt; MARGIN: 0px 10px 0px 10px; FONT-FAMILY: 'Microsoft Sans Serif'; text-align: justify; width: 100%;"
+						colspan="3">Para solicitar soporte técnico comunicarse a:</td>
+				</tr>
+				<tr>
+					<td class="TopBrowser"
+						style="PADDING: 1px 0px 0px 5px; FONT-SIZE: 7.5pt; MARGIN: 0px 10px 0px 10px; FONT-FAMILY: 'Microsoft Sans Serif'; text-align: justify; width: 100%;"
+						colspan="3">URL:<a href="http://www.fin.uce.edu.ec/"
+						target="_new">http://www.fin.uce.edu.ec/</a></td>
+				</tr>
+				<tr>
+					<td class="TopBrowser"
+						style="PADDING: 1px 0px 0px 5px; FONT-SIZE: 7.5pt; MARGIN: 0px 10px 0px 10px; FONT-FAMILY: 'Microsoft Sans Serif'; text-align: justify; width: 100%;"
+						colspan="3">Email: <a href="mailto:freddy.geovanni@gmail.com">freddy.geovanni@gmail.com</a>
+					</td>
+				</tr>
+				<tr>
+					<td class="TopBrowser"
+						style="PADDING-LEFT: 5px; FONT-SIZE: 7.5pt; FONT-FAMILY: 'Microsoft Sans Serif'; text-align: left; padding-top: 10px;"
+						valign="top" colspan="3">Se autoriza el uso de este producto
+						a:</td>
+				</tr>
+				<tr>
+					<td class="TopBrowser" colspan="3" style="HEIGHT: 49px;">
+						<p
+							style="BORDER-RIGHT: black 1px solid; BORDER-TOP: black 1px solid; FONT-WEIGHT: bold; FONT-SIZE: 9.75pt; BORDER-LEFT: black 1px solid; WIDTH: 100%; BORDER-BOTTOM: black 1px solid; FONT-FAMILY: Verdana; HEIGHT: 30px; BACKGROUND-COLOR: #2f5ea1; color: white; vertical-align: middle; padding-top: 5px; padding-left: 5px;">Chaupiloma</p>
+					</td>
+				</tr>
+				<tr>
+					<td class="TopBrowser"
+						style="BORDER-TOP: #2f5ea1 3px solid; PADDING: 5px 10px 0px 5px; FONT-SIZE: 7pt; MARGIN: 0px 10px 0px 10px; FONT-FAMILY: 'Microsoft Sans Serif'; text-align: justify; width: 100%;"
+						colspan="3">Advertencia: Este programa está protegido por las
+						leyes de derechos de autor y otros tratados internacionales. La
+						reproducción o distribución ilícitas de este programa, o de
+						cualquier parte del mismo, está penada por la ley con severas
+						sanciones civiles y penales y será objeto de todas las acciones
+						jurídicas que correspondan.</td>
+				</tr>
+				<tr>
+					<td class="TopBrowser" style="text-align: right;" colspan="3"><a4j:commandButton
+							value="Cerrar" id="btnCerrar"
+							oncomplete="#{rich:component('idModalAcercaDe')}.hide();" /></td>
+				</tr>
+				<tr>
+					<td class="TopBrowser" style="WIDTH: 788px; HEIGHT: 25px"
+						colspan="3">&nbsp;</td>
+				</tr>
+			</table>
+		</rich:popupPanel>
+		<div style="display: none;">
+			<a4j:commandLink value="" id="btnShowModal"
+				disabled="#{pageBean.disableCambioContrasenia}"
+				oncomplete="#{rich:component('idModalChangePass')}.show();" />
+
+		</div>
+	</h:body>
+</f:view>

@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('usuarioSRolEdit');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{usuarioSRolEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value,label,value">
+					<rich:dataTable value="#{usuarioSRolEditBean.usuarioRols}"
+						rows="#{usuarioSRolEditBean.numeroFilas}" var="usu" id="datatable"
+						rowKeyVar="row" columnClasses="columDerecha,columnIxquierdo">
+						<rich:column>
+							<f:facet name="header">
+								<h:outputText value="#" />
+							</f:facet>
+							<h:outputText value="#{row+1}" />
+						</rich:column>
+						<rich:column>
+							<f:facet name="header">
+								<h:outputText value="Descripción" />
+							</f:facet>
+							<h:outputText value="#{usu.idRol.descripcion}" />
+						</rich:column>
+						<rich:column>
+							<f:facet name="header">
+								<h:outputText value="Activo" />
+							</f:facet>
+							<h:selectOneMenu value="#{usu.activo}">
+								<f:selectItems value="#{usuarioSRolEditBean.siNo}" />
+							</h:selectOneMenu>
+						</rich:column>
+					</rich:dataTable>
+
+				</h:panelGrid>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

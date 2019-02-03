@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body
+			onload="javascript:load('rangoConsumoEdit',':WorkPage:txtCodigo');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{rangoConsumoEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value,label,value">
+					<h:outputLabel for="txtFormaPago" value="* Forma de Pago:" />
+					<h:selectOneMenu id="txtFormaPago"
+						value="#{rangoConsumoEditBean.rangoConsumo.formaPago}">
+						<f:selectItems value="#{rangoConsumoEditBean.formaPago}" />
+					</h:selectOneMenu>
+
+					<h:outputLabel for="txtValorMinimo" value="* Valor Mínimo:" />
+					<h:inputText id="txtValorMinimo" size="60"
+						value="#{rangoConsumoEditBean.rangoConsumo.m3Minimo}" />
+					<h:outputLabel for="txtValorMaximo" value="* Valor Máximo:" />
+					<h:panelGroup>
+						<h:inputText id="txtValorMaximo" size="60"
+							value="#{rangoConsumoEditBean.rangoConsumo.m3Maximo}" />
+							<h:outputLabel value="Si el rango es el último el valor máximo debe ser -1" />
+					</h:panelGroup>
+					<h:outputLabel for="txtValorUSDM3" value="* USD/M3:" />
+					<h:inputText id="txtValorUSDM3" size="60"
+						value="#{rangoConsumoEditBean.rangoConsumo.valorM3}" />
+					<h:outputLabel for="txtValorM3Exceso" value="USD/M3 Exceso:" />
+					<h:inputText id="txtValorM3Exceso" size="60"
+						value="#{rangoConsumoEditBean.rangoConsumo.valorExceso}" />
+					<h:outputLabel for="txtOrden" value="* Orden:" />
+					<h:inputText id="txtOrden" size="60"
+						value="#{rangoConsumoEditBean.rangoConsumo.orden}" />
+				</h:panelGrid>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

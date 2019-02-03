@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('usuarioList');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{usuarioListBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value">
+					<h:outputLabel value="Filtro:" />
+					<h:inputText value="#{usuarioListBean.filtro.valorCadena}">
+						<f:ajax event="keyup" render="datatable"
+							listener="#{usuarioListBean.changeName}" />
+					</h:inputText>
+				</h:panelGrid>
+
+				<rich:dataScroller for="datatable" maxPages="5" id="scroll" />
+				<rich:dataTable value="#{usuarioListBean.listUsuarios}"
+					rows="#{usuarioListBean.numeroFilas}" var="usu" id="datatable"
+					rowKeyVar="row" columnClasses="columDerecha,columnIxquierdo">
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="#" />
+						</f:facet>
+						<h:outputText value="#{row+1}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Cédula" />
+						</f:facet>
+						<h:commandLink value="#{usu.cedula}" action="usuarioEdit">
+							<f:param name="action" value="UPD" />
+							<f:param name="param1" value="#{usu.idUsuario}" />
+						</h:commandLink>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Cantidad Rayas" />
+						</f:facet>
+						<h:outputText value="#{usu.cantidadRayas}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Nombre" />
+						</f:facet>
+						<h:outputText value="#{usu.nombres} #{usu.apellidos}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Estado" />
+						</f:facet>
+						<h:outputText
+							value="#{usu.estado eq 'ING'?'Ingresado':(usu.estado eq 'ACT'?'Activo':(usu.estado eq 'INAC'?'Inactivo':'Edición'))}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Estado Civil" />
+						</f:facet>
+						<h:outputText value="#{usu.idEstadoCivil.descripcion}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="" />
+						</f:facet>
+						<h:commandLink rendered="#{usu.estado eq 'ACT'}" value="Cuotas"
+							action="detallePagoList">
+							<f:param name="action" value="UPD" />
+							<f:param name="param2" value="#{usu.idUsuario}" />
+							<f:param name="param3" value="CUO" />
+						</h:commandLink>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="" />
+						</f:facet>
+						<h:commandLink rendered="#{usu.estado eq 'ACT'}" value="Multas"
+							action="detallePagoList">
+							<f:param name="action" value="UPD" action="detallePagoList" />
+							<f:param name="param2" value="#{usu.idUsuario}" />
+							<f:param name="param3" value="MUL" />
+						</h:commandLink>
+					</rich:column>
+				</rich:dataTable>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

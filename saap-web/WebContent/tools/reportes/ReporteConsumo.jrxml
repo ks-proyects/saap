@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteCaja" language="groovy" pageWidth="595" pageHeight="842" columnWidth="425" leftMargin="85" rightMargin="85" topMargin="85" bottomMargin="85" uuid="9f57b30a-0e9f-4280-839b-8d9cf2776abd">
+	<property name="ireport.zoom" value="2.049040366095215"/>
+	<property name="ireport.x" value="181"/>
+	<property name="ireport.y" value="215"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<subDataset name="Table Dataset 1" uuid="33941c32-955a-407d-93f0-2126521bb408"/>
+	<parameter name="ID_REPORT" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[311]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ID_USER" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[245]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PATH_IMAGE" class="java.lang.String">
+		<defaultValueExpression><![CDATA["D:\\WorkSpace\\Saap.root\\Saap\\WebContent\\tools\\imagenes\\logo.png"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from saap.reporte($P{ID_USER}, $P{ID_REPORT})]]>
+	</queryString>
+	<field name="orden01" class="java.lang.Integer"/>
+	<field name="orden02" class="java.lang.Integer"/>
+	<field name="orden03" class="java.lang.Integer"/>
+	<field name="orden04" class="java.lang.Integer"/>
+	<field name="orden05" class="java.lang.Integer"/>
+	<field name="orden06" class="java.lang.Integer"/>
+	<field name="orden07" class="java.lang.Integer"/>
+	<field name="orden08" class="java.lang.Integer"/>
+	<field name="orden09" class="java.lang.Integer"/>
+	<field name="orden10" class="java.lang.Integer"/>
+	<field name="texto01" class="java.lang.String"/>
+	<field name="texto02" class="java.lang.String"/>
+	<field name="texto03" class="java.lang.String"/>
+	<field name="texto04" class="java.lang.String"/>
+	<field name="texto05" class="java.lang.String"/>
+	<field name="texto06" class="java.lang.String"/>
+	<field name="texto07" class="java.lang.String"/>
+	<field name="texto08" class="java.lang.String"/>
+	<field name="texto09" class="java.lang.String"/>
+	<field name="texto10" class="java.lang.String"/>
+	<field name="texto11" class="java.lang.String"/>
+	<field name="texto12" class="java.lang.String"/>
+	<field name="texto13" class="java.lang.String"/>
+	<field name="texto14" class="java.lang.String"/>
+	<field name="texto15" class="java.lang.String"/>
+	<field name="texto16" class="java.lang.String"/>
+	<field name="texto17" class="java.lang.String"/>
+	<field name="texto18" class="java.lang.String"/>
+	<field name="texto19" class="java.lang.String"/>
+	<field name="texto20" class="java.lang.String"/>
+	<field name="texto21" class="java.lang.String"/>
+	<field name="numero01" class="java.math.BigDecimal"/>
+	<field name="numero02" class="java.math.BigDecimal"/>
+	<field name="numero03" class="java.math.BigDecimal"/>
+	<field name="numero04" class="java.math.BigDecimal"/>
+	<field name="numero05" class="java.math.BigDecimal"/>
+	<field name="numero06" class="java.math.BigDecimal"/>
+	<field name="numero07" class="java.math.BigDecimal"/>
+	<field name="numero08" class="java.math.BigDecimal"/>
+	<field name="numero09" class="java.math.BigDecimal"/>
+	<field name="numero10" class="java.math.BigDecimal"/>
+	<field name="numero11" class="java.math.BigDecimal"/>
+	<field name="numero12" class="java.math.BigDecimal"/>
+	<field name="numero13" class="java.math.BigDecimal"/>
+	<field name="numero14" class="java.math.BigDecimal"/>
+	<field name="numero15" class="java.math.BigDecimal"/>
+	<field name="numero16" class="java.math.BigDecimal"/>
+	<field name="numero17" class="java.math.BigDecimal"/>
+	<field name="numero18" class="java.math.BigDecimal"/>
+	<field name="numero19" class="java.math.BigDecimal"/>
+	<field name="numero20" class="java.math.BigDecimal"/>
+	<field name="fecha01" class="java.sql.Timestamp"/>
+	<field name="fecha02" class="java.sql.Timestamp"/>
+	<field name="fecha03" class="java.sql.Timestamp"/>
+	<field name="fecha04" class="java.sql.Timestamp"/>
+	<field name="fecha05" class="java.sql.Timestamp"/>
+	<field name="fecha06" class="java.sql.Timestamp"/>
+	<field name="fecha07" class="java.sql.Timestamp"/>
+	<field name="fecha08" class="java.sql.Timestamp"/>
+	<field name="fecha09" class="java.sql.Timestamp"/>
+	<field name="fecha10" class="java.sql.Timestamp"/>
+	<variable name="TOTAL_A_PAGAR" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{numero09}]]></variableExpression>
+	</variable>
+	<variable name="variable1" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="75" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="425" height="20" uuid="7be62ad1-445c-41c2-b252-47609e387d46"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JUNTA ADMINISTRADORA DE AGUA POTABLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="425" height="18" uuid="6013ba97-fe78-4b16-9204-2f99b1a6106c"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[COMUNIDAD CHAUPILOMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="38" width="425" height="33" uuid="d5e2ce38-cacf-4ed8-b796-088693479746"/>
+				<textElement textAlignment="Center">
+					<font fontName="Pristina" size="14"/>
+				</textElement>
+				<text><![CDATA[Parroquia Tupigachi - Cantón Pedro Moncayo - Tabacundo - Ecuador]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="1" y="0" width="96" height="20" forecolor="#FFFFFF" backcolor="#0066FF" uuid="fbbad088-12fb-4e4a-95a8-7c44ee056761"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mes - Año]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="224" y="0" width="67" height="20" forecolor="#FFFFFF" backcolor="#0066FF" uuid="02ec5075-ce0d-4dca-91df-dca5db9d59f0"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Consumo(USD)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="153" y="0" width="71" height="20" forecolor="#FFFFFF" backcolor="#0066FF" uuid="091723cc-0240-494d-b4ff-b5dda6707509"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Consumo(m3)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="97" y="0" width="56" height="20" forecolor="#FFFFFF" backcolor="#0066FF" uuid="8fb25741-ad1c-4ffe-b58d-d04e176395bf"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[# Usuarios]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="291" y="0" width="67" height="20" forecolor="#FFFFFF" backcolor="#0066FF" uuid="93908633-6eec-4db7-b2be-4c669ad8bd66"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Facturado(USD)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="358" y="0" width="67" height="20" forecolor="#FFFFFF" backcolor="#0066FF" uuid="993befdd-4ee1-4498-9f39-c330367dbd41"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Por Cobrar(USD)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="0" width="96" height="20" uuid="df859f91-3987-41c9-83df-3ba82a8a08c4"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.25" lineColor="#0066FF"/>
+					<topPen lineWidth="0.25" lineColor="#0066FF"/>
+					<leftPen lineWidth="0.25" lineColor="#0066FF"/>
+					<bottomPen lineWidth="0.25" lineColor="#0066FF"/>
+					<rightPen lineWidth="0.25" lineColor="#0066FF"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{texto01}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(-###0.00)" isBlankWhenNull="true">
+				<reportElement x="153" y="0" width="71" height="20" uuid="6aba89f1-878e-4073-b73b-9940269a83d9"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.25" lineColor="#0066FF"/>
+					<topPen lineWidth="0.25" lineColor="#0066FF"/>
+					<leftPen lineWidth="0.25" lineColor="#0066FF"/>
+					<bottomPen lineWidth="0.25" lineColor="#0066FF"/>
+					<rightPen lineWidth="0.25" lineColor="#0066FF"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{numero01}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="224" y="0" width="67" height="20" uuid="8812d9a7-d213-4bf9-9024-fbdd97545588"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.25" lineColor="#0066FF"/>
+					<topPen lineWidth="0.25" lineColor="#0066FF"/>
+					<leftPen lineWidth="0.25" lineColor="#0066FF"/>
+					<bottomPen lineWidth="0.25" lineColor="#0066FF"/>
+					<rightPen lineWidth="0.25" lineColor="#0066FF"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{numero02}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;(-###0)" isBlankWhenNull="true">
+				<reportElement x="97" y="0" width="56" height="20" uuid="5ff88d0c-02fa-4a36-943e-cce215127ddd"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.25" lineColor="#0066FF"/>
+					<topPen lineWidth="0.25" lineColor="#0066FF"/>
+					<leftPen lineWidth="0.25" lineColor="#0066FF"/>
+					<bottomPen lineWidth="0.25" lineColor="#0066FF"/>
+					<rightPen lineWidth="0.25" lineColor="#0066FF"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{orden01}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="291" y="0" width="67" height="20" uuid="5447d88b-50eb-444f-a285-65d7f11fc44a"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.25" lineColor="#0066FF"/>
+					<topPen lineWidth="0.25" lineColor="#0066FF"/>
+					<leftPen lineWidth="0.25" lineColor="#0066FF"/>
+					<bottomPen lineWidth="0.25" lineColor="#0066FF"/>
+					<rightPen lineWidth="0.25" lineColor="#0066FF"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{numero03}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="358" y="1" width="67" height="19" uuid="b11cfcc0-1fe7-43cb-bd1c-5c7e5b13245e"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.25" lineColor="#0066FF"/>
+					<topPen lineWidth="0.25" lineColor="#0066FF"/>
+					<leftPen lineWidth="0.25" lineColor="#0066FF"/>
+					<bottomPen lineWidth="0.25" lineColor="#0066FF"/>
+					<rightPen lineWidth="0.25" lineColor="#0066FF"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{numero02}-$F{numero03}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="1"/>
+	</lastPageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

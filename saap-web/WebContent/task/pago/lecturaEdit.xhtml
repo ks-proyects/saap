@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('lecturaEdit');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{lecturaEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value,label,value">
+					<h:outputLabel value="Periodo:" />
+					<h:outputText value="#{lecturaEditBean.peridoPago.descripcion}" />
+
+
+					<h:outputLabel for="txtEstado" value="Estado:" />
+					<h:commandLink id="txtEstado" 
+						onclick="javascript:AbrirPagina('../data/entidadCambioEstadoList.jsf',550,420);"
+						disabled="true"
+						value="#{lecturaEditBean.descripcionEstado}">
+						<f:ajax event="click" />
+					</h:commandLink>
+					<h:outputLabel for="txtNumero" value="Lectura Anterior(m3):" />
+					<h:inputText id="txtNumero" disabled="#{lecturaEditBean.readOnly1}"
+						onkeypress="return ValidarNumerico('%f',this,event);"
+						value="#{lecturaEditBean.lectura.lecturaAnterior}" />
+					<h:outputLabel for="txtNumero2" value="* Lectura Actual(m3):" />
+					<h:inputText id="txtNumero2"
+						disabled="#{lecturaEditBean.readOnly1}"
+						onkeypress="return ValidarNumerico('%f',this,event);"
+						value="#{lecturaEditBean.lectura.lecturaIngresada}" />
+					<h:outputLabel value="Consumo del mes(m3):" />
+					<h:outputText value="#{lecturaEditBean.lectura.metros3}" />
+
+
+					<h:outputLabel for="txtFechaRegistro" value="Fecha de Registro:" />
+					<h:outputText value="#{lecturaEditBean.lectura.fechaRegistro}"
+						id="txtFechaRegistro">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</h:panelGrid>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

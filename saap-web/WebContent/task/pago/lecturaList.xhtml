@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('lecturaList');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{lecturaListBean.page.nombre}"
+					styleClass="pageLabel" />
+
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value">
+					<h:outputLabel value="Periodo:" />
+					<h:outputLabel value="#{lecturaListBean.periodoPago.descripcion}" />
+					<h:outputLabel value="Filtro" />
+					<h:inputText value="#{lecturaListBean.filtro}">
+						<f:ajax event="keyup" render="table"
+							listener="#{lecturaListBean.changeName}" />
+					</h:inputText>
+				</h:panelGrid>
+				<rich:dataScroller for="table" maxPages="5" id="scroll" />
+
+				<a4j:jsFunction name="selectRow" render="table"
+					action="#{lecturaListBean.setDisabled}">
+					<a4j:param name="selectedClientId"
+						assignTo="#{lecturaListBean.lecturasSelect}" />
+				</a4j:jsFunction>
+
+				<rich:dataTable columnClasses="columDerecha,columnIxquierdo"
+					onrowdblclick="selectRow(#{lect.idLectura})"
+					rows="#{lecturaListBean.numeroFilas}" id="table"
+					value="#{lecturaListBean.lecturas}" var="lect" rowKeyVar="row">
+
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="# Llave" />
+						</f:facet>
+						<h:outputText value="#{lect.idLlave.numero}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="# Usuario" />
+						</f:facet>
+						<h:outputText title="Usuario"
+							value="#{lect.idLlave.idUsuario.nombres} #{lect.idLlave.idUsuario.apellidos}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="# Cédula" />
+						</f:facet>
+						<h:outputText title="Cédula"
+							value="#{lect.idLlave.idUsuario.cedula}" />
+					</rich:column>
+
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Lectura Anterio(m3)" />
+						</f:facet>
+						<h:inputText title="Número de Llave" disabled="#{lect.disabled}"
+							value="#{lect.lecturaAnterior}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Lectura Actual(m3)" />
+						</f:facet>
+						<h:inputText title="Lectura Actual"
+							value="#{lect.lecturaIngresada}" readonly="#{lect.readOnly}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Consumo del mes(m3)" />
+						</f:facet>
+						<h:outputText title="Consumo del mes" value="#{lect.metros3} m3" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Valor Consumo( USD/M3 )" />
+						</f:facet>
+						<h:outputText title="Valor Consumo" value="$ #{lect.valorMetro3}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Exceso(m3)" />
+						</f:facet>
+						<h:outputText title="Exceso" value="#{lect.metros3Exceso} m3" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Valor Exceso (USD/m3)" />
+						</f:facet>
+						<h:outputText title="Valor Exceso"
+							value="$ #{lect.valorMetro3Exceso}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Consumo Total (m3)" />
+						</f:facet>
+						<h:outputText title="Consumo Total"
+							value="#{lect.metros3 +lect.metros3Exceso} m3" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Meses Ultima Lectura" />
+						</f:facet>
+						<h:outputText title="Meses última Lectura"
+							value="#{lect.numeroMeses}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Es Usuario Nuevo" />
+						</f:facet>
+						<h:selectBooleanCheckbox value="#{lect.usuarioNuevo}"
+							disabled="#{lect.disabled}" title="Es Usuario Nuevo" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="No se tomo lectura" />
+						</f:facet>
+						<h:selectBooleanCheckbox title="No se tomo lectura"
+							disabled="#{lect.disabled}" value="#{lect.sinLectura}" />
+					</rich:column>
+				</rich:dataTable>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

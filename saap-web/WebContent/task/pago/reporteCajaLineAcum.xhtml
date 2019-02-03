@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fiji1="http://exadel.com/fiji"
+	xmlns:fiji4="http://exadel.com/fiji/chart"
+	xmlns:fiji2="http://exadel.com/fiji/commonchart">
+	<ui:define name="body">
+		<h:body onload="javascript:load('reporteCajaLineAcum');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{reporteCajaLineBean.page.nombre}"
+					styleClass="pageLabel" style="FONT-STYLE: italic;"/>
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value">
+					<h:outputText value="Hasta el Año:" />
+					<h:selectOneMenu value="#{reporteCajaLineBean.anio}">
+						<f:selectItems value="#{reporteCajaLineBean.anios}" />
+					</h:selectOneMenu>
+
+				</h:panelGrid>
+				<h:panelGrid styleClass="Table" columns="1">
+
+
+					<fiji4:lineChart id="lineChartCapital"
+						value="#{reporteCajaLineBean.medalsDataHist}"
+						barColors="#{reporteCajaLineBean.colorsCapital}"
+						title="Ingresos, Salidas y Capital Acumulativo Mensuales"
+						legendPosition="top" captionX="Meses"  width="800" height="400">
+						<fiji2:chartData type="name"
+							value="#{reporteCajaLineBean.namesCapital}" />
+					</fiji4:lineChart>
+				</h:panelGrid>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

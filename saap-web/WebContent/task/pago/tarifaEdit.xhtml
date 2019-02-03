@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body
+			onload="javascript:load('tarifaEdit',':WorkPage:txtDescricpcion');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{tarifaEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value,label,value">
+					<h:outputLabel for="txtDescricpcion" value="* Descripción:" />
+					<h:inputText id="txtDescricpcion" size="30"
+						value="#{tarifaEditBean.tarifa.descripcion}" />
+					<h:outputLabel value="* Tipo Llave:" />
+					<h:selectOneMenu value="#{tarifaEditBean.tipoLlave}">
+						<f:selectItems value="#{tarifaEditBean.tipoLlaveList}" />
+					</h:selectOneMenu>
+					<h:outputLabel for="txtBasicoPago" value="* Pago Básico USD:" />
+					<h:inputText id="txtBasicoPago" size="60"
+						value="#{tarifaEditBean.tarifa.basicoPago}" />
+
+				</h:panelGrid>
+				<h:outputLabel
+					value="La configuración de los rangos debe ser de la siguiente manera: El vamor máximo de un rango debe ser el mismo del valor mínimo del seguiente rango identificado por el orden." />
+				<br />
+				<rich:dataTable value="#{tarifaEditBean.rangoConsumos}" var="var"
+					id="datatable" rowKeyVar="row"
+					columnClasses="columDerecha,columnIxquierdo">
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="#" />
+						</f:facet>
+						<h:outputText value="#{row+1}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Identificador" />
+						</f:facet>
+						<h:commandLink value="#{var.idRangoConsumo}"
+							action="rangoConsumoEdit">
+							<f:param name="action" value="UPD" />
+							<f:param name="param2" value="#{var.idRangoConsumo}" />
+						</h:commandLink>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Forma de Pago" />
+						</f:facet>
+						<h:outputText value="#{var.formaPago.descripcion}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Valor Mínimo" />
+						</f:facet>
+						<h:outputText value="#{var.m3Minimo}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Valor Máximo" />
+						</f:facet>
+						<h:outputText value="#{var.m3Maximo}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="USD/M3" />
+						</f:facet>
+						<h:outputText value="#{var.valorM3}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="USD/M3 Exceso" />
+						</f:facet>
+						<h:outputText value="#{var.valorExceso}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Orden" />
+						</f:facet>
+						<h:outputText value="#{var.orden}" />
+					</rich:column>
+				</rich:dataTable>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

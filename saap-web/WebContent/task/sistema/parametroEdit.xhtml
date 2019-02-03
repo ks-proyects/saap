@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('parametroEdit');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{parametroEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value,label,value">
+					<h:outputLabel value="* Descripción" />
+					<h:inputTextarea value="#{parametroEditBean.parametro.descripcion}"
+						style="width:300px" rows="3" />
+					<h:outputLabel value="Valor Númerico:" />
+					<h:inputText value="#{parametroEditBean.parametro.valorNumerico}" />
+					<h:outputLabel value="Valor Cadena:" />
+					<h:inputText value="#{parametroEditBean.parametro.valorString}" />
+					<h:outputLabel value="Valor Entero:" />
+					<h:inputText value="#{parametroEditBean.parametro.valorEntero}" />
+					<h:outputLabel value="Valor Fecha:" />
+					<rich:calendar value="#{parametroEditBean.parametro.valorFecha}"
+						datePattern="dd/MM/yyy" />
+				</h:panelGrid>
+
+
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

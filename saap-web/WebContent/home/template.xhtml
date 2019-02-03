@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<h:head>
+		<title>saap</title>
+		<link rel="shortcut icon" href="#{request.contextPath}/favicon.ico" />
+		<script type="text/javascript"
+			src="#{request.contextPath}/tools/js/pageTools.js" />
+		<p:growl id="messages" autoUpdate="true" life="4000" />
+		<ui:insert name="head">
+			<script type="text/javascript" language="javascript">
+		<!--
+		window.onresize=resize;
+		window.onload=resize;
+		function resize()
+		{
+			var _height=window.innerHeight;
+			document.getElementById('divContent').style.height=_height+'px';
+		}
+		-->
+		</script>
+		</ui:insert>
+	</h:head>
+	<h:body onkeyup="javascript:onKeyUp(event);">
+		<link rel="stylesheet" type="text/css"
+			href="#{request.contextPath}/tools/css/estilo.css" />
+		<link rel="stylesheet" type="text/css"
+			href="#{request.contextPath}/tools/css/skin.css" />
+		<div id="page_loader" style="display: none;">
+			<div id="div_text">Espere...</div>
+			<img alt="loader" title="Espere" width="30%"
+				src="#{request.contextPath}/tools/imagenes/loading.gif" />
+		</div>
+		<div style="overflow: auto;" id="divContent">
+			<ui:insert name="body" />
+		</div>
+	</h:body>
+</f:view>

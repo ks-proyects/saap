@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body
+			onload="javascript:load('usuarioSEdit',':WorkPage:txtNombres');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{usuarioSEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value,label,value">
+					<h:outputLabel for="txtNombres" value="* Nombres:" />
+					<h:inputText id="txtNombres"
+						readonly="#{usuarioSEditBean.readOnly1}" size="60"
+						value="#{usuarioSEditBean.usuario.nombres}" />
+					<h:outputLabel for="txtEstado" value="Estado:" />
+					<h:commandLink id="txtEstado"
+						onclick="javascript:AbrirPagina('../data/entidadCambioEstadoList.jsf',550,420);"
+						disabled="#{usuarioSEditBean.accion eq 'INS'}"
+						value="#{usuarioSEditBean.descripcionEstado}">
+						<f:ajax event="click" />
+					</h:commandLink>
+					<h:outputLabel for="txtApellidos" value="* Apellidos:" />
+
+					<h:inputText id="txtApellidos"
+						readonly="#{usuarioSEditBean.readOnly1}" size="60"
+						value="#{usuarioSEditBean.usuario.apellidos}" />
+					<h:outputLabel for="txtCedula" value="* Cédula:" />
+					<h:inputText id="txtCedula" maxlength="10"
+						readonly="#{usuarioSEditBean.readOnly1}"
+						onkeypress="return ValidarNumerico('%d',this,event);"
+						value="#{usuarioSEditBean.usuario.cedula}" />
+					<h:outputLabel for="txtUsername" value="* Nombre de Usuario:" />
+					<h:inputText id="txtUsername"
+						readonly="#{usuarioSEditBean.readOnly1}" size="60"
+						value="#{usuarioSEditBean.usuario.username}" />
+
+					<h:outputLabel for="txtEsComunero" value="Es Comunero:" />
+					<h:selectOneMenu id="txtEsComunero"
+						readonly="#{usuarioSEditBean.readOnly1}"
+						value="#{usuarioSEditBean.usuario.esComunero}">
+						<f:selectItem itemLabel="NO" itemValue="N" />
+						<f:selectItem itemLabel="SI" itemValue="S" />
+					</h:selectOneMenu>
+
+
+					<h:outputLabel for="txtEstadoCivil" value="Estado Civil:" />
+					<h:selectOneMenu id="txtEstadoCivil"
+						readonly="#{usuarioSEditBean.readOnly1}"
+						disabled="#{usuarioSEditBean.readOnly1}"
+						value="#{usuarioSEditBean.idEstadoCivil}">
+						<f:selectItems value="#{usuarioSEditBean.itemEstadoCicils}" />
+					</h:selectOneMenu>
+					<h:outputLabel for="txtFechaNacimiento" value="* Fecha Nacimiento:" />
+					<rich:calendar id="txtFechaNacimiento" datePattern="dd/MM/yyyy"
+						disabled="#{usuarioSEditBean.readOnly1}" enableManualInput="true"
+						value="#{usuarioSEditBean.usuario.fechaNacimiento}" />
+					<h:outputLabel for="txtEdad" value="Edad:" />
+					<h:outputText id="txtEdad" value="#{usuarioSEditBean.usuario.edad}" />
+					<h:outputLabel for="txtSexo" value="Sexo:" />
+					<h:selectOneMenu id="txtSexo"
+						readonly="#{usuarioSEditBean.readOnly1}"
+						disabled="#{usuarioSEditBean.readOnly1}"
+						value="#{usuarioSEditBean.usuario.sexo}">
+						<f:selectItem itemValue="F" itemLabel="Femenino" />
+						<f:selectItem itemValue="M" itemLabel="Masculino" />
+					</h:selectOneMenu>
+
+					<h:outputLabel for="txtTelefono" value="Tel&#233;fono:" />
+					<h:inputText id="txtTelefono"
+						readonly="#{usuarioSEditBean.readOnly1}"
+						value="#{usuarioSEditBean.usuario.telefono1}" />
+					<h:outputLabel for="txtCelular" value="C&#233;lular:" />
+					<h:inputText id="txtCelular"
+						readonly="#{usuarioSEditBean.readOnly1}"
+						value="#{usuarioSEditBean.usuario.telefono2}" maxlength="10"
+						onkeypress="return ValidarNumerico('%d',this,event);" />
+					<h:outputLabel for="txtEmail" value="Email:" />
+					<h:inputText id="txtEmail"
+						value="#{usuarioSEditBean.usuario.email}"
+						readonly="#{usuarioSEditBean.readOnly1}" />
+
+					<h:outputText value="Resetear Clave:" />
+					<h:selectBooleanCheckbox title="Resetear Clave"
+						readonly="#{usuarioSEditBean.readOnly1}"
+						disabled="#{usuarioSEditBean.readOnly1}"
+						value="#{usuarioSEditBean.resetearClave}">
+					</h:selectBooleanCheckbox>
+
+				</h:panelGrid>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

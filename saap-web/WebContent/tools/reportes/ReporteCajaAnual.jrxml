@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteCajaAnual" language="groovy" pageWidth="595" pageHeight="842" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="9f57b30a-0e9f-4280-839b-8d9cf2776abd">
+	<property name="ireport.zoom" value="2.049040366095215"/>
+	<property name="ireport.x" value="475"/>
+	<property name="ireport.y" value="249"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<subDataset name="Table Dataset 1" uuid="33941c32-955a-407d-93f0-2126521bb408"/>
+	<parameter name="ID_REPORT" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[268]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ID_USER" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[243]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PATH_IMAGE" class="java.lang.String">
+		<defaultValueExpression><![CDATA["D:\\WorkSpace\\Saap.root\\Saap\\WebContent\\tools\\imagenes\\logo.png"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from saap.reporte($P{ID_USER}, $P{ID_REPORT})]]>
+	</queryString>
+	<field name="orden01" class="java.lang.Integer"/>
+	<field name="orden02" class="java.lang.Integer"/>
+	<field name="orden03" class="java.lang.Integer"/>
+	<field name="orden04" class="java.lang.Integer"/>
+	<field name="orden05" class="java.lang.Integer"/>
+	<field name="orden06" class="java.lang.Integer"/>
+	<field name="orden07" class="java.lang.Integer"/>
+	<field name="orden08" class="java.lang.Integer"/>
+	<field name="orden09" class="java.lang.Integer"/>
+	<field name="orden10" class="java.lang.Integer"/>
+	<field name="texto01" class="java.lang.String"/>
+	<field name="texto02" class="java.lang.String"/>
+	<field name="texto03" class="java.lang.String"/>
+	<field name="texto04" class="java.lang.String"/>
+	<field name="texto05" class="java.lang.String"/>
+	<field name="texto06" class="java.lang.String"/>
+	<field name="texto07" class="java.lang.String"/>
+	<field name="texto08" class="java.lang.String"/>
+	<field name="texto09" class="java.lang.String"/>
+	<field name="texto10" class="java.lang.String"/>
+	<field name="texto11" class="java.lang.String"/>
+	<field name="texto12" class="java.lang.String"/>
+	<field name="texto13" class="java.lang.String"/>
+	<field name="texto14" class="java.lang.String"/>
+	<field name="texto15" class="java.lang.String"/>
+	<field name="texto16" class="java.lang.String"/>
+	<field name="texto17" class="java.lang.String"/>
+	<field name="texto18" class="java.lang.String"/>
+	<field name="texto19" class="java.lang.String"/>
+	<field name="texto20" class="java.lang.String"/>
+	<field name="texto21" class="java.lang.String"/>
+	<field name="numero01" class="java.math.BigDecimal"/>
+	<field name="numero02" class="java.math.BigDecimal"/>
+	<field name="numero03" class="java.math.BigDecimal"/>
+	<field name="numero04" class="java.math.BigDecimal"/>
+	<field name="numero05" class="java.math.BigDecimal"/>
+	<field name="numero06" class="java.math.BigDecimal"/>
+	<field name="numero07" class="java.math.BigDecimal"/>
+	<field name="numero08" class="java.math.BigDecimal"/>
+	<field name="numero09" class="java.math.BigDecimal"/>
+	<field name="numero10" class="java.math.BigDecimal"/>
+	<field name="numero11" class="java.math.BigDecimal"/>
+	<field name="numero12" class="java.math.BigDecimal"/>
+	<field name="numero13" class="java.math.BigDecimal"/>
+	<field name="numero14" class="java.math.BigDecimal"/>
+	<field name="numero15" class="java.math.BigDecimal"/>
+	<field name="numero16" class="java.math.BigDecimal"/>
+	<field name="numero17" class="java.math.BigDecimal"/>
+	<field name="numero18" class="java.math.BigDecimal"/>
+	<field name="numero19" class="java.math.BigDecimal"/>
+	<field name="numero20" class="java.math.BigDecimal"/>
+	<field name="fecha01" class="java.sql.Timestamp"/>
+	<field name="fecha02" class="java.sql.Timestamp"/>
+	<field name="fecha03" class="java.sql.Timestamp"/>
+	<field name="fecha04" class="java.sql.Timestamp"/>
+	<field name="fecha05" class="java.sql.Timestamp"/>
+	<field name="fecha06" class="java.sql.Timestamp"/>
+	<field name="fecha07" class="java.sql.Timestamp"/>
+	<field name="fecha08" class="java.sql.Timestamp"/>
+	<field name="fecha09" class="java.sql.Timestamp"/>
+	<field name="fecha10" class="java.sql.Timestamp"/>
+	<variable name="TOTAL_A_PAGAR" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{numero09}]]></variableExpression>
+	</variable>
+	<variable name="TOTALES" class="java.math.BigDecimal" resetType="Group" resetGroup="TipoRegistro" calculation="Sum">
+		<variableExpression><![CDATA[$F{numero01}]]></variableExpression>
+	</variable>
+	<group name="TipoRegistro">
+		<groupExpression><![CDATA[$F{texto02}]]></groupExpression>
+		<groupHeader>
+			<band height="21">
+				<textField>
+					<reportElement x="0" y="0" width="160" height="21" uuid="c581a113-f638-4fb6-979e-d9f0257c5019"/>
+					<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+						<pen lineWidth="0.25" lineColor="#0066FF"/>
+						<topPen lineWidth="0.25" lineColor="#0066FF"/>
+						<leftPen lineWidth="0.25" lineColor="#0066FF"/>
+						<bottomPen lineWidth="0.25" lineColor="#0066FF"/>
+						<rightPen lineWidth="0.25" lineColor="#0066FF"/>
+					</box>
+					<textFieldExpression><![CDATA[$F{texto02}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="245">
+				<textField pattern="###0.00;-###0.00">
+					<reportElement x="388" y="0" width="135" height="20" uuid="9869713e-319d-4438-b68d-27adad52a24c"/>
+					<textFieldExpression><![CDATA[$V{TOTALES}]]></textFieldExpression>
+				</textField>
+				<pie3DChart>
+					<chart>
+						<reportElement x="71" y="20" width="386" height="225" uuid="3073b58f-9a11-4ffd-ba58-932167f14b9a"/>
+						<chartTitle/>
+						<chartSubtitle/>
+						<chartLegend/>
+					</chart>
+					<pieDataset>
+						<dataset resetType="Group" resetGroup="TipoRegistro"/>
+						<keyExpression><![CDATA[$F{texto01}]]></keyExpression>
+						<valueExpression><![CDATA[$F{numero01}]]></valueExpression>
+					</pieDataset>
+					<pie3DPlot>
+						<plot/>
+						<itemLabel/>
+					</pie3DPlot>
+				</pie3DChart>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="128" splitType="Stretch">
+			<staticText>
+				<reportElement x="71" y="0" width="452" height="20" uuid="7be62ad1-445c-41c2-b252-47609e387d46"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JUNTA ADMINISTRADORA DE AGUA POTABLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="71" y="20" width="452" height="18" uuid="6013ba97-fe78-4b16-9204-2f99b1a6106c"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[COMUNIDAD CHAUPILOMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="71" y="38" width="452" height="33" uuid="d5e2ce38-cacf-4ed8-b796-088693479746"/>
+				<textElement textAlignment="Center">
+					<font fontName="Pristina" size="14"/>
+				</textElement>
+				<text><![CDATA[Parroquia Tupigachi - Cantón Pedro Moncayo - Tabacundo - Ecuador]]></text>
+			</staticText>
+			<image hAlign="Center" vAlign="Middle">
+				<reportElement x="0" y="0" width="71" height="71" uuid="8e2147cb-0d41-4623-82bc-ec47a4738000"/>
+				<imageExpression><![CDATA[$P{PATH_IMAGE}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="82" width="71" height="20" uuid="7a819574-eff3-4b19-8ef3-76cf765d7a97"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Año:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="71" y="82" width="138" height="20" uuid="c1216c79-94a5-4bce-a526-5fdff6f2c45e"/>
+				<textFieldExpression><![CDATA[$F{texto03}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="102" width="71" height="20" uuid="6e8b5e06-c0ba-47ef-8c0b-d87bb1424e5b"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Mes:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="71" y="102" width="138" height="20" uuid="a398d42e-3f76-4812-964c-6a1ea5464468"/>
+				<textFieldExpression><![CDATA[$F{texto04}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="160" y="0" width="228" height="20" forecolor="#FFFFFF" backcolor="#0066FF" uuid="fbbad088-12fb-4e4a-95a8-7c44ee056761"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Registro]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="388" y="0" width="135" height="20" forecolor="#FFFFFF" backcolor="#0066FF" uuid="091723cc-0240-494d-b4ff-b5dda6707509"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor USD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="160" height="20" forecolor="#FFFFFF" backcolor="#0066FF" uuid="069aca29-ebf8-4ede-bb0e-529ad73396b9"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="160" y="0" width="228" height="20" uuid="df859f91-3987-41c9-83df-3ba82a8a08c4"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.25" lineColor="#0066FF"/>
+					<topPen lineWidth="0.25" lineColor="#0066FF"/>
+					<leftPen lineWidth="0.25" lineColor="#0066FF"/>
+					<bottomPen lineWidth="0.25" lineColor="#0066FF"/>
+					<rightPen lineWidth="0.25" lineColor="#0066FF"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{texto01}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(-###0.00)" isBlankWhenNull="true">
+				<reportElement x="388" y="0" width="135" height="20" uuid="6aba89f1-878e-4073-b73b-9940269a83d9"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+					<pen lineWidth="0.25" lineColor="#0066FF"/>
+					<topPen lineWidth="0.25" lineColor="#0066FF"/>
+					<leftPen lineWidth="0.25" lineColor="#0066FF"/>
+					<bottomPen lineWidth="0.25" lineColor="#0066FF"/>
+					<rightPen lineWidth="0.25" lineColor="#0066FF"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{numero01}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="226">
+			<pie3DChart>
+				<chart>
+					<reportElement x="0" y="0" width="523" height="221" uuid="0d44fded-8450-4a93-8357-1b1ee9e4593b"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{texto02}]]></keyExpression>
+					<valueExpression><![CDATA[$V{TOTALES}]]></valueExpression>
+				</pieDataset>
+				<pie3DPlot>
+					<plot/>
+					<itemLabel/>
+				</pie3DPlot>
+			</pie3DChart>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

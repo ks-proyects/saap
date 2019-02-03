@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('usuarioEdit');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{representanteEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value,label,value">
+					<h:outputLabel for="txtNombres" value="* Nombres:" />
+					<h:inputText id="txtNombres" size="60"
+						value="#{representanteEditBean.usuario.nombres}" />
+					<h:outputLabel for="txtApellidos" value="* Apellidos:" />
+					<h:inputText id="txtApellidos" size="60"
+						value="#{representanteEditBean.usuario.apellidos}" />
+					<h:outputLabel for="txtCedula" value="* Cédula:" />
+					<h:inputText id="txtCedula" maxlength="10"
+						onkeypress="return ValidarNumerico('%d',this,event);"
+						value="#{representanteEditBean.usuario.cedula}" />
+					<h:outputLabel for="txtEstado" value="Estado:" />
+					<h:commandLink id="txtEstado"
+						value="#{representanteEditBean.usuario.estado}" disabled="true" />
+					<h:outputLabel for="txtParentesco" value="Parentesco:" />
+					<h:selectOneMenu id="txtParentesco"
+						value="#{representanteEditBean.idParentesco}">
+						<f:selectItems value="#{representanteEditBean.itemParentesco}" />
+					</h:selectOneMenu>
+					<h:outputLabel for="txtOrden" value="Orden:" />
+					<h:inputText id="txtOrden"
+						onkeypress="return ValidarNumerico('%d',this,event);"
+						value="#{representanteEditBean.representante.orden}" />
+					<h:outputLabel for="txtFechaNacimiento" value="* Fecha Nacimiento:" />
+					<rich:calendar id="txtFechaNacimiento" datePattern="dd/MM/yyyy"
+						enableManualInput="true"
+						value="#{representanteEditBean.usuario.fechaNacimiento}" />
+					<h:outputLabel for="txtEsComunero" value="Es Comunero:" />
+					<h:selectOneMenu id="txtEsComunero"
+						value="#{representanteEditBean.usuario.esComunero}">
+						<f:selectItem itemLabel="NO" itemValue="N" />
+						<f:selectItem itemLabel="SI" itemValue="S" />
+					</h:selectOneMenu>
+					<h:outputLabel for="txtUsername" value="Username:" />
+					<h:inputText id="txtUsername"
+						value="#{representanteEditBean.usuario.username}" />
+					<h:outputLabel for="txtDireccion" value="Direcci&#243;n:" />
+
+					<h:inputTextarea style="width:200px" rows="3"
+						value="#{representanteEditBean.usuario.direccion}"
+						id="txtDireccion" />
+
+					<h:outputLabel for="txtEstadoCivil" value="Estado Civil:" />
+					<h:selectOneMenu id="txtEstadoCivil"
+						value="#{representanteEditBean.idEstadoCivil}">
+						<f:selectItems value="#{representanteEditBean.itemEstadoCicils}" />
+					</h:selectOneMenu>
+
+					<h:outputLabel for="txtEdad" value="Edad:" />
+					<h:outputText id="txtEdad"
+						value="#{representanteEditBean.usuario.edad}" />
+					<h:outputLabel for="txtSexo" value="Sexo:" />
+					<h:selectOneMenu id="txtSexo"
+						value="#{representanteEditBean.usuario.sexo}">
+						<f:selectItem itemValue="F" itemLabel="Femenino" />
+						<f:selectItem itemValue="M" itemLabel="Masculino" />
+					</h:selectOneMenu>
+					<h:outputLabel for="txtTelefono" value="Tel&#233;fono:" />
+					<h:inputText id="txtTelefono"
+						value="#{representanteEditBean.usuario.telefono1}" />
+					<h:outputLabel for="txtCelular" value="C&#233;lular:" />
+					<h:inputText id="txtCelular"
+						value="#{representanteEditBean.usuario.telefono2}" maxlength="10"
+						onkeypress="return ValidarNumerico('%d',this,event);" />
+					<h:outputLabel for="txtEmail" value="Email:" />
+					<h:inputText id="txtEmail"
+						value="#{representanteEditBean.usuario.email}" />
+				</h:panelGrid>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

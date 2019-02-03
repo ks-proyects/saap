@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<photos>
+
+	<config
+		folder="photos/"
+		show_tooltip="true"
+		auto_play="true"
+		auto_play_button="true"
+		auto_play_duration="3"
+		
+		thumbnail_area_width="710"
+		thumbnail_height="100"
+		thumbnail_spacing="10"
+		thumbnail_border_size="5"
+		thumbnail_border_color="#EEEEEE"
+		thumbnail_highlight_color="#994422"
+
+		previous_button="true"
+		next_button="true"
+		fullscreen_button="true"
+		
+		description="true"
+		description_bg_color="#000000"
+		description_bg_alpha="0.6"
+		css_file="flashmo_210_style.css"
+		tween_duration="0.5"
+		tween_delay="0.05"
+		default_effect="easeInOutQuart"
+		default_row="4"
+		default_column="6">
+	</config>
+	
+	<photo>
+		<transition direction="up"></transition>
+		<thumbnail>s_flashmo_1920x1200_01.jpg</thumbnail>
+		<filename>flashmo_1920x1200_01.jpg</filename>
+		<tooltip>Stylish Title 01</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 01 goes here</p><p><a href="#/preview/flashmo_279_stylish_gallery" target="_parent">Stylish Gallery</a> is a flexible image gallery that can fit in any screen size. <span class="highlight">This textfield supports HTML and CSS. Edit the XML file for gallery settings.</span> Quisque at ante sit amet erat laoreet fermentum. Duis nulla diam, posuere ac, varius id, ullamcorper sit amet, libero. <u>Nam scelerisque</u> cursus dolor.</p>]]></description>
+	</photo>
+	
+	<photo>
+		<transition direction="random" row="4" effect="easeInOutCirc"></transition>
+		<thumbnail>s_flashmo_1920x1200_02.jpg</thumbnail>
+		<filename>flashmo_1920x1200_02.jpg</filename>
+		<tooltip>Stylish Title 02</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 02 goes here</p><p><span class="highlight"><a href="#/preview/flashmo_259_fluid_gallery" target="_blank">Fluid Gallery</a> is a similar photo gallery with fading in/out transition effect.</span> Phasellus auctor, ipsum eu semper cursus, magna odio ullamcorper eros, eget sodales lacus purus quis ipsum. Integer quis lacinia diam. Sed in mi metus, eget euismod dui.</p>]]></description>
+	</photo>
+	
+	<photo>
+		<transition direction="down" column="4"></transition>
+		<thumbnail>s_flashmo_1920x1200_03.jpg</thumbnail>
+		<filename>flashmo_1920x1200_03.jpg</filename>
+		<tooltip>Stylish Title 03</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 03 goes here</p><p>You may try <a href="#/preview/flashmo_271_stylish_slider" target="_blank">Stylish Slider</a> with a fixed dimension to apply as a content piece of your page. This text is dynamically loaded from the external XML file. This textfield supports HTML and CSS. <span class="note">Praesent consectetur imperdiet mauris. Suspendisse at pede vel lorem pulvinar laoreet.</span></p>]]></description>
+	</photo>
+	
+	<photo>
+		<transition direction="random" row="5" column="5"></transition>
+		<thumbnail>s_flashmo_1920x1200_04.jpg</thumbnail>
+		<filename>flashmo_1920x1200_04.jpg</filename>
+		<tooltip>Stylish Title 04</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 04 goes here</p><p>Praesent mattis varius quam. <a href="#/page/1" target="_blank">Mauris vestibulum felis</a> eget tortor. Vestibulum ullamcorper ipsum nec augue. Nunc commodo, magna pharetra semper vehicula, dui ligula feugiat elit, et euismod nunc orci ut libero. Mauris et elit quis mauris aliquet luctus.</p>]]></description>
+	</photo>
+	
+	<photo>
+		<transition direction="right" effect="easeOutQuart"></transition>
+		<thumbnail>s_flashmo_1920x1200_05.jpg</thumbnail>
+		<filename>flashmo_1920x1200_05.jpg</filename>
+		<tooltip>Stylish Title 05</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 05 goes here</p><p>Nunc aliquam, dolor vitae sollicitudin lacinia, nibh orci sagittis diam, dignissim sodales dui erat nec eros. Fusce quis enim. <a href="#/page/2" target="_parent">Aenean eleifend</a>, neque hendrerit elementum sodales, sed tempor vitae tellus.</p>]]></description>
+	</photo>
+
+	<photo>
+		<transition direction="left" effect="easeInOutCirc"></transition>
+		<thumbnail>s_flashmo_1920x1200_06.jpg</thumbnail>
+		<filename>flashmo_1920x1200_06.jpg</filename>
+		<tooltip>Stylish Title 06</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 06 goes here</p><p>Praesent consectetur imperdiet mauris. <a href="#" target="_parent">Suspendisse at pede vel</a> lorem pulvinar laoreet. Pellentesque elementum enim a augue in nisi. <span class="highlight">Nunc commodo, magna pharetra semper vehicula, dui ligula feugiat elit, et euismod nunc orci ut libero.</span></p>]]></description>
+	</photo>
+	
+	<photo>
+		<transition direction="center" fade="out" scale="out" effect="easeInOutSine"></transition>
+		<thumbnail>s_flashmo_1920x1200_07.jpg</thumbnail>
+		<filename>flashmo_1920x1200_07.jpg</filename>
+		<tooltip>Stylish Title 07</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 07 goes here</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <span class="highlight">Quisque at ante sit amet</span> erat laoreet <u>fermentum</u>. Quisque nec nisl. <a href="#/page/3" target="_parent">Integer vel sapien quis</a> risus egestas suscipit. Aliquam at sagittis sapien. Duis volutpat pharetra tristique.</p>]]></description>
+	</photo>
+	
+	<photo>
+		<transition direction="center" fade="in" scale="in" row="4" column="7"></transition>
+		<thumbnail>s_flashmo_1920x1200_08.jpg</thumbnail>
+		<filename>flashmo_1920x1200_08.jpg</filename>
+		<tooltip>Stylish Title 08</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 08 goes here</p><p>Quisque at ante sit amet erat laoreet <u>fermentum</u>. Quisque nec nisl. <a href="#/page/4" target="_blank">Nam scelerisque</a> cursus dolor. Integer vel sapien quis risus egestas suscipit. Nam lorem tortor, viverra gravida, egestas id, pellentesque in, mi. <span class="highlight">Praesent consectetur imperdiet mauris.</span></p>]]></description>
+	</photo>
+	
+	<photo>
+		<transition direction="left" effect="easeInOutCirc"></transition>
+		<thumbnail>s_flashmo_1920x1200_09.jpg</thumbnail>
+		<filename>flashmo_1920x1200_09.jpg</filename>
+		<tooltip>Stylish Title 09</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 09 goes here</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <span class="highlight">Quisque at ante sit amet</span> erat laoreet <u>fermentum</u>. Quisque nec nisl. <a href="#/page/5" target="_parent">Nam scelerisque</a> cursus dolor. Duis nulla diam, posuere ac, varius id, ullamcorper sit amet, libero.</p><p><span class="note">This text is dynamically loaded from the external XML file. This textfield supports HTML and CSS.</span></p>]]></description>
+	</photo>
+	
+	<photo>
+		<transition direction="center" fade="out" scale="out" effect="easeInOutSine"></transition>
+		<thumbnail>s_flashmo_1920x1200_10.jpg</thumbnail>
+		<filename>flashmo_1920x1200_10.jpg</filename>
+		<tooltip>Stylish Title 10</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 10 goes here</p><p>Fusce quis diam sit amet tortor luctus pellentesque. <a href="#/page/1" target="_blank">Donec accumsan urna</a> non elit tristique mattis. Vivamus fermentum orci viverra nisl. <b>In nec magna id</b> ipsum aliquam dictum. Quisque nec nisl.</p>]]></description>
+	</photo>
+	
+	<photo>
+		<transition direction="right" row="5" column="3" effect="easeOutQuart"></transition>
+		<thumbnail>s_flashmo_1920x1200_11.jpg</thumbnail>
+		<filename>flashmo_1920x1200_11.jpg</filename>
+		<tooltip>Stylish Title 11</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 11 goes here</p><p>In velit urna, convallis id, pharetra in, <u>iaculis sit amet</u>, mi. Praesent consectetur imperdiet mauris. Suspendisse at pede vel lorem pulvinar laoreet. Etiam et neque. Donec dapibus viverra est.</p><p><span class="note">This text is dynamically loaded from the external XML file. This textfield supports HTML and CSS.</span></p>]]></description>
+	</photo>
+	
+	<photo>
+		<transition direction="random" row="3" column="8"></transition>
+		<thumbnail>s_flashmo_1920x1200_12.jpg</thumbnail>
+		<filename>flashmo_1920x1200_12.jpg</filename>
+		<tooltip>Stylish Title 12</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 12 goes here</p><p>Mauris vestibulum felis eget tortor. Praesent mattis varius quam. Vestibulum ullamcorper ipsum nec augue. <a href="#/page/6" target="_blank">Vestibulum auctor</a> odio eget ante. Nunc commodo, magna pharetra semper vehicula, dui ligula feugiat elit, et euismod nunc orci ut libero.</p>]]></description>
+	</photo>
+	
+	<photo>
+		<transition direction="random" row="7" effect="easeInOutCirc"></transition>
+		<thumbnail>s_flashmo_1920x1200_13.jpg</thumbnail>
+		<filename>flashmo_1920x1200_13.jpg</filename>
+		<tooltip>Stylish Title 13</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 13 goes here</p><p>Sed enim dui, interdum vitae cursus vitae, laoreet non magna. <a href="#" target="_parent">Pellentesque habitant</a> morbi tristique senectus et netus et malesuada fames ac turpis egestas. In nec tellus sed purus ornare faucibus. Duis risus erat, vulputate id placerat quis, ullamcorper vitae libero.</p>]]></description>
+	</photo>
+
+	<photo>
+		<transition direction="up" row="3" column="9"></transition>
+		<thumbnail>s_flashmo_1920x1200_14.jpg</thumbnail>
+		<filename>flashmo_1920x1200_14.jpg</filename>
+		<tooltip>Stylish Title 14</tooltip>
+		<description><![CDATA[<p class="subtitle">Stylish Title 14 goes here</p><p>Praesent bibendum nulla sit amet turpis vehicula fringilla. Duis rhoncus mollis magna, vel pellentesque magna facilisis et. Donec consequat malesuada sollicitudin. <a href="#/contact" target="_parent">Class aptent taciti</a> sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>]]></description>
+	</photo>
+	
+</photos>

@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('actividadEdit');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{actividadEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value,label,value">
+					<h:outputLabel value="* Descripción:" />
+					<h:inputText readonly="#{actividadEditBean.readOnly1}"
+						value="#{actividadEditBean.actividad.descripcion}" />
+					<h:outputLabel for="txtEstado" value="Estado:" />
+					<h:commandLink id="txtEstado"
+						onclick="javascript:AbrirPagina('../data/entidadCambioEstadoList.jsf',550,420);"
+						disabled="true" value="#{actividadEditBean.descripcionEstado}">
+						<f:ajax event="click" />
+					</h:commandLink>
+					<h:outputText value="Periodo:" />
+					<h:selectOneMenu disabled="#{actividadEditBean.readOnly1}"
+						value="#{actividadEditBean.idPeriodoPago}">
+						<f:selectItems value="#{actividadEditBean.periodoPago}" />
+					</h:selectOneMenu>
+					<h:outputText value="Tipo Actividad:" />
+					<h:selectOneMenu disabled="#{actividadEditBean.readOnly1}"
+						valueChangeListener="#{actividadEditBean.valueChange}"
+						value="#{actividadEditBean.idTipoActividad}">
+						<f:selectItems value="#{actividadEditBean.tipoActividad}" />
+						<f:ajax event="change" render=":WorkPage:txtValorMulta" />
+					</h:selectOneMenu>
+					<h:outputText value="Rayas por Beneficiario:" />
+					<h:inputText readonly="#{actividadEditBean.readOnly1}"
+						onkeypress="return ValidarNumerico('%f',this,event);"
+						value="#{actividadEditBean.actividad.maximoRayas}" />
+					<h:outputText value="* Fecha de Actividad:" />
+					<rich:calendar disabled="#{actividadEditBean.readOnly1}"
+						datePattern="dd/MM/yyyy"
+						value="#{actividadEditBean.actividad.fechaEvento}" />
+					<h:outputText value="* Valor de la Multa:" />
+					<h:inputText id="txtValorMulta"
+						readonly="#{actividadEditBean.readOnly1}"
+						value="#{actividadEditBean.actividad.valorMulta}" />
+
+				</h:panelGrid>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

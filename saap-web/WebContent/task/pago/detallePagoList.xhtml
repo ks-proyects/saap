@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('detallePagoList');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{detallePagoListBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value">
+					<h:outputLabel value="Periodo:" />
+					<h:selectOneMenu value="#{detallePagoListBean.idPeriodopago}"
+						valueChangeListener="#{detallePagoListBean.valueChange}">
+						<f:selectItems value="#{detallePagoListBean.periodos}" />
+						<f:ajax event="change" render=":WorkPage:table" />
+					</h:selectOneMenu>
+				</h:panelGrid>
+				<rich:dataTable id="table"
+					columnClasses="columDerecha,columnIxquierdo"
+					value="#{detallePagoListBean.detallePlanillas}" var="dp"
+					rowKeyVar="row">
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="#" />
+						</f:facet>
+						<h:outputText value="#{row+1}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Descripción" />
+						</f:facet>
+						<h:commandLink value="#{dp.descripcion}"
+							action="detallePagoEdit">
+							<f:param name="action" value="UPD" />
+							<f:param name="param4" value="#{dp.idDetallePlanilla}" />
+						</h:commandLink>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Valor" />
+						</f:facet>
+						<h:outputText value="#{dp.valorTotal}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Valor Pagado" />
+						</f:facet>
+						<h:outputText value="#{dp.valorPagado}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Valor Pendiente" />
+						</f:facet>
+						<h:outputText value="#{dp.valorPendiente}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Periodo" />
+						</f:facet>
+						<h:outputText
+							value="#{dp.idRegistroEconomico.idPeriodoPago.descripcion}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Estado" />
+						</f:facet>
+						<h:outputText
+							value="#{dp.estado eq 'ING'?'Ingresado':(dp.estado eq 'DESC'?'Descartado':(dp.estado eq 'PAG'?'Pagado':(dp.estado eq 'NOPAG'?'No Pagado':'Traspasado')))}" />
+					</rich:column>
+				</rich:dataTable>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

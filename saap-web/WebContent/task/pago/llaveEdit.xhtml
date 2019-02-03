@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('llaveEdit');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{llaveEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value,label,value">
+					<h:outputLabel for="txtNumero" value="* # Medidor:" />
+					<h:outputText id="txtNumero" value="#{llaveEditBean.llave.numero}" />
+					<h:outputLabel for="txtEstado" value="Estado:" />
+					<h:commandLink id="txtEstado"
+						onclick="javascript:AbrirPagina('../data/entidadCambioEstadoList.jsf',550,420);"
+						disabled="#{llaveEditBean.accion eq 'INS'}"
+						value="#{llaveEditBean.descripcionEstado}">
+						<f:ajax event="click" />
+					</h:commandLink>
+					<h:outputLabel for="txtNombresUsuario" value="Usuario:" />
+					<h:outputText id="txtNombresUsuario"
+						value="#{llaveEditBean.usuario.nombres} #{llaveEditBean.usuario.apellidos}" />
+
+					<h:outputLabel for="txtCedula" value="* Cédula:" />
+					<h:outputText id="txtCedula"
+						value="#{llaveEditBean.usuario.cedula}" />
+					<h:outputLabel for="txtTipoLlave" value="Tipo de Llave:" />
+					<h:outputText id="txtTipoLlave"
+						value="#{llaveEditBean.llave.idTarifa.tipoLlave.descripcion}" />
+					<h:outputLabel for="txtTarifa" value="Tarifa:" />
+					<h:outputText id="txtTarifa"
+						value="#{llaveEditBean.llave.idTarifa.descripcion}" />
+					<h:outputLabel for="txtUbicacion" value="Ubicacion" />
+					<h:outputText id="txtUbicacion"
+						value="#{llaveEditBean.llave.ubicacion}" />
+					<h:outputLabel value="Fecha de Registro:" />
+					<h:outputText value="#{llaveEditBean.llave.fechaRegistro}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</h:panelGrid>
+
+
+				<rich:dataTable value="#{llaveEditBean.lecturasList}" var="lect"
+					id="dataTable" rowKeyVar="row">
+
+					<f:facet name="header">
+						<h:panelGroup>
+							<h:outputLabel for="txtNumero" value="Periodo" />
+							<h:selectOneMenu value="#{llaveEditBean.idPeriodoPago}"
+								valueChangeListener="#{llaveEditBean.valueChange}">
+								<f:selectItems value="#{llaveEditBean.periodos}" />
+								<f:ajax event="change" render="dataTable" />
+							</h:selectOneMenu>
+						</h:panelGroup>
+
+					</f:facet>
+					<f:facet name="noData">
+						<h:outputText value="No Existen Registros" />
+					</f:facet>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="#" />
+						</f:facet>
+						<h:outputText value="#{row+1}" />
+					</rich:column>
+					<rich:column>
+
+						<f:facet name="header">
+							<h:outputText value="Fecha de Registro" />
+						</f:facet>
+						<h:commandLink value="#{lect.descripcion}" action="lecturaEdit">
+							<f:param name="action" value="UPD" />
+							<f:param name="param3" value="#{lect.idLectura}" />
+						</h:commandLink>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Consumo" />
+						</f:facet>
+						<h:outputText value="#{lect.metros3} m3" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Estado" />
+						</f:facet>
+						<h:outputText
+							value="#{lect.estado eq 'ING'?'Ingresado':(lect.estado eq 'DESC'?'Descartado':(lect.estado eq 'PAG'?'Pagado':(lect.estado eq 'NOPAG'?'No Pagado':'Traspasado')))}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Fecha de Registro" />
+						</f:facet>
+						<h:outputText value="#{lect.fechaRegistro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</rich:column>
+
+				</rich:dataTable>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

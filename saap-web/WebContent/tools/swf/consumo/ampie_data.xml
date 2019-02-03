@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pie>
+
+	<message bg_color="#CCBB00" text_color="#FFFFFF">
+    <![CDATA[You can broadcast any message to chart from data XML file]]>
+	</message>
+	<message bg_color="#CCBB11" text_color="#FF000">
+    <![CDATA[mENSAJE]]>
+	</message>
+
+	<slice title="WinXP" pull_out="true">74.7</slice>
+	<slice title="W2000">2.6</slice>
+	<slice title="Win98">0.2</slice>
+	<slice title="Vista">11.5</slice>
+	<slice title="W2003">2.0</slice>
+	<slice title="Linux">3.9</slice>
+	<slice title="Mac">4.8</slice>
+</pie>

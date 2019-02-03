@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fiji1="http://exadel.com/fiji"
+	xmlns:fiji4="http://exadel.com/fiji/chart"
+	xmlns:fiji2="http://exadel.com/fiji/commonchart">
+	<ui:define name="body">
+		<h:body onload="javascript:load('reporteConsumo');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{reporteConsumoBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value">
+					<h:outputText value="Año:" />
+					<h:selectOneMenu value="#{reporteConsumoBean.anio.valorEntero}">
+						<f:selectItems value="#{reporteConsumoBean.anios}" />
+					</h:selectOneMenu>
+					<h:outputText value="Tipo de Usuario:" />
+					<h:selectOneMenu value="#{reporteConsumoBean.tb.valorEntero}">
+						<f:selectItems value="#{reporteConsumoBean.tipoBeneficiario}" />
+					</h:selectOneMenu>
+				</h:panelGrid>
+				<rich:dataTable value="#{reporteConsumoBean.consumoDTOs}" var="dto">
+					<rich:column>
+						<f:facet name="header">Mes - Año</f:facet>
+						<h:outputText value="#{dto.descripcion}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Número de Usuarios</f:facet>
+						<h:outputText value="#{dto.numeroPagos}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Consumo en M3</f:facet>
+						<h:outputText value="#{dto.consumoM3} m3" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Consumo en M3 Facturado Promedio</f:facet>
+						<h:outputText value="#{dto.valorMetro3Facturado} m3" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Valor Total</f:facet>
+						<h:outputText value="#{dto.valorTotal}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Valor Facturado </f:facet>
+						<h:outputText value="#{dto.valorRecaudado}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Valor Por Cobrar</f:facet>
+						<h:outputText value="#{dto.valorPorCobra}" />
+					</rich:column>
+				</rich:dataTable>
+
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

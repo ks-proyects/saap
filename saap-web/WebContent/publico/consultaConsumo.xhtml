@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<ui:define name="body">
+		<h:form id="WorkPage">
+			<rich:panel header="Consulta de Pago" headerClass="headerTitleClass">
+				<h:panelGrid columns="2" columnClasses="label,value">
+					<h:outputText value="Cédula/# Llave:" />
+					<h:inputText value="#{consultaConsumoBean.filtro}" />
+					<h:outputText value="" />
+					<h:commandButton value="Consultar"
+						actionListener="#{consultaConsumoBean.search}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2" id="table" columnClasses="label,value">
+					<h:outputText value="Usuario" />
+					<h:outputText
+						value="#{consultaConsumoBean.cp.idLlave.idUsuario.nombres} #{consultaConsumoBean.cp.idLlave.idUsuario.apellidos}"
+						readonly="true" />
+					<h:outputText value="# Llave" />
+					<h:outputText value="#{consultaConsumoBean.cp.idLlave.numero}"
+						readonly="true" />
+					<h:outputText value="Valor Pendiente" />
+					<h:outputText value="#{consultaConsumoBean.cp.valorPendiente}"
+						readonly="true" />
+					<h:outputText value="Valor Cancelado" />
+					<h:outputText value="#{consultaConsumoBean.cp.valorPagado}"
+						readonly="true" />
+					<h:outputText value="Estado" />
+					<h:outputText readonly="true"
+						value="#{consultaConsumoBean.cp.estado eq 'ING'?'Ingresado':(consultaConsumoBean.cp.estado eq 'ANU'?'Anulado':(consultaConsumoBean.cp.estado  eq 'NOPAG'?'No Pagado':(consultaConsumoBean.cp.estado  eq 'PAG'?'Pagado':(consultaConsumoBean.cp.estado  eq 'INC'?'Incompleto':'Traspasado'))))}" />
+
+				</h:panelGrid>
+			</rich:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('detalleEdit');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{detalleEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value,label,value">
+					<h:outputText value="Usuario" />
+					<h:outputText
+						value="#{detalleEditBean.cp.idLlave.idUsuario.nombres} #{detalleEditBean.cp.idLlave.idUsuario.apellidos}" />
+					<h:outputText value="# Llave" />
+					<h:outputText value="#{detalleEditBean.cp.idLlave.numero}" />
+					<h:outputLabel value="Registro de:" />
+					<h:selectOneMenu disabled="#{detalleEditBean.readOnly1}"
+						value="#{detalleEditBean.tipoRegistro}">
+						<f:selectItems value="#{detalleEditBean.tipoRegistros}" />
+					</h:selectOneMenu>
+					<h:outputLabel value="Valor:" />
+					<h:inputText readonly="#{detalleEditBean.readOnly1}"
+						value="#{detalleEditBean.detallePlanilla.valorUnidad}"
+						onkeypress="return ValidarNumerico('%f',this,event);" />
+					<h:outputLabel value="Descrpción:" />
+					<h:inputText readonly="#{detalleEditBean.readOnly1}"
+						required="true" requiredMessage="Este campo es obligatorio."
+						value="#{detalleEditBean.detallePlanilla.descripcion}" />
+				</h:panelGrid>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

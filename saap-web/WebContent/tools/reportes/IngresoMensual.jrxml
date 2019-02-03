@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteCajaAnual" language="groovy" pageWidth="595" pageHeight="842" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="9f57b30a-0e9f-4280-839b-8d9cf2776abd">
+	<property name="ireport.zoom" value="2.049040366095215"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="55"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<style name="Hader" mode="Opaque" forecolor="#FFFFFF" backcolor="#3399FF"/>
+	<subDataset name="Table Dataset 1" uuid="33941c32-955a-407d-93f0-2126521bb408"/>
+	<parameter name="ID_REPORT" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[273]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ID_USER" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[243]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PATH_IMAGE" class="java.lang.String">
+		<defaultValueExpression><![CDATA["D:\\WorkSpace\\WorkSpaceSaap\\Saap.root\\Saap\\WebContent\\tools\\imagenes\\logo.png"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from saap.reporte($P{ID_USER}, $P{ID_REPORT})]]>
+	</queryString>
+	<field name="orden01" class="java.lang.Integer"/>
+	<field name="orden02" class="java.lang.Integer"/>
+	<field name="orden03" class="java.lang.Integer"/>
+	<field name="orden04" class="java.lang.Integer"/>
+	<field name="orden05" class="java.lang.Integer"/>
+	<field name="orden06" class="java.lang.Integer"/>
+	<field name="orden07" class="java.lang.Integer"/>
+	<field name="orden08" class="java.lang.Integer"/>
+	<field name="orden09" class="java.lang.Integer"/>
+	<field name="orden10" class="java.lang.Integer"/>
+	<field name="texto01" class="java.lang.String"/>
+	<field name="texto02" class="java.lang.String"/>
+	<field name="texto03" class="java.lang.String"/>
+	<field name="texto04" class="java.lang.String"/>
+	<field name="texto05" class="java.lang.String"/>
+	<field name="texto06" class="java.lang.String"/>
+	<field name="texto07" class="java.lang.String"/>
+	<field name="texto08" class="java.lang.String"/>
+	<field name="texto09" class="java.lang.String"/>
+	<field name="texto10" class="java.lang.String"/>
+	<field name="texto11" class="java.lang.String"/>
+	<field name="texto12" class="java.lang.String"/>
+	<field name="texto13" class="java.lang.String"/>
+	<field name="texto14" class="java.lang.String"/>
+	<field name="texto15" class="java.lang.String"/>
+	<field name="texto16" class="java.lang.String"/>
+	<field name="texto17" class="java.lang.String"/>
+	<field name="texto18" class="java.lang.String"/>
+	<field name="texto19" class="java.lang.String"/>
+	<field name="texto20" class="java.lang.String"/>
+	<field name="texto21" class="java.lang.String"/>
+	<field name="numero01" class="java.math.BigDecimal"/>
+	<field name="numero02" class="java.math.BigDecimal"/>
+	<field name="numero03" class="java.math.BigDecimal"/>
+	<field name="numero04" class="java.math.BigDecimal"/>
+	<field name="numero05" class="java.math.BigDecimal"/>
+	<field name="numero06" class="java.math.BigDecimal"/>
+	<field name="numero07" class="java.math.BigDecimal"/>
+	<field name="numero08" class="java.math.BigDecimal"/>
+	<field name="numero09" class="java.math.BigDecimal"/>
+	<field name="numero10" class="java.math.BigDecimal"/>
+	<field name="numero11" class="java.math.BigDecimal"/>
+	<field name="numero12" class="java.math.BigDecimal"/>
+	<field name="numero13" class="java.math.BigDecimal"/>
+	<field name="numero14" class="java.math.BigDecimal"/>
+	<field name="numero15" class="java.math.BigDecimal"/>
+	<field name="numero16" class="java.math.BigDecimal"/>
+	<field name="numero17" class="java.math.BigDecimal"/>
+	<field name="numero18" class="java.math.BigDecimal"/>
+	<field name="numero19" class="java.math.BigDecimal"/>
+	<field name="numero20" class="java.math.BigDecimal"/>
+	<field name="fecha01" class="java.sql.Timestamp"/>
+	<field name="fecha02" class="java.sql.Timestamp"/>
+	<field name="fecha03" class="java.sql.Timestamp"/>
+	<field name="fecha04" class="java.sql.Timestamp"/>
+	<field name="fecha05" class="java.sql.Timestamp"/>
+	<field name="fecha06" class="java.sql.Timestamp"/>
+	<field name="fecha07" class="java.sql.Timestamp"/>
+	<field name="fecha08" class="java.sql.Timestamp"/>
+	<field name="fecha09" class="java.sql.Timestamp"/>
+	<field name="fecha10" class="java.sql.Timestamp"/>
+	<variable name="totalAnualIngreso" class="java.math.BigDecimal" resetType="Group" resetGroup="GrupoAnio" calculation="Sum">
+		<variableExpression><![CDATA[$F{numero01}]]></variableExpression>
+	</variable>
+	<variable name="totalAnioSalidas" class="java.math.BigDecimal" resetType="Group" resetGroup="GrupoAnio" calculation="Sum">
+		<variableExpression><![CDATA[$F{numero02}]]></variableExpression>
+	</variable>
+	<group name="GrupoAnio">
+		<groupExpression><![CDATA[$F{texto02}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement mode="Opaque" x="0" y="0" width="523" height="20" forecolor="#000000" backcolor="#FFCC66" uuid="b051b83d-4a03-40af-806a-d58da72e8e87"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+					<textFieldExpression><![CDATA[$F{texto02}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<textField pattern="###0.00;(-###0.00)">
+					<reportElement mode="Opaque" x="162" y="0" width="129" height="20" forecolor="#333333" backcolor="#99FF66" uuid="aabc5e8e-49ed-4570-8dc5-ff287eac6af0"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{totalAnualIngreso}]]></textFieldExpression>
+				</textField>
+				<textField pattern="###0.00;(-###0.00)">
+					<reportElement mode="Opaque" x="291" y="0" width="111" height="20" forecolor="#333333" backcolor="#99FF66" uuid="b0b6c14b-12dd-4e47-acd9-3f3a99cafaa7"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{totalAnioSalidas}]]></textFieldExpression>
+				</textField>
+				<textField pattern="###0.00;(-###0.00)">
+					<reportElement mode="Opaque" x="402" y="0" width="121" height="20" forecolor="#333333" backcolor="#99FF66" uuid="d1f1c1a2-2520-4d18-8af0-94165fbe2ec3"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA[$V{totalAnualIngreso}-$V{totalAnioSalidas}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement style="Hader" mode="Opaque" x="0" y="0" width="162" height="20" forecolor="#333333" backcolor="#99FF66" uuid="a39e8b7c-7988-4015-bfb4-b884d6cb0ae2"/>
+					<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+					<textElement textAlignment="Right">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Total Anual:]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="85" splitType="Stretch">
+			<staticText>
+				<reportElement x="89" y="0" width="434" height="20" uuid="7be62ad1-445c-41c2-b252-47609e387d46"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JUNTA ADMINISTRADORA DE AGUA POTABLE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="89" y="20" width="434" height="18" uuid="6013ba97-fe78-4b16-9204-2f99b1a6106c"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[COMUNIDAD CHAUPILOMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="89" y="38" width="434" height="33" uuid="d5e2ce38-cacf-4ed8-b796-088693479746"/>
+				<textElement textAlignment="Center">
+					<font fontName="Pristina" size="14"/>
+				</textElement>
+				<text><![CDATA[Parroquia Tupigachi - Cantón Pedro Moncayo - Tabacundo - Ecuador]]></text>
+			</staticText>
+			<image hAlign="Center" vAlign="Middle">
+				<reportElement x="23" y="0" width="66" height="71" uuid="8e2147cb-0d41-4623-82bc-ec47a4738000"/>
+				<imageExpression><![CDATA[$P{PATH_IMAGE}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement style="Hader" mode="Opaque" x="89" y="0" width="73" height="20" forecolor="#FFFFFF" backcolor="#3366FF" uuid="028286c6-87f7-4363-a3e2-c833d252e340"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+				<text><![CDATA[Mes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Hader" mode="Opaque" x="162" y="0" width="129" height="20" forecolor="#FFFFFF" backcolor="#3366FF" uuid="9462c8d3-91e8-4028-8952-f31152bfed30"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Ingreso]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Hader" mode="Opaque" x="291" y="0" width="111" height="20" forecolor="#FFFFFF" backcolor="#3366FF" uuid="51289612-4845-45f0-8936-36b586910cc7"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Egreso]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Hader" mode="Opaque" x="0" y="0" width="89" height="20" forecolor="#FFFFFF" backcolor="#3366FF" uuid="fbff1a1c-6fe9-4cc5-b830-694a4fdafd6b"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+				<text><![CDATA[Año]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Hader" mode="Opaque" x="402" y="0" width="121" height="20" forecolor="#FFFFFF" backcolor="#3366FF" uuid="1ff8e811-a195-42b4-bd40-aebfceb2891a"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Saldo]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="89" y="0" width="73" height="20" uuid="f3ec5d01-0440-4952-b59c-16853d8db5c1"/>
+				<textFieldExpression><![CDATA[$F{texto04}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(-###0.00)" isBlankWhenNull="true">
+				<reportElement x="162" y="0" width="129" height="20" uuid="4c5d6a34-6e3b-4c52-a620-af614dd5b20d"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{numero01}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(-###0.00)" isBlankWhenNull="true">
+				<reportElement x="291" y="0" width="111" height="20" uuid="f06f3d0b-4a1c-4e27-ad40-1cfc401cd74c"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{numero02}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(-###0.00)" isBlankWhenNull="true">
+				<reportElement x="402" y="0" width="121" height="20" uuid="732ddd13-e91a-48fe-819e-083baf1c6217"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{numero01}-$F{numero02}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,124 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('planillaEdit');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{planillaEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value,label,value">
+					<h:outputLabel value="Usuario:" />
+					<h:outputText
+						value="#{planillaEditBean.cp.idLlave.idUsuario.nombres} #{planillaEditBean.cp.idLlave.idUsuario.apellidos}" />
+					<h:outputLabel for="txtEstado" value="Estado:" />
+					<h:commandLink id="txtEstado"
+						onclick="javascript:AbrirPagina('../data/entidadCambioEstadoList.jsf',550,420);"
+						disabled="#{planillaEditBean.accion eq 'INS'}"
+						value="#{planillaEditBean.descripcionEstado}">
+						<f:ajax event="click" />
+					</h:commandLink>
+					<h:outputText value="Num." />
+					<h:outputText value="#{planillaEditBean.cp.observacion}" />
+					<h:outputText value="Llave:" />
+					<h:outputText value="#{planillaEditBean.cp.idLlave.numero}" />
+					<h:outputLabel value="Total" />
+					<h:outputText value="#{planillaEditBean.cp.total}" />
+					<h:outputLabel value="Total Pagado" />
+					<h:outputText value="#{planillaEditBean.cp.valorPagado}" />
+					<h:outputLabel value="Valor Pendiente" />
+					<h:outputText value="#{planillaEditBean.cp.valorPendiente}" />
+					<h:outputLabel value="Valor Cancelado" />
+					<h:outputText value="#{planillaEditBean.cp.valorCancelado}" />
+					<h:outputLabel value="Cambio" />
+					<h:outputText value="#{planillaEditBean.cp.cambioUsd}" />
+					<h:outputLabel value="Abono" />
+					<h:outputText value="#{planillaEditBean.cp.abonoUsd}" />
+				</h:panelGrid>
+
+				<rich:dataTable value="#{planillaEditBean.dp}" var="detalle"
+					rowClasses="#{detalle.origen.replace(' ','_') }"
+					columnClasses="update,columnIxquierdo,columDerecha,columDerecha,columDerecha"
+					rowKeyVar="roe">
+					<f:facet name="header">
+						<h:outputText value="Detalle" />
+					</f:facet>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Detalle de Lectura" />
+						</f:facet>
+
+						<h:commandLink value="Lectura" action="detalleLectura"
+							rendered="#{not empty detalle.outcome}">
+							<f:param name="param5" value="#{detalle.idLectura.idLectura}" />
+							
+						</h:commandLink>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Descricpion" />
+						</f:facet>
+						<h:outputText value="#{detalle.descripcion}"
+							rendered="#{!detalle.esManual}" />
+						<h:commandLink value="#{detalle.descripcion}" action="detalleEdit"
+							rendered="#{detalle.esManual}">
+							<f:param name="action" value="UPD" />
+							<f:param name="param4" value="#{detalle.idDetallePlanilla}" />
+						</h:commandLink>
+					</rich:column>
+
+					<rich:column rendered="false">
+						<f:facet name="header">
+							<h:outputText value="Valor Unidad" />
+						</f:facet>
+						<h:outputText value="#{detalle.valorUnidad}">
+
+						</h:outputText>
+					</rich:column>
+					<rich:column rendered="false">
+						<f:facet name="header">
+							<h:outputText value="Valor Inicial" />
+						</f:facet>
+						<h:outputText value="#{detalle.valorTotalOrigen}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Valor Total" />
+						</f:facet>
+						<h:outputText value="#{detalle.valorTotal}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Valor Pagado" />
+						</f:facet>
+						<h:outputText value="#{detalle.valorPagado}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Valor Pendiente"
+								style="color:red;font-weight:bold" />
+						</f:facet>
+						<h:outputText value="#{detalle.valorPendiente}" />
+					</rich:column>
+
+
+
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Estado Pago" />
+						</f:facet>
+						<h:outputText value="#{detalle.origen}" />
+					</rich:column>
+				</rich:dataTable>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

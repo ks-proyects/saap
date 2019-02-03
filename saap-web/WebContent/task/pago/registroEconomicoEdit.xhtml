@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('registroEconomicoEdit');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{registroEconomicoEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value,label,value">
+					<h:outputLabel value="Descripción:" />
+					<h:inputText readonly="#{registroEconomicoEditBean.readOnly1}"
+						size="60"
+						value="#{registroEconomicoEditBean.registroEconomico.descripcion}" />
+
+					<h:outputLabel for="txtEstado" value="Estado:" />
+					<h:commandLink id="txtEstado"
+						onclick="javascript:AbrirPagina('../data/entidadCambioEstadoList.jsf',550,420);"
+						disabled="#{registroEconomicoEditBean.accion} eq 'INS'}"
+						value="#{registroEconomicoEditBean.descripcionEstado}">
+						<f:ajax event="click" />
+					</h:commandLink>
+					<h:outputLabel value="Valor:" />
+					<h:inputText
+						value="#{registroEconomicoEditBean.registroEconomico.valor}"
+						onkeypress="return ValidarNumerico('%f',this,event);"
+						readonly="#{registroEconomicoEditBean.readOnly1}" />
+
+					<h:outputLabel value="Periodo:" />
+					<h:selectOneMenu disabled="#{registroEconomicoEditBean.readOnly1}"
+						value="#{registroEconomicoEditBean.idPeriodoPago}">
+						<f:selectItems value="#{registroEconomicoEditBean.periodoPago}" />
+					</h:selectOneMenu>
+					<h:outputText value="Fecha Registro:" />
+					<h:outputText
+						value="#{registroEconomicoEditBean.registroEconomico.fechaRegistro}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+
+				</h:panelGrid>
+
+
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

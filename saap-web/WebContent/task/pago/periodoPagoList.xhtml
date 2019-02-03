@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('periodoPagoList');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{periodoPagoListBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value">
+					<h:outputLabel value="Filtro" />
+					<h:inputText value="#{periodoPagoListBean.filtro}" size="50">
+						<f:ajax event="keyup" render="table"
+							listener="#{periodoPagoListBean.changeName}" />
+					</h:inputText>
+				</h:panelGrid>
+				<rich:dataScroller for="table" maxPages="5"  id="scroll"/>
+				<rich:dataTable id="table" rows="#{periodoPagoListBean.numeroFilas}"
+					value="#{periodoPagoListBean.periodoPagos}" var="pp"
+					rowKeyVar="row" columnClasses="columDerecha,columnIxquierdo">
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="#" />
+						</f:facet>
+						<h:outputText value="#{row+1}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Descripción" />
+						</f:facet>
+						<h:commandLink value="#{pp.descripcion}" action="periodoPagoEdit">
+							<f:param name="action" value="UPD" />
+							<f:param name="param1" value="#{pp.idPeriodoPago}" />
+						</h:commandLink>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Fecha Inicio" />
+						</f:facet>
+						<h:outputText value="#{pp.fechaInicio}">
+							<f:convertDateTime pattern="dd/MM/yyy" />
+						</h:outputText>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Fecha Finalización" />
+						</f:facet>
+						<h:outputText value="#{pp.fechaFin}">
+							<f:convertDateTime pattern="dd/MM/yyy" />
+						</h:outputText>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Estado" />
+						</f:facet>
+						<h:outputText
+							value="#{pp.estado eq 'ING'?'Ingresado':(pp.estado eq 'ABIE'?'Abierto':(pp.estado eq 'FIN' or pp.estado eq 'FINI'?'Finalizado':'Cerrado'))}" />
+					</rich:column>
+
+
+				</rich:dataTable>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

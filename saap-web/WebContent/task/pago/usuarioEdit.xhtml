@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body
+			onload="javascript:load('usuarioEdit',':WorkPage:txtNombres');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{usuarioEditBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value,label,value">
+					<h:outputLabel for="txtNombres" value="* Nombres:" />
+					<h:inputText id="txtNombres"
+						readonly="#{usuarioEditBean.readOnly1}" size="60"
+						value="#{usuarioEditBean.usuario.nombres}" />
+					<h:outputLabel for="txtEstado" value="Estado:" />
+					<h:commandLink id="txtEstado"
+						onclick="javascript:AbrirPagina('../data/entidadCambioEstadoList.jsf',550,420);"
+						disabled="#{usuarioEditBean.accion eq 'INS'}"
+						value="#{usuarioEditBean.descripcionEstado}">
+						<f:ajax event="click" />
+					</h:commandLink>
+					<h:outputLabel for="txtApellidos" value="* Apellidos:" />
+
+					<h:inputText id="txtApellidos"
+						readonly="#{usuarioEditBean.readOnly1}" size="60"
+						value="#{usuarioEditBean.usuario.apellidos}" />
+					<h:outputLabel for="txtCedula" value="* Cédula:" />
+					<h:inputText id="txtCedula" maxlength="10"
+						readonly="#{usuarioEditBean.readOnly1}"
+						onkeypress="return ValidarNumerico('%d',this,event);"
+						value="#{usuarioEditBean.usuario.cedula}" />
+
+					<h:outputLabel for="txtEsComunero" value="Es Comunero:" />
+					<h:selectOneMenu id="txtEsComunero"
+						readonly="#{usuarioEditBean.readOnly1}"
+						value="#{usuarioEditBean.usuario.esComunero}">
+						<f:selectItem itemLabel="NO" itemValue="N" />
+						<f:selectItem itemLabel="SI" itemValue="S" />
+					</h:selectOneMenu>
+
+
+					<h:outputLabel for="txtEstadoCivil" value="Estado Civil:" />
+					<h:selectOneMenu id="txtEstadoCivil"
+						readonly="#{usuarioEditBean.readOnly1}"
+						disabled="#{usuarioEditBean.readOnly1}"
+						value="#{usuarioEditBean.idEstadoCivil}">
+						<f:selectItems value="#{usuarioEditBean.itemEstadoCicils}" />
+					</h:selectOneMenu>
+					<h:outputLabel for="txtFechaNacimiento" value="* Fecha Nacimiento:" />
+					<rich:calendar id="txtFechaNacimiento" datePattern="dd/MM/yyyy"
+						disabled="#{usuarioEditBean.readOnly1}" enableManualInput="true"
+						value="#{usuarioEditBean.usuario.fechaNacimiento}" />
+					<h:outputLabel for="txtEdad" value="Edad:" />
+					<h:outputText id="txtEdad" value="#{usuarioEditBean.usuario.edad}" />
+					<h:outputLabel for="txtSexo" value="Sexo:" />
+					<h:selectOneMenu id="txtSexo"
+						readonly="#{usuarioEditBean.readOnly1}"
+						disabled="#{usuarioEditBean.readOnly1}"
+						value="#{usuarioEditBean.usuario.sexo}">
+						<f:selectItem itemValue="F" itemLabel="Femenino" />
+						<f:selectItem itemValue="M" itemLabel="Masculino" />
+					</h:selectOneMenu>
+					<h:outputLabel for="txtDireccion" value="Direcci&#243;n:" />
+					<h:inputTextarea style="width:200px" rows="3"
+						value="#{usuarioEditBean.usuario.direccion}"
+						readonly="#{usuarioEditBean.readOnly1}" id="txtDireccion" />
+
+					<h:outputLabel for="txtTelefono" value="Tel&#233;fono:" />
+					<h:inputText id="txtTelefono"
+						readonly="#{usuarioEditBean.readOnly1}"
+						value="#{usuarioEditBean.usuario.telefono1}" />
+					<h:outputLabel for="txtCelular" value="C&#233;lular:" />
+					<h:inputText id="txtCelular"
+						readonly="#{usuarioEditBean.readOnly1}"
+						value="#{usuarioEditBean.usuario.telefono2}" maxlength="10"
+						onkeypress="return ValidarNumerico('%d',this,event);" />
+					<h:outputLabel for="txtEmail" value="Email:" />
+					<h:inputText id="txtEmail" value="#{usuarioEditBean.usuario.email}"
+						readonly="#{usuarioEditBean.readOnly1}" />
+				</h:panelGrid>
+
+				<rich:dataTable value="#{usuarioEditBean.listLlaves}" var="llave"
+					columnClasses="columDerecha,columnIxquierdo" rowKeyVar="roe">
+					<f:facet name="header">
+						<h:outputText value="Llave" />
+					</f:facet>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="#" />
+						</f:facet>
+						<h:outputText value="#{row +1}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="# Medidor" />
+						</f:facet>
+						<h:commandLink action="llaveInsert" value="#{llave.numero}">
+							<f:param name="action" value="UPD" />
+							<f:param name="param2" value="#{llave.idLlave}" />
+						</h:commandLink>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Fecha de Registro" />
+						</f:facet>
+						<h:outputText value="#{llave.fechaRegistro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Tarifa" />
+						</f:facet>
+						<h:outputText value="#{llave.idTarifa.descripcion}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Tarifa" />
+						</f:facet>
+						<h:outputText value="#{llave.idTarifa.descripcion}" />
+					</rich:column>
+				</rich:dataTable>
+				<br />
+				<rich:dataTable value="#{usuarioEditBean.listRepresentantes}"
+					rendered="#{not empty usuarioEditBean.listRepresentantes}"
+					columnClasses="columDerecha,columnIxquierdo,columnIxquierdo,columnIxquierdo,columDerecha"
+					var="rep" rowKeyVar="roe">
+					<f:facet name="header">
+						<h:outputText value="Representantes" />
+					</f:facet>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="#" />
+						</f:facet>
+						<h:outputText value="#{row +1}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="C&#233;dula" />
+						</f:facet>
+						<h:commandLink action="representanteEdit"
+							value="#{rep.idUsuario.cedula}">
+							<f:param name="action" value="UPD" />
+							<f:param name="param2" value="#{rep.idRepresentante}" />
+						</h:commandLink>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Nombres" />
+						</f:facet>
+						<h:outputText
+							value="#{rep.idUsuario.nombres} #{rep.idUsuario.apellidos}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Paretesco" />
+						</f:facet>
+						<h:outputText value="#{rep.idParentesco.descripcion}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Orden" />
+						</f:facet>
+						<h:outputText value="#{rep.orden}" />
+					</rich:column>
+				</rich:dataTable>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

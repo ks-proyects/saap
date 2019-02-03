@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('llaveList');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{llaveListBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value">
+					<h:outputLabel value="Filtro" />
+					<h:inputText value="#{llaveListBean.filtro.valorCadena}" size="60">
+						<f:ajax event="keyup" render="table"
+							listener="#{llaveListBean.changeName}" />
+					</h:inputText>
+				</h:panelGrid>
+				<rich:dataScroller for="table" maxPages="5"  id="scroll"/>
+				<rich:dataTable id="table" columnClasses="columDerecha,columnIxquierdo"
+					value="#{llaveListBean.listLlaves}" var="ll" rowKeyVar="row" rows="#{llaveListBean.numeroFilas}">
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="#" />
+						</f:facet>
+						<h:outputText value="#{row+1}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="# Medidor" />
+						</f:facet>
+						<h:commandLink value="#{ll.numero}" action="llaveEdit">
+							<f:param name="action" value="UPD" />
+							<f:param name="param2" value="#{ll.idLlave}" />
+						</h:commandLink>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Usuario" />
+						</f:facet>
+						<h:outputText
+							value="#{ll.idUsuario.nombres} #{ll.idUsuario.apellidos}" />
+					</rich:column>
+
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="C&#233;dula Usuario" />
+						</f:facet>
+						<h:outputText value="#{ll.idUsuario.cedula}" />
+					</rich:column>
+
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Estado" />
+						</f:facet>
+						<h:outputText
+							value="#{ll.estado eq 'ING'?'Ingresado':(ll.estado eq 'REV'?'Revición':(ll.estado eq 'ACT'?'Activo':'Defectuoso'))}" />
+					</rich:column>
+
+				</rich:dataTable>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

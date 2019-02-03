@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('usuarioPagoList');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{usuarioPagoListBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value">
+					<h:outputLabel value="Multa:" />
+					<h:outputText
+						value="#{usuarioPagoListBean.registroEconomico.descripcion}" />
+					<h:outputLabel value="Valor:" />
+					<h:outputLabel
+						value="#{usuarioPagoListBean.registroEconomico.valor}">
+						<f:convertNumber currencySymbol="$" />
+					</h:outputLabel>
+					<h:outputText value="Filtro" />
+					<h:inputText value="#{usuarioPagoListBean.filtro}" size="50">
+						<f:ajax event="keyup" render="table"
+							listener="#{usuarioPagoListBean.changeName}" />
+					</h:inputText>
+
+				</h:panelGrid>
+				<rich:dataScroller for="table" maxPages="5" id="scroll" />
+				<rich:dataTable columnClasses="columDerecha,columnIxquierdo"
+					rows="#{usuarioPagoListBean.numeroFilas}" id="table"
+					value="#{usuarioPagoListBean.pagoDTOs}" var="ll" rowKeyVar="row">
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="#" />
+						</f:facet>
+						<h:outputText value="#{roe+1}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Usuario" />
+						</f:facet>
+						<h:outputText
+							value="#{ll.usuario.nombres} #{ll.usuario.apellidos}" />
+
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Cédula" />
+						</f:facet>
+						<h:outputText value="#{ll.usuario.cedula}" />
+
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Estado" />
+						</f:facet>
+						<h:outputText value="#{ll.estadoDescripcion}" />
+					</rich:column>
+					<rich:column style="text-align:center;width:10px;">
+						<f:facet name="header">
+							<h:outputText value="Seleccionado" />
+						</f:facet>
+						<h:selectBooleanCheckbox
+							disabled="#{usuarioPagoListBean.readOnly1}"
+							value="#{ll.seleccionado}" />
+					</rich:column>
+
+
+				</rich:dataTable>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

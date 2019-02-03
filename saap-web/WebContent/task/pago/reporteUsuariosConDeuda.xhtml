@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fiji1="http://exadel.com/fiji"
+	xmlns:fiji4="http://exadel.com/fiji/chart"
+	xmlns:fiji2="http://exadel.com/fiji/commonchart">
+	<ui:define name="body">
+		<h:body onload="javascript:load('reporteUsuariosConDeuda');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{reporteDeudasUsuarioBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value">
+					<h:outputText value="Tipo" />
+					<h:selectOneMenu value="#{reporteDeudasUsuarioBean.tipoRegistro}">
+						<f:selectItems
+							value="#{reporteDeudasUsuarioBean.tipoRegistroIngresos}" />
+					</h:selectOneMenu>
+				</h:panelGrid>
+
+				<rich:tabPanel>
+					<rich:tab header="Gráfico">
+						<fiji4:columnChart id="goldMedals"
+							value="#{reporteDeudasUsuarioBean.medalsData}"
+							legendPosition="top"
+							barColors="#{reporteDeudasUsuarioBean.colors}" width="700"
+							height="400">
+							<fiji2:chartData type="name"
+								value="#{reporteDeudasUsuarioBean.names}" />
+						</fiji4:columnChart>
+					</rich:tab>
+					<rich:tab header="Grilla"></rich:tab>
+				</rich:tabPanel>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

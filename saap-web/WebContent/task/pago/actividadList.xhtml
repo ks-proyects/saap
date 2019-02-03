@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('actividadList');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{actividadListBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="2"
+					columnClasses="label,value">
+					<h:outputLabel value="Periodo:" />
+					<h:selectOneMenu value="#{actividadListBean.idPeriodopago}"
+						valueChangeListener="#{actividadListBean.valueChange}">
+						<f:selectItems value="#{actividadListBean.periodos}" />
+						<f:ajax event="change" render=":WorkPage:table" />
+					</h:selectOneMenu>
+				</h:panelGrid>
+				<rich:dataTable id="table"
+					columnClasses="columDerecha,columnIxquierdo"
+					value="#{actividadListBean.listActividads}" var="dp"
+					rowKeyVar="row">
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="#" />
+						</f:facet>
+						<h:outputText value="#{row+1}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Descripción" />
+						</f:facet>
+						<h:commandLink value="#{dp.descripcion}" action="actividadEdit">
+							<f:param name="action" value="UPD" />
+							<f:param name="param1" value="#{dp.actividad}" />
+						</h:commandLink>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Valor Multa" />
+						</f:facet>
+						<h:outputText value="#{dp.valorMulta}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Periodo" />
+						</f:facet>
+						<h:outputText value="#{dp.idPeriodoPago.descripcion}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Máximo Rayas" />
+						</f:facet>
+						<h:outputText value="#{dp.maximoRayas}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Fecha de Actividad" />
+						</f:facet>
+						<h:outputText value="#{dp.fechaEvento}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Tipo de EActividad" />
+						</f:facet>
+						<h:outputText value="#{dp.tipoActividad.descripcion}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Estado" />
+						</f:facet>
+						<h:outputText
+							value="#{dp.actEstado eq 'ING'?'Ingresado':'Aplicado'}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="" />
+						</f:facet>
+						<h:commandLink value="Asistencias" action="asistenciaList">
+							<f:param name="action" value="UPD" />
+							<f:param name="param1" value="#{dp.actividad}" />
+
+						</h:commandLink>
+					</rich:column>
+				</rich:dataTable>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

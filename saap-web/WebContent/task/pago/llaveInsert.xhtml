@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:define name="body">
+		<h:body onload="javascript:load('llaveInsert');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{llaveInsertBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value,label,value">
+					<h:outputLabel for="txtNumero" value="* # Medidor:" />
+					<h:inputText id="txtNumero" value="#{llaveInsertBean.llave.numero}"
+						readonly="#{llaveInsertBean.readOnly1}"
+						onkeypress="return ValidarNumerico('%d',this,event);" />
+
+					<h:outputLabel for="txtEstado" value="Estado:" />
+					<h:commandLink id="txtEstado"
+						value="#{llaveInsertBean.llave.estado}" disabled="true" />
+					<h:outputLabel for="txtTipoLlave" value="Tipo de Llave:" />
+
+					<h:selectOneMenu id="txtTipoLlave"
+						disabled="#{llaveInsertBean.readOnly1}"
+						valueChangeListener="#{llaveInsertBean.changeTipoLlave}"
+						value="#{llaveInsertBean.tipoLlave}">
+						<f:selectItems value="#{llaveInsertBean.itemTipoLlave}" />
+						<f:ajax render="txtTarifa" event="change" />
+					</h:selectOneMenu>
+					<h:outputLabel for="txtTarifa" value="Tarifa:" />
+					<h:selectOneMenu id="txtTarifa" value="#{llaveInsertBean.idTarifa}"
+						disabled="#{llaveInsertBean.readOnly1}">
+						<f:selectItems value="#{llaveInsertBean.itemTarifa}" />
+					</h:selectOneMenu>
+					<h:outputLabel for="txtUbicacion" value="Ubicación:" />
+					<h:selectOneMenu value="#{llaveInsertBean.llave.ubicacion}"
+						disabled="#{llaveInsertBean.readOnly1}">
+						<f:selectItem itemLabel="GRUPO1" itemValue="GRUPO1" />
+						<f:selectItem itemLabel="GRUPO2" itemValue="GRUPO2" />
+						<f:selectItem itemLabel="GRUPO3" itemValue="GRUPO3" />
+						<f:selectItem itemLabel="GRUPO4" itemValue="GRUPO4" />
+					</h:selectOneMenu>
+					<h:outputLabel value="Fecha de Registro:" />
+					<h:outputText value="#{llaveInsertBean.llave.fechaRegistro}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</h:panelGrid>
+
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

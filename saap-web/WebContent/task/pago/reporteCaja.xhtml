@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/home/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fiji1="http://exadel.com/fiji"
+	xmlns:fiji4="http://exadel.com/fiji/chart"
+	xmlns:fiji2="http://exadel.com/fiji/commonchart">
+	<ui:define name="body">
+		<h:body onload="javascript:load('reporteCaja');">
+			<h:form id="WorkPage">
+				<h:outputText value="#{reporteCajaBean.page.nombre}"
+					styleClass="pageLabel" />
+				<rich:toolbar styleClass="toolbar" id="toolBar" />
+				<h:panelGrid styleClass="Table" columns="4"
+					columnClasses="label,value">
+					<h:outputText value="Año:" />
+					<h:selectOneMenu value="#{reporteCajaBean.anio.valorEntero}">
+						<f:selectItems value="#{reporteCajaBean.anios}" />
+						<f:ajax event="change" render=":WorkPage:cmdMeses"
+							listener="#{reporteCajaBean.changeAnio}" />
+					</h:selectOneMenu>
+					<h:outputText value="Mes:" />
+					<h:selectOneMenu id="cmdMeses" value="#{reporteCajaBean.mes.valorEntero}">
+						<f:selectItems value="#{reporteCajaBean.meses}" />
+					</h:selectOneMenu>
+				</h:panelGrid>
+				<h:panelGrid styleClass="Table" columns="3">
+
+					<fiji1:swf src="/tools/swf/ingresos/ampie.swf" bgcolor="#FFFFFF"
+						width="375" height="650">
+						<f:param name="path" value="/ingresos" />
+						<f:param name="settings_file"
+							value="#{request.contextPath}/tools/swf/ingresos/ampie_settings.xml" />
+						<f:param name="data_file"
+							value="#{request.contextPath}/tools/swf/ingresos/ampie_data.xml" />
+						<f:param name="preloader_color" value="#999999" />
+					</fiji1:swf>
+					<fiji1:swf src="/tools/swf/salidas/ampie.swf" bgcolor="#FFFFFF"
+						width="375" height="450">
+						<f:param name="path" value="/salidas" />
+						<f:param name="settings_file"
+							value="#{request.contextPath}/tools/swf/salidas/ampie_settings.xml" />
+						<f:param name="data_file"
+							value="#{request.contextPath}/tools/swf/salidas/ampie_data.xml" />
+						<f:param name="preloader_color" value="#999999" />
+					</fiji1:swf>
+					<fiji1:swf src="/tools/swf/total/ampie.swf" bgcolor="#FFFFFF"
+						width="375" height="450">
+						<f:param name="path" value="/total" />
+						<f:param name="settings_file"
+							value="#{request.contextPath}/tools/swf/total/ampie_settings.xml" />
+						<f:param name="data_file"
+							value="#{request.contextPath}/tools/swf/total/ampie_data.xml" />
+						<f:param name="preloader_color" value="#999999" />
+					</fiji1:swf>
+				</h:panelGrid>
+			</h:form>
+		</h:body>
+	</ui:define>
+</ui:composition>
+

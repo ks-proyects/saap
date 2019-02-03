@@ -1,0 +1,13 @@
+@CHARSET "ISO-8859-1";
+
+/*Header*/
+#HomeForm .rf-tb{
+	border: 0px solid #C4C0B9;
+	font-family:Verdana;
+	opacity:0.97;
+}
+.rf-tab-hdr-tabline-vis.rf-tab-hdr-tabline-top{
+	border-color:transparent;
+	border-width:0px;
+	background: transparent;
+}
