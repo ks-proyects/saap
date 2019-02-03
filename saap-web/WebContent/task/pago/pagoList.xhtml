@@ -12,13 +12,15 @@
 				<h:outputText value="#{pagoListBean.page.nombre}"
 					styleClass="pageLabel" />
 				<rich:toolbar styleClass="toolbar" id="toolBar" />
-				<h:panelGrid styleClass="Table" columns="2"
-					columnClasses="label,value">
+				<h:panelGrid styleClass="Table" columns="3"
+					columnClasses="label,value,value">
 					<h:outputLabel value="Filtro" />
 					<h:inputText value="#{pagoListBean.filtro}" size="50">
-						<f:ajax event="keyup" render="table"
+						<f:ajax event="keyup" render="table" execute="maxResult"
 							listener="#{pagoListBean.changeName}" />
 					</h:inputText>
+					<rich:inputNumberSpinner value="#{pagoListBean.cantidadResultados}"
+						id="maxResult" title="Cantidad Máxima de Registros a mostrar." />
 				</h:panelGrid>
 				<rich:dataScroller for="table" maxPages="5" id="scroll" />
 				<rich:dataTable columnClasses="columDerecha,columnIxquierdo"
@@ -85,7 +87,7 @@
 					</rich:column>
 					<f:facet name="footer">
 
-						
+
 					</f:facet>
 				</rich:dataTable>
 			</h:form>

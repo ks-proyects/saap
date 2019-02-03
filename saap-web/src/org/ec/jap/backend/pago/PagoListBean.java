@@ -33,6 +33,7 @@ public class PagoListBean extends Bean {
 
 	private List<CabeceraPlanilla> cabeceraPlanillas;
 	private String filtro;
+	private Integer cantidadResultados;
 
 	public PagoListBean() {
 		super();
@@ -42,6 +43,7 @@ public class PagoListBean extends Bean {
 	public void init() {
 		try {
 			super.init();
+			cantidadResultados=10;
 			search(null);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -55,7 +57,7 @@ public class PagoListBean extends Bean {
 			map = new HashMap<>();
 			map.put("filtro", filtro != null ? filtro : "%");
 			map.put("estado", "CERR");
-			cabeceraPlanillas = cabeceraPlanillaBO.findAllByNamedQuery("CabeceraPlanilla.findByPerAbiertActFilters", map);
+			cabeceraPlanillas = cabeceraPlanillaBO.findAllByNamedQuery(cantidadResultados,"CabeceraPlanilla.findByPerAbiertActFilters", map);
 		} catch (Exception e) {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
@@ -67,7 +69,7 @@ public class PagoListBean extends Bean {
 			map.put("filtro", filtro != null ? filtro : "%");
 			map.put("filtro", filtro != null ? filtro : "%");
 			map.put("estado", "CERR");
-			cabeceraPlanillas = cabeceraPlanillaBO.findAllByNamedQuery("CabeceraPlanilla.findByPerAbiertActFilters", map);
+			cabeceraPlanillas = cabeceraPlanillaBO.findAllByNamedQuery(cantidadResultados,"CabeceraPlanilla.findByPerAbiertActFilters", map);
 		} catch (Exception e) {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
@@ -89,6 +91,15 @@ public class PagoListBean extends Bean {
 	public void setFiltro(String filtro) {
 		this.filtro = filtro;
 	}
+
+	public Integer getCantidadResultados() {
+		return cantidadResultados;
+	}
+
+	public void setCantidadResultados(Integer cantidadResultados) {
+		this.cantidadResultados = cantidadResultados;
+	}
+	
 
 //	public Integer getTotalPagado() {
 //		Integer total = 0;

@@ -35,8 +35,9 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
 	@Override
 	public String guardarLecturas(Usuario usuario, List<Lectura> lecturas) throws Exception {
-		// Parametro que indica el método de calculo de los metros consumidos
+		// Parametro que indica el mï¿½todo de calculo de los metros consumidos
 		String aplicaMetodoCobroAnt = parametroBO.getString("", usuario.getIdComunidad().getIdComunidad(), "APLTITAA");
+		Boolean esMetodoAnterior = "SI".equalsIgnoreCase(aplicaMetodoCobroAnt);
 		Double valorDiferencia = parametroBO.getNumerico("", usuario.getIdComunidad().getIdComunidad(), "DIFCONS");
 		String mensaje = "";
 		String mensajeAlerta = "";
@@ -91,20 +92,21 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 								// la
 								// mulata por exceso
 								rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
+								Double metros3Exceso = esMetodoAnterior ? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo())) : 0;
+								lectura.setMetros3Exceso(metros3Exceso);
 
-								lectura.setMetros3Exceso(Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo())));
-								lectura.setValorMetro3Exceso(Utilitario.redondear(rangoConsumo.getValorExceso()));
-								lectura.setMetros3(Utilitario.redondear(rangoConsumo.getM3Minimo()));// El
-																										// valor
-																										// basico
-																										// consumido
-																										// sera
-																										// la
-																										// diferencia
-								lectura.setBasicoM3(rangoConsumo.getM3Minimo());
+								lectura.setValorMetro3Exceso(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0);
+								lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo()) : lectura.getMetros3());// El
+								// valor
+								// basico
+								// consumido
+								// sera
+								// la
+								// diferencia
+								lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Minimo() : 0);
 							} else
-								lectura.setBasicoM3(rangoConsumo.getM3Maximo());
-							lectura.setValorMetro3Exceso(rangoConsumo.getValorExceso());
+								lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Maximo() : 0);
+							lectura.setValorMetro3Exceso(esMetodoAnterior ? rangoConsumo.getValorExceso() : 0);
 							lectura.setValorMetro3(Utilitario.redondear(rangoConsumo.getValorM3()));
 						}
 					} else {
@@ -139,8 +141,9 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
 	@Override
 	public Lectura recalcularLectura(Usuario usuario, Lectura lectura) throws Exception {
-		// Parametro que indica el método de calculo de los metros consumidos
+		// Parametro que indica el mï¿½todo de calculo de los metros consumidos
 		String aplicaMetodoCobroAnt = parametroBO.getString("", usuario.getIdComunidad().getIdComunidad(), "APLTITAA");
+		Boolean esMetodoAnterior = "SI".equalsIgnoreCase(aplicaMetodoCobroAnt);
 		lectura.setValorBasico(0.0);
 		if (lectura.getSinLectura()) {
 			lectura.setLecturaIngresada(0.0);
@@ -179,17 +182,19 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 						map = new HashMap<>(0);
 						map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
 						map.put("valor", lectura.getMetros3());
-						map.put("formaPago", "SI".equalsIgnoreCase(aplicaMetodoCobroAnt) ? Formapago.valueOf("A") : Formapago.valueOf("N"));
+						map.put("formaPago", esMetodoAnterior ? Formapago.valueOf("A") : Formapago.valueOf("N"));
 						RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
 						if (rangoConsumo == null) {
 							rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
-							lectura.setMetros3Exceso(Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo())));
-							lectura.setValorMetro3Exceso(Utilitario.redondear(rangoConsumo.getValorExceso()));
-							lectura.setMetros3(Utilitario.redondear(rangoConsumo.getM3Minimo()));
-							lectura.setBasicoM3(rangoConsumo.getM3Minimo());
+							Double metros3Excso = esMetodoAnterior ? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo())) : 0.0;
+							lectura.setMetros3Exceso(metros3Excso);
+							Double valorMetro3Exceso = esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0.0;
+							lectura.setValorMetro3Exceso(valorMetro3Exceso);
+							lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo()) : lectura.getMetros3());
+							lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Minimo() : 0);
 						} else
-							lectura.setBasicoM3(rangoConsumo.getM3Maximo());
-						lectura.setValorMetro3Exceso(Utilitario.redondear(rangoConsumo.getValorExceso()));
+							lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Maximo() : 0);
+						lectura.setValorMetro3Exceso(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0);
 						lectura.setValorMetro3(Utilitario.redondear(rangoConsumo.getValorM3()));
 					}
 				} else {
@@ -209,13 +214,15 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
 	@Override
 	public String guardarLecturasCerradas(Usuario usuario, List<Lectura> lecturas) throws Exception {
-		// Parametro que indica el método de calculo de los metros consumidos
+		// Parametro que indica el mï¿½todo de calculo de los metros consumidos
 		String aplicaMetodoCobroAnt = parametroBO.getString("", usuario.getIdComunidad().getIdComunidad(), "APLTITAA");
+		Boolean esMetodoAnterior = "SI".equalsIgnoreCase(aplicaMetodoCobroAnt);
 		Double valorDiferencia = parametroBO.getNumerico("", usuario.getIdComunidad().getIdComunidad(), "DIFCONS");
 		String mensaje = "";
 		String mensajeAlerta = "";
 
 		for (Lectura lectura : lecturas) {
+
 			lectura.setValorBasico(0.0);
 			if (lectura.getSinLectura() || !lectura.getEsModificable()) {
 				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0)) || lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
@@ -228,7 +235,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 							map = new HashMap<>(0);
 							map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
 							map.put("valor", lectura.getMetros3());
-							map.put("formaPago", "SI".equalsIgnoreCase(aplicaMetodoCobroAnt) ? Formapago.valueOf("A") : Formapago.valueOf("N"));
+							map.put("formaPago", esMetodoAnterior ? Formapago.valueOf("A") : Formapago.valueOf("N"));
 							RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
 							// Si no esta en algun rango buscamos el exseso
 							if (rangoConsumo == null) {
@@ -238,22 +245,23 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 								// la
 								// mulata por exceso
 								rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
-
-								lectura.setMetros3Exceso(Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo())));
-								lectura.setValorMetro3Exceso(Utilitario.redondear(rangoConsumo.getValorExceso()));
-								lectura.setMetros3(Utilitario.redondear(rangoConsumo.getM3Minimo()));// El
-																										// valor
-																										// basico
-																										// consumido
-																										// sera
-																										// la
-																										// diferencia
-								lectura.setBasicoM3(rangoConsumo.getM3Minimo());
+								Double exceso = esMetodoAnterior ? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo())) : 0;
+								lectura.setMetros3Exceso(exceso);
+								Double valorExceso = esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0;
+								lectura.setValorMetro3Exceso(valorExceso);
+								lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo()) : lectura.getMetros3());// El
+								// valor
+								// basico
+								// consumido
+								// sera
+								// la
+								// diferencia
+								lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Minimo() : 0);
 							} else {
-								lectura.setBasicoM3(rangoConsumo.getM3Maximo());
+								lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Maximo() : 0);
 
 							}
-							lectura.setValorMetro3Exceso(rangoConsumo.getValorExceso());
+							lectura.setValorMetro3Exceso(esMetodoAnterior ? rangoConsumo.getValorExceso() : 0);
 							lectura.setValorMetro3(Utilitario.redondear(rangoConsumo.getValorM3()));
 						}
 					} else {

@@ -83,6 +83,10 @@ public abstract class DAOImpl<Entiti, Pk extends Serializable> implements DAO<En
 	public final List<Entiti> findAllByNamedQuery(String namedQuery, HashMap<String, Object> p) throws Exception {
 		return getQuery(namedQuery, p).getResultList();
 	}
+	@Override
+	public final List<Entiti> findAllByNamedQuery(Integer maxResult,String namedQuery, HashMap<String, Object> p) throws Exception {
+		return getQuery(namedQuery, p).setMaxResults(maxResult).getResultList();
+	}
 
 	@Override
 	public final List<Entiti> findAllByNamedQueryObject(String namedQuery, Object... p) throws Exception {

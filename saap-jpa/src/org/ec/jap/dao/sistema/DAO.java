@@ -193,4 +193,6 @@ public interface DAO<Entiti, Pk extends Serializable> {
 
 	<E> List<E> findAllEntentiByNamedQuery(String namedQuery, Object... p) throws Exception;
 
+	List<Entiti> findAllByNamedQuery(Integer maxResult, String namedQuery, HashMap<String, Object> p) throws Exception;
+
 }
