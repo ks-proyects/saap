@@ -3,6 +3,7 @@
 saap-jpa/.settings*
 saap-ejb/.settings*
 saap-web/.settings*
+saap-ear/.settings*
 
 # Log file
 *.log
