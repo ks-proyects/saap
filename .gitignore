@@ -1,5 +1,8 @@
 # Compiled class file
 *.class
+saap-jpa/.settings*
+saap-ejb/.settings*
+saap-web/.settings*
 
 # Log file
 *.log
