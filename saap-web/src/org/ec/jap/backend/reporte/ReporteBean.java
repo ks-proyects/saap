@@ -83,7 +83,7 @@ public class ReporteBean extends Bean {
 		} else if (formato.equals(OutputType.PRINT)) {
 			String servidor = parametroBO.getString("", getUsuarioCurrent().getIdComunidad().getIdComunidad(), "SERIMPR");
 			String nombreImpresora = parametroBO.getString("", getUsuarioCurrent().getIdComunidad().getIdComunidad(), "NOMIMPR");
-			JassperConfigUtil.exportReportAsPrint(jasperPrint, Impresora.getImpresora((servidor != null ? servidor : "") + nombreImpresora));
+			JassperConfigUtil.exportReportAsPrint(jasperPrint, Impresora.getImpresora((servidor != null ? servidor : "") + nombreImpresora),parametroBO.getInteger("", getUsuarioCurrent().getIdComunidad().getIdComunidad(), "NUMCOP"));
 		} else {
 			request.getSession().setAttribute(BaseHttpServlet.DEFAULT_JASPER_PRINT_SESSION_ATTRIBUTE, jasperPrint);
 			response.sendRedirect(request.getContextPath() + "/servlets/report/" + formato);
