@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.util.Map;
 
 import javax.print.PrintService;
+import javax.print.attribute.AttributeSet;
+import javax.print.attribute.HashAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.Copies;
 import javax.servlet.ServletContext;
@@ -98,13 +100,11 @@ public class JassperConfigUtil {
 		JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
 	}
 
-	public static void exportReportAsPrint(JasperPrint jasperPrint, PrintService printService, int numCopies) throws Exception {
+	public static void exportReportAsPrint(JasperPrint jasperPrint, PrintService printService) throws Exception {
 		if (printService != null) {
 			JRExporter jrExporter = new JRPrintServiceExporter();
 			jrExporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
 			jrExporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE, printService);
-			PrintServiceAttributeSet attributes = printService.getAttributes();
-			attributes.add(new Copies(numCopies));
 			jrExporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printService.getAttributes());
 			jrExporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
 			jrExporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);
