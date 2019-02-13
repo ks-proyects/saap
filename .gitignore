@@ -1,9 +1,14 @@
 # Compiled class file
 *.class
-saap-jpa/.settings*
-saap-ejb/.settings*
-saap-web/.settings*
-saap-ear/.settings*
+#saap-jpa/.settings*
+#saap-ejb/.settings*
+#saap-web/.settings*
+#saap-ear/.settings*
+
+saap-jpa/build*
+saap-ejb/build*
+saap-web/build*
+saap-ear/build*
 
 # Log file
 *.log
