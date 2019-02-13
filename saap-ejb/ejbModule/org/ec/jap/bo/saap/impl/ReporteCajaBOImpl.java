@@ -90,6 +90,9 @@ public class ReporteCajaBOImpl implements ReporteCajaBO {
 			case "MULAGU":
 				valor = (Double) detallePlanillaBO.findDoubleByNamedQuery("DetallePlanilla.findCuotas", map);
 				break;
+			case "BASCON":
+				valor = (Double) detallePlanillaBO.findDoubleByNamedQuery("DetallePlanilla.findCuotas", map);
+				break;
 			default:
 				break;
 			}
@@ -252,6 +255,9 @@ public class ReporteCajaBOImpl implements ReporteCajaBO {
 			case "MULAGU":
 				valor += (Double) detallePlanillaBO.findDoubleByNamedQuery("DetallePlanilla.findCuotasAcumulatovo", map);
 				break;
+			case "BASCON":
+				valor = (Double) detallePlanillaBO.findDoubleByNamedQuery("DetallePlanilla.findCuotas", map);
+				break;
 			default:
 				break;
 			}
@@ -393,6 +399,16 @@ public class ReporteCajaBOImpl implements ReporteCajaBO {
 			doubles[1] = Utilitario.redondear(valor);
 			break;
 		case "MULAGU":
+			param.put("tipo", "I");
+			param.put("estado1", "PAG");
+			valor = (Double) detallePlanillaBO.findDoubleByNamedQuery("DetallePlanilla.findValor", param);
+			doubles[0] = Utilitario.redondear(valor);
+			param.put("tipo", "S");
+			param.put("estado1", "ING");
+			valor = (Double) detallePlanillaBO.findDoubleByNamedQuery("DetallePlanilla.findValor", param);
+			doubles[1] = Utilitario.redondear(valor);
+			break;
+		case "BASCON":
 			param.put("tipo", "I");
 			param.put("estado1", "PAG");
 			valor = (Double) detallePlanillaBO.findDoubleByNamedQuery("DetallePlanilla.findValor", param);

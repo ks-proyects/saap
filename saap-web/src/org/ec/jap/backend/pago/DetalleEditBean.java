@@ -108,7 +108,7 @@ public class DetalleEditBean extends Bean {
 			detallePlanilla.setValorPagado(0.0);
 			detallePlanilla.setValorTotal(detallePlanilla.getValorUnidad());
 			detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
-			
+
 			detallePlanilla.setValorPendiente(detallePlanilla.getValorUnidad());
 			detallePlanilla.setValorTotalOrigen(detallePlanilla.getValorUnidad());
 			detallePlanilla.setOrigen(Constantes.origen_mes_Actual);
@@ -130,10 +130,10 @@ public class DetalleEditBean extends Bean {
 				cambioEstadoBO.cambiarEstadoSinVerificar(8, getUsuarioCurrent(), registroEconomico.getIdRegistroEconomico(), "");
 			}
 
-			if ("CONS".equals(tipoRegistro)) {
+			if ("CONS".equals(tipoRegistro) ) {
 				detallePlanilla.setOrdenStr("B");
 				// detallePlanilla.setDescripcion(registroEconomico.getDescripcion());
-			} else if ("MULAGU".equals(tipoRegistro)) {
+			} else if ("MULAGU".equals(tipoRegistro)|| "BASCON".equalsIgnoreCase(tipoRegistro)	) {
 				detallePlanilla.setOrdenStr("A");
 				// detallePlanilla.setDescripcion(registroEconomico.getDescripcion());
 			} else if ("CUO".equals(tipoRegistro)) {
@@ -224,8 +224,7 @@ public class DetalleEditBean extends Bean {
 	}
 
 	/**
-	 * @param tipoRegistros
-	 *            the tipoRegistros to set
+	 * @param tipoRegistros the tipoRegistros to set
 	 */
 	public void setTipoRegistros(List<SelectItem> tipoRegistros) {
 		this.tipoRegistros = tipoRegistros;
@@ -239,8 +238,7 @@ public class DetalleEditBean extends Bean {
 	}
 
 	/**
-	 * @param tipoRegistro
-	 *            the tipoRegistro to set
+	 * @param tipoRegistro the tipoRegistro to set
 	 */
 	public void setTipoRegistro(String tipoRegistro) {
 		this.tipoRegistro = tipoRegistro;

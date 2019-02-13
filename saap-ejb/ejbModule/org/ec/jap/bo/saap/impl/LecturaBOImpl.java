@@ -222,12 +222,11 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 		String mensajeAlerta = "";
 
 		for (Lectura lectura : lecturas) {
-
-			lectura.setValorBasico(0.0);
+			lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
 			if (lectura.getSinLectura() || !lectura.getEsModificable()) {
 				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0)) || lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
 					lectura.setMetros3(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
-					lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
+					
 					lectura.setMetros3Exceso(0.0);
 					lectura.setValorMetro3Exceso(0.0);
 					if (lectura.getMetros3() > 0) {

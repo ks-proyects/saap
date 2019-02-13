@@ -74,7 +74,7 @@ public class RegistroEconomicoBOImpl extends RegistroEconomicoDAOImpl implements
 				if ("CONS".equals(tipoRegistro)) {
 					detallePlanilla.setOrdenStr("B");
 					detallePlanilla.setDescripcion(registroEconomico.getDescripcion());
-				} else if ("MULAGU".equals(tipoRegistro)) {
+				} else if ("MULAGU".equals(tipoRegistro) || "BASCON".equalsIgnoreCase(tipoRegistro)) {
 					detallePlanilla.setOrdenStr("A");
 					detallePlanilla.setDescripcion(registroEconomico.getDescripcion());
 				} else if ("CUO".equals(tipoRegistro)) {
