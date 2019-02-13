@@ -10,6 +10,12 @@ saap-ejb/build*
 saap-web/build*
 saap-ear/build*
 
+
+saap-jpa/.tern-project*
+saap-ejb/.tern-project*
+saap-web/.tern-project*
+saap-ear/.tern-project*
+
 # Log file
 *.log
 
