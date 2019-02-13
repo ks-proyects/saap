@@ -35,7 +35,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
 	@Override
 	public String guardarLecturas(Usuario usuario, List<Lectura> lecturas) throws Exception {
-		// Parametro que indica el mï¿½todo de calculo de los metros consumidos
+		// Parametro que indica el método de calculo de los metros consumidos
 		String aplicaMetodoCobroAnt = parametroBO.getString("", usuario.getIdComunidad().getIdComunidad(), "APLTITAA");
 		Boolean esMetodoAnterior = "SI".equalsIgnoreCase(aplicaMetodoCobroAnt);
 		Double valorDiferencia = parametroBO.getNumerico("", usuario.getIdComunidad().getIdComunidad(), "DIFCONS");
@@ -141,7 +141,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
 	@Override
 	public Lectura recalcularLectura(Usuario usuario, Lectura lectura) throws Exception {
-		// Parametro que indica el mï¿½todo de calculo de los metros consumidos
+		// Parametro que indica el método de calculo de los metros consumidos
 		String aplicaMetodoCobroAnt = parametroBO.getString("", usuario.getIdComunidad().getIdComunidad(), "APLTITAA");
 		Boolean esMetodoAnterior = "SI".equalsIgnoreCase(aplicaMetodoCobroAnt);
 		lectura.setValorBasico(0.0);
@@ -214,7 +214,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
 	@Override
 	public String guardarLecturasCerradas(Usuario usuario, List<Lectura> lecturas) throws Exception {
-		// Parametro que indica el mï¿½todo de calculo de los metros consumidos
+		// Parametro que indica el método de calculo de los metros consumidos
 		String aplicaMetodoCobroAnt = parametroBO.getString("", usuario.getIdComunidad().getIdComunidad(), "APLTITAA");
 		Boolean esMetodoAnterior = "SI".equalsIgnoreCase(aplicaMetodoCobroAnt);
 		Double valorDiferencia = parametroBO.getNumerico("", usuario.getIdComunidad().getIdComunidad(), "DIFCONS");

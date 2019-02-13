@@ -99,10 +99,10 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		// Obtenemos el periodo de pago
 		PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
 
-		// Obtenemos el nï¿½mero de factura
+		// Obtenemos el numero de factura
 		Parametro parametro = parametroBO.findByPk("NUMFACT");
 		Integer numeroFactura = parametro.getValorEntero();
-		// Tamaï¿½o de numeral de la factura definido acorde al actual formato
+		// Tamaño de numeral de la factura definido acorde al actual formato
 		String path = "0000000000000";
 		// Registros Economico de multas
 		Boolean existenMultaAtrazos = false;
@@ -655,13 +655,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						detallePlanilla.setDescripcion( Utilitario.redondear(lectura.getMetros3()) + " m3" + " " + periodoPago.getDescripcion());
 					} 
 					// En caso de que no existio ningun consumo se procede a
-					// cobrar al valor bï¿½sico
-					//lectura.setDescripcion("Lectura Bï¿½sica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + periodoPago.getDescripcion());
+					// cobrar al valor básico
+					//lectura.setDescripcion("Lectura Básica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + periodoPago.getDescripcion());
 					detallePlanillaBasico.setValorTotal(Utilitario.redondear(lectura.getValorBasico()));
 					detallePlanillaBasico.setValorUnidad(Utilitario.redondear(lectura.getValorBasico()));
 					detallePlanillaBasico.setValorPagado(0.0);
 					detallePlanillaBasico.setValorPendiente(detallePlanilla.getValorTotal());
-					detallePlanillaBasico.setDescripcion("Tarifa Bï¿½sica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + periodoPago.getDescripcion());
+					detallePlanillaBasico.setDescripcion("Tarifa Básica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + periodoPago.getDescripcion());
 					//lecturaBO.update(usuario, lectura);
 					
 				}
@@ -800,13 +800,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 
 					detallePlanilla.setDescripcion( Utilitario.redondear(lectura.getMetros3()) + " m3 "  + periodoPago.getDescripcion());
 				} else {
-					lectura.setDescripcion("Lectura Bï¿½sica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + periodoPago.getDescripcion());
+					lectura.setDescripcion("Lectura Básica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + periodoPago.getDescripcion());
 					detallePlanilla.setValorTotal(Utilitario.redondear(lectura.getValorBasico()));
 					detallePlanilla.setValorUnidad(Utilitario.redondear(lectura.getValorBasico()));
 					detallePlanilla.setValorPagado(0.0);
 
 					detallePlanilla.setValorPendiente(detallePlanilla.getValorTotal());
-					detallePlanilla.setDescripcion("Tarifa Bï¿½sica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + periodoPago.getDescripcion());
+					detallePlanilla.setDescripcion("Tarifa Básica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + periodoPago.getDescripcion());
 					lecturaBO.update(usuario, lectura);
 				}
 
@@ -1210,12 +1210,12 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				detallePlanilla.setValorPagado(0.0);
 				detallePlanilla.setDescripcion( Utilitario.redondear(lectura.getMetros3()) + " m3 "  + Utilitario.descricionMes(lectura.getFechaRegistro()));
 			} else {
-				lectura.setDescripcion("Lectura Bï¿½sica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + cabeceraPlanilla.getIdPeriodoPago().getDescripcion());
+				lectura.setDescripcion("Lectura Básica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + cabeceraPlanilla.getIdPeriodoPago().getDescripcion());
 				detallePlanilla.setValorTotal(Utilitario.redondear(lectura.getValorBasico()));
 				detallePlanilla.setValorUnidad(Utilitario.redondear(lectura.getValorBasico()));
 				detallePlanilla.setValorPagado(0.0);
 				detallePlanilla.setValorPendiente(detallePlanilla.getValorTotal());
-				detallePlanilla.setDescripcion("Tarifa Bï¿½sica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + Utilitario.descricionMes(lectura.getFechaRegistro()));
+				detallePlanilla.setDescripcion("Tarifa Básica(" + Utilitario.redondear(lectura.getMetros3()) + " m3) " + Utilitario.descricionMes(lectura.getFechaRegistro()));
 			}
 			if (lectura.getMetros3() > 0)
 				detallePlanillaBO.update(usuario, detallePlanilla);
