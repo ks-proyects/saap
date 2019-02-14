@@ -645,12 +645,9 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				detallePlanillaBasico.setOrdenStr("B");
 				detallePlanillaBasico.setValorTotalOrigen(detallePlanillaBasico.getValorTotal());
 				detallePlanillaBasico.setOrigen(Constantes.origen_mes_Actual);
-				detallePlanillaBO.save(usuario, detallePlanillaBasico);
 				cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + detallePlanillaBasico.getValorTotal()));
 				cp.setTotal(Utilitario.redondear(cp.getTotal() + detallePlanillaBasico.getValorTotal()));
 				registroEconomicoBasico.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
-				detallePlanillaBasico.setValorTotalOrigen(detallePlanillaBasico.getValorTotal());
-				detallePlanillaBasico.setOrigen(Constantes.origen_mes_Actual);
 				detallePlanillaBO.save(usuario, detallePlanillaBasico);
 				cantidadMultaAtrazosAplicados++;
 
@@ -669,19 +666,15 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						detallePlanilla.setValorPendiente(detallePlanilla.getValorTotal());
 						detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3" + " " + periodoPago.getDescripcion());
 					}
-					// En caso de que no existio ningun consumo se procede a
-					// cobrar al valor básico
-					// lectura.setDescripcion("Lectura Básica(" +
-					// Utilitario.redondear(lectura.getMetros3()) + " m3) " +
-					// periodoPago.getDescripcion());
-					// lecturaBO.update(usuario, lectura);
 				}
 				if (debeRegistrarDetalle) {
-					detallePlanilla.setValorTotalOrigen(detallePlanilla.getValorTotal());
-					detallePlanilla.setOrigen(Constantes.origen_mes_Actual);
-					detallePlanillaBO.save(usuario, detallePlanilla);
-					cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + detallePlanilla.getValorTotal()));
-					cp.setTotal(Utilitario.redondear(cp.getTotal() + detallePlanilla.getValorTotal()));
+					if (lectura.getMetros3() > 0) {
+						detallePlanilla.setValorTotalOrigen(detallePlanilla.getValorTotal());
+						detallePlanilla.setOrigen(Constantes.origen_mes_Actual);
+						detallePlanillaBO.save(usuario, detallePlanilla);
+						cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + detallePlanilla.getValorTotal()));
+						cp.setTotal(Utilitario.redondear(cp.getTotal() + detallePlanilla.getValorTotal()));
+					}
 				}
 			}
 
@@ -772,7 +765,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					detallePlanillaBasico.setOrdenStr("B");
 					detallePlanillaBasico.setValorTotalOrigen(detallePlanillaBasico.getValorTotal());
 					detallePlanillaBasico.setOrigen(Constantes.origen_mes_Actual);
-					detallePlanillaBO.save(usuario, detallePlanillaBasico);
 					cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + detallePlanillaBasico.getValorTotal()));
 					cp.setTotal(Utilitario.redondear(cp.getTotal() + detallePlanillaBasico.getValorTotal()));
 					registroEconomicoBasico.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
@@ -1074,7 +1066,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		cp.setValorPagado(Utilitario.redondear(cp.getValorPagado() + valorAPagar));
 		cp.setAbonoUsd(Utilitario.redondear(cp.getAbonoUsd() + valorAbono));
 		cp.setValorPendiente(Utilitario.redondear(cp.getTotal() - cp.getValorPagado()));
-
+		cp.setFechaPago(Calendar.getInstance().getTime());
 		map.clear();
 		map.put("idPeriodoPago", anterior.getIdPeriodoPago());
 		map.put("tipoRegistro", "CUEPAG");
