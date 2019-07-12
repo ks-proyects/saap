@@ -104,14 +104,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		Integer numeroFactura = parametro.getValorEntero();
 		// Tamaño de numeral de la factura definido acorde al actual formato
 		String path = "0000000000000";
-		// Registros Economico de multas
-		Boolean existenMultaAtrazos = false;
-		// Cantidad de usuarios con multa de atrazoss
-		Integer cantidadMultaAtrazosAplicados = 0;
-		// Multa por no pagar es independiente del tipo de llave
-		Double multaNoPago = parametroBO.getNumerico("", usuario.getIdComunidad().getIdComunidad(), "MULPAGATR");
-		// Generamos el registro economico
-		RegistroEconomico multaAtrazoMes = registroEconomicoBO.inicializar(periodoPago, "MULAGU", "Multa Consumo " + periodoPago.getDescripcion(), 0, usuario);
 		// Inasistencias los creamos al inicio para que en el transcurso
 		// registre ello
 		RegistroEconomico asistenciaRE = registroEconomicoBO.inicializar(periodoPago, "INASIS", "Multa Inasistencia " + periodoPago.getDescripcion(), 1, usuario);
@@ -196,29 +188,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					planillaNueva.setTotal(planillaNueva.getTotal() + detallePlanillaNuevo.getValorTotal());
 
 				}
-
-				// Si la planilla anterior no fue pagada creamos una multa por
-				// no haberla pagado
-				DetallePlanilla detallePlanilla = new DetallePlanilla();
-				detallePlanilla.setEstado("ING");
-				detallePlanilla.setIdCabeceraPlanilla(planillaNueva);
-				detallePlanilla.setIdRegistroEconomico(multaAtrazoMes);
-				detallePlanilla.setValorTotal(multaNoPago);
-				detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
-				detallePlanilla.setValorUnidad(multaNoPago);
-				detallePlanilla.setValorPagado(0.0);
-				detallePlanilla.setValorPendiente(multaNoPago);
-				detallePlanilla.setOrdenStr("AA");
-				detallePlanilla.setDescripcion("Multa Consumo " + planillaNoPagada.getIdPeriodoPago().getDescripcion());
-				detallePlanilla.setValorTotalOrigen(detallePlanilla.getValorTotal());
-				detallePlanilla.setOrigen(Constantes.origen_mes_Actual);
-				// detallePlanilla.setDescripcion(multaAtrazoMes.getDescripcion());
-				detallePlanillaBO.save(usuario, detallePlanilla);
-				cantidadMultaAtrazosAplicados++;
-				planillaNueva.setSubtotal(planillaNueva.getSubtotal() + multaNoPago);
-				planillaNueva.setTotal(planillaNueva.getTotal() + multaNoPago);
-				multaAtrazoMes.setValor(multaAtrazoMes.getValor() + multaNoPago);
-				existenMultaAtrazos = true;
 				cambioEstadoBO.cambiarEstadoSinVerificar(22, usuario, planillaNoPagada.getIdCabeceraPlanilla(), "");
 				Query queryDetalle = em().createQuery("UPDATE DetallePlanilla SET estado='TRAS' where estado='NOPAG' AND idCabeceraPlanilla=:idCabeceraPlanilla");
 				queryDetalle.setParameter("idCabeceraPlanilla", planillaNoPagada);
@@ -333,12 +302,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			update(usuario, planillaNueva);
 
 		}
-		if (!existenMultaAtrazos)
-			cambioEstadoBO.eliminarEntidad(8, multaAtrazoMes.getIdRegistroEconomico());
-		else {
-			multaAtrazoMes.setCantidadAplicados(cantidadMultaAtrazosAplicados);
-			registroEconomicoBO.update(usuario, multaAtrazoMes);
-		}
 		parametro.setValorEntero(numeroFactura);
 		parametroBO.update(usuario, parametro);
 	}
@@ -356,14 +319,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		Parametro parametro = parametroBO.findByPk("NUMFACT");
 		Integer numeroFactura = parametro.getValorEntero();
 		String path = "0000000000000";
-		// Mulata por no pagar es independiente del tipo de llave
-		Double multaNoPago = parametroBO.getNumerico("", usuario.getIdComunidad().getIdComunidad(), "MULPAGATR");
-		// Registros Economico de multas
-		Boolean existenMultaAtrazos = false;
-		RegistroEconomico registroEconomicoNP = registroEconomicoBO.inicializar(periodoPago, "MULAGU", "Multa " + periodoPago.getDescripcion(), 0, usuario); // new
-																																								// RegistroEconomico();
-		// Variable que almacena la cantidad de usuarios con multa
-		Integer cantidadMultaPorAtrazo = 0;
 
 		for (Llave idLlave : llaves) {
 
@@ -436,29 +391,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					cabeceraPlanilla.setSubtotal(cabeceraPlanilla.getSubtotal() + detallePlanillaNuevo.getValorTotal());
 					cabeceraPlanilla.setTotal(cabeceraPlanilla.getTotal() + detallePlanillaNuevo.getValorTotal());
 				}
-
-				// Si la planilla anteriro no fue pagada creamos una multa por no
-				// pagar
-
-				DetallePlanilla detallePlanilla = new DetallePlanilla();
-				detallePlanilla.setEstado("ING");
-				detallePlanilla.setIdCabeceraPlanilla(cabeceraPlanilla);
-				detallePlanilla.setIdRegistroEconomico(registroEconomicoNP);
-				detallePlanilla.setValorTotal(multaNoPago);
-				detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
-				detallePlanilla.setValorUnidad(multaNoPago);
-				detallePlanilla.setValorPagado(0.0);
-				detallePlanilla.setValorPendiente(multaNoPago);
-				detallePlanilla.setDescripcion("Multa Consumo " + planillaNoPagada.getIdPeriodoPago().getDescripcion());
-				detallePlanilla.setOrdenStr("C");
-				detallePlanilla.setValorTotalOrigen(detallePlanilla.getValorTotal());
-				detallePlanilla.setOrigen(Constantes.origen_mes_Actual);
-				detallePlanillaBO.save(usuario, detallePlanilla);
-				cantidadMultaPorAtrazo++;
-				cabeceraPlanilla.setSubtotal(cabeceraPlanilla.getSubtotal() + multaNoPago);
-				cabeceraPlanilla.setTotal(cabeceraPlanilla.getTotal() + multaNoPago);
-				registroEconomicoNP.setValor(registroEconomicoNP.getValor() + multaNoPago);
-				existenMultaAtrazos = true;
 
 				cambioEstadoBO.cambiarEstadoSinVerificar(22, usuario, planillaNoPagada.getIdCabeceraPlanilla(), "");
 				Query queryDetalle = em().createQuery("UPDATE DetallePlanilla SET estado='TRAS' where estado='NOPAG' AND idCabeceraPlanilla=:idCabeceraPlanilla");
@@ -556,13 +488,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			update(usuario, cabeceraPlanilla);
 
 		}
-		// Si existe registro de atrazos de pago lo actualizamos
-		if (!existenMultaAtrazos)
-			cambioEstadoBO.eliminarEntidad(8, registroEconomicoNP.getIdRegistroEconomico());
-		else {
-			registroEconomicoNP.setCantidadAplicados(cantidadMultaPorAtrazo);
-			registroEconomicoBO.update(usuario, registroEconomicoNP);
-		}
+		
 		parametro.setValorEntero(numeroFactura);
 		parametroBO.update(usuario, parametro);
 
