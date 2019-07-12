@@ -12,7 +12,7 @@
 				<h:outputText value="#{detalleLecturaBean.page.nombre}"
 					styleClass="pageLabel" />
 				<rich:toolbar styleClass="toolbar" id="toolBar" />
-				<h:panelGrid styleClass="Table" columns="8"
+				<h:panelGrid styleClass="Table" columns="9"
 					rowClasses="firstRow,secondRow,tercerRow"
 					columnClasses="value,label,value,label,value,label,value">
 					<h:outputText value="" />
@@ -24,6 +24,8 @@
 					<h:outputText value="" />
 					<h:outputText value="" />
 					<h:outputText value="" />
+					<h:outputText value="" />
+					<h:outputLabel value="Descripción" />
 					<h:outputLabel value="Lectura Anterior" />
 					<h:outputLabel value="Lectura Actual" />
 					<h:outputLabel value="Consumo Básico(M3)" />
@@ -32,6 +34,7 @@
 					<h:outputLabel value="Tarifa Básica (USD/M3)" />
 					<h:outputLabel value="Tarifa Exceso (USD/M3)" />
 					<h:outputLabel value="Valor Básico" />
+					<h:outputText value="#{detalleLecturaBean.lectura.descripcion}" />
 					<h:inputText readonly="#{detalleLecturaBean.readOnly1}"
 						value="#{detalleLecturaBean.lectura.lecturaAnterior}" />
 					<h:inputText readonly="#{detalleLecturaBean.readOnly1}"

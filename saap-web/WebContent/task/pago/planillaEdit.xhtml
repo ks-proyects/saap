@@ -39,7 +39,7 @@
 					<h:outputText value="#{planillaEditBean.cp.valorCancelado}" />
 					<h:outputLabel value="Cambio" />
 					<h:outputText value="#{planillaEditBean.cp.cambioUsd}" />
-					<h:outputLabel value="Saldo a Favor" />
+					<h:outputLabel value="Saldo a Favor 5" />
 					<h:outputText value="#{planillaEditBean.cp.abonoUsd}" />
 				</h:panelGrid>
 
@@ -52,28 +52,20 @@
 					</f:facet>
 					<rich:column>
 						<f:facet name="header">
-							<h:outputText value="Detalle de Lectura" />
-						</f:facet>
-
-						<h:commandLink value="Lectura" action="detalleLectura"
-							rendered="#{not empty detalle.outcome}">
-							<f:param name="param5" value="#{detalle.idLectura.idLectura}" />
-							
-						</h:commandLink>
-					</rich:column>
-					<rich:column>
-						<f:facet name="header">
 							<h:outputText value="Descricpion" />
 						</f:facet>
 						<h:outputText value="#{detalle.descripcion}"
-							rendered="#{!detalle.esManual}" />
+							rendered="#{!detalle.esManual and empty detalle.outcome}" />
 						<h:commandLink value="#{detalle.descripcion}" action="detalleEdit"
 							rendered="#{detalle.esManual}">
 							<f:param name="action" value="UPD" />
 							<f:param name="param4" value="#{detalle.idDetallePlanilla}" />
 						</h:commandLink>
+						<h:commandLink value="#{detalle.descripcion}" action="detalleLectura"
+							rendered="#{not empty detalle.outcome}">
+							<f:param name="param5" value="#{detalle.idLectura.idLectura}" />
+						</h:commandLink>
 					</rich:column>
-
 					<rich:column rendered="false">
 						<f:facet name="header">
 							<h:outputText value="Valor Unidad" />
@@ -107,9 +99,14 @@
 						</f:facet>
 						<h:outputText value="#{detalle.valorPendiente}" />
 					</rich:column>
-
-
-
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Lectura" />
+						</f:facet>
+						<h:outputText rendered="#{not empty detalle.outcome}"
+							value="#{detalle.idLectura.descripcion}">
+						</h:outputText>
+					</rich:column>
 					<rich:column>
 						<f:facet name="header">
 							<h:outputText value="Estado Pago" />

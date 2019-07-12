@@ -1082,6 +1082,20 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			}
 			update(usuario, cp);
 
+		}else{
+			lectura = lecturaBO.recalcularLectura(usuario, lectura);
+			lecturaBO.update(usuario, lectura);
+			HashMap<String, Object> pama = new HashMap<>();
+			pama.put("idLectura", lectura);
+			pama.put("idCabeceraPlanilla", cabeceraPlanilla);
+			DetallePlanilla detallePlanilla = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
+			// Si es mayor a cero realizamos el calculo caso contrario
+			// cobramos el basico
+			if (lectura.getMetros3() > 0) {
+				detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3 " + Utilitario.descricionMes(lectura.getFechaRegistro()));
+			}
+			if (lectura.getMetros3() > 0)
+				detallePlanillaBO.update(usuario, detallePlanilla);
 		}
 	}
 

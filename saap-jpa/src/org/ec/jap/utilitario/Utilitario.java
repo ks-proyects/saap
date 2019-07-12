@@ -103,7 +103,7 @@ public class Utilitario {
 		String descricpion = "";
 		Calendar fechaCal = Calendar.getInstance();
 		fechaCal.setTime(fecha);
-		fechaCal.add(Calendar.MONTH, -1);
+		//fechaCal.add(Calendar.MONTH, -1);
 		Integer mesInt = fechaCal.get(Calendar.MONTH);
 		switch (mesInt) {
 		case 0:
