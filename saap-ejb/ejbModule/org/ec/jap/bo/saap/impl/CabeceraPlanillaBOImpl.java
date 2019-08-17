@@ -634,22 +634,22 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public void regenerarPeriodoCerrado(Usuario usuario, Integer idPeriodoPago) throws Exception {
-
 		HashMap<String, Object> map = new HashMap<>();
 		map.clear();
 		map.put("estado", "ING");
 		map.put("idPeriodoPago", idPeriodoPago);
 		map.put("esModificable", false);
-
 		// Obtenemos las planillas llaves en las cuales la planilla aun no ha
 		// sido pagada
 		List<Object[]> objects = lecturaBO.findObjects("Lectura.findByPeridoCerrModificable", map);
-
 		PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
-		// Cantidad de usuarios CON EL BASICO
-		Integer cantidadMultaAtrazosAplicados = 0;
-		RegistroEconomico registroEconomicoBasico = registroEconomicoBO.inicializar(periodoPago, "BASCON", " " + periodoPago.getDescripcion(), 0, usuario);
-
+		
+		map.clear();
+		map.put("idPeriodoPago", periodoPago);
+		map.put("tipoRegistro", "BASCON");
+		RegistroEconomico registroEconomicoBasico = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType", map);
+		// Cantidad de usuarios CON EL BASIC
+		Integer cantidadUsuariosConBasico = registroEconomicoBasico.getCantidadAplicados();
 		for (Object[] object : objects) {
 
 			CabeceraPlanilla cp = (CabeceraPlanilla) object[0];
@@ -677,29 +677,35 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					detallePlanilla.setValorTotal(0.0);
 					detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
 					detallePlanilla.setValorUnidad(0.0);
-
-					detallePlanillaBasico = new DetallePlanilla();
-					detallePlanillaBasico.setEstado("ING");
-					detallePlanillaBasico.setIdCabeceraPlanilla(cp);
-					detallePlanillaBasico.setIdRegistroEconomico(registroEconomicoBasico);
-					detallePlanillaBasico.setFechaRegistro(Calendar.getInstance().getTime());
-					detallePlanillaBasico.setValorUnidad(Utilitario.redondear(lectura.getValorBasico()));
-					detallePlanillaBasico.setValorPagado(0.0);
-					detallePlanillaBasico.setValorTotal(Utilitario.redondear(lectura.getValorBasico()));
-					detallePlanillaBasico.setValorPendiente(detallePlanillaBasico.getValorTotal());
-					detallePlanillaBasico.setDescripcion("Básico " + periodoPago.getDescripcion());
-					detallePlanillaBasico.setOrdenStr("B");
-					detallePlanillaBasico.setValorTotalOrigen(detallePlanillaBasico.getValorTotal());
-					detallePlanillaBasico.setOrigen(Constantes.origen_mes_Actual);
-					cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + detallePlanillaBasico.getValorTotal()));
-					cp.setTotal(Utilitario.redondear(cp.getTotal() + detallePlanillaBasico.getValorTotal()));
-					registroEconomicoBasico.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
-					detallePlanillaBasico.setValorTotalOrigen(detallePlanillaBasico.getValorTotal());
-					detallePlanillaBasico.setOrigen(Constantes.origen_mes_Actual);
-					detallePlanillaBO.save(usuario, detallePlanillaBasico);
+					pama = new HashMap<>();
+					pama.put("regeco", registroEconomicoBasico);
+					pama.put("cp", cp);
+					pama.put("desc", "Básico");
+					DetallePlanilla dpb = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByBasico", pama);
+					if(dpb==null){
+						detallePlanillaBasico = new DetallePlanilla();
+						detallePlanillaBasico.setEstado("ING");
+						detallePlanillaBasico.setIdCabeceraPlanilla(cp);
+						detallePlanillaBasico.setIdRegistroEconomico(registroEconomicoBasico);
+						detallePlanillaBasico.setFechaRegistro(Calendar.getInstance().getTime());
+						detallePlanillaBasico.setValorUnidad(Utilitario.redondear(lectura.getValorBasico()));
+						detallePlanillaBasico.setValorPagado(0.0);
+						detallePlanillaBasico.setValorTotal(Utilitario.redondear(lectura.getValorBasico()));
+						detallePlanillaBasico.setValorPendiente(detallePlanillaBasico.getValorTotal());
+						detallePlanillaBasico.setDescripcion("Básico " + periodoPago.getDescripcion());
+						detallePlanillaBasico.setOrdenStr("B");
+						detallePlanillaBasico.setValorTotalOrigen(detallePlanillaBasico.getValorTotal());
+						detallePlanillaBasico.setOrigen(Constantes.origen_mes_Actual);
+						cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + detallePlanillaBasico.getValorTotal()));
+						cp.setTotal(Utilitario.redondear(cp.getTotal() + detallePlanillaBasico.getValorTotal()));
+						registroEconomicoBasico.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
+						detallePlanillaBasico.setValorTotalOrigen(detallePlanillaBasico.getValorTotal());
+						detallePlanillaBasico.setOrigen(Constantes.origen_mes_Actual);
+						detallePlanillaBO.save(usuario, detallePlanillaBasico);
+						cantidadUsuariosConBasico++;
+					}
+					
 				}
-				cantidadMultaAtrazosAplicados++;
-
 				// Si es mayor a cero realizamos el calculo caso contrario
 				// cobramos el basico
 				if (lectura.getMetros3() > 0) {
@@ -737,7 +743,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			}
 
 		}
-		registroEconomicoBasico.setCantidadAplicados(cantidadMultaAtrazosAplicados);
+		registroEconomicoBasico.setCantidadAplicados(cantidadUsuariosConBasico);
 		registroEconomicoBO.update(usuario, registroEconomicoBasico);
 	}
 

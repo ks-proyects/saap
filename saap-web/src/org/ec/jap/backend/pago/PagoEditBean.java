@@ -71,7 +71,7 @@ public class PagoEditBean extends Bean {
 			valorPendiente = Utilitario.redondear(cp.getValorPendiente());
 			valorAPagar = Utilitario.redondear(cp.getValorPendiente());
 			if (anterior.getAbonoUsd() > cp.getValorPendiente()) {
-				valorAbono = Utilitario.redondear(anterior.getAbonoUsd()) - Utilitario.redondear(cp.getValorPendiente());
+				valorAbono = Utilitario.redondear(Utilitario.redondear(anterior.getAbonoUsd()) - Utilitario.redondear(cp.getValorPendiente()));
 			} else {
 				valorAbono = Utilitario.redondear(cp.getAbonoUsd());
 			}

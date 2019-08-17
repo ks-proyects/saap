@@ -109,9 +109,16 @@
 					</rich:column>
 					<rich:column>
 						<f:facet name="header">
-							<h:outputText value="Estado Pago" />
+							<h:outputText value="Origen" />
 						</f:facet>
 						<h:outputText value="#{detalle.origen}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Estado" />
+						</f:facet>
+						<h:outputText
+							value="#{detalle.estado eq 'ING'?'Ingresado':(detalle.estado eq 'DESC'?'Descartado':(detalle.estado eq 'PAG'?'Pagado':(detalle.estado eq 'NOPAG'?'No Pagado':'Traspasado')))}" />
 					</rich:column>
 				</rich:dataTable>
 			</h:form>
