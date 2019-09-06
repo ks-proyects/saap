@@ -15,6 +15,7 @@ public class Impresora {
 		List<PrintService> services = getImpresoras(numCopies);
 		if (services.size() > 0) {
 			for (PrintService printService : services) {
+				System.out.println("Impresora: "+printService.getName());
 				if (printService.getName().equalsIgnoreCase(nombreImpresora)) {
 					return printService;
 				}
