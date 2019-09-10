@@ -1,5 +1,6 @@
 package org.ec.jap.backend.pago;
 
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class PlanillaEditBean extends Bean {
 			redisplayAction(11, "pagoList".equals(pageLasT));
 			redisplayAction(2, "pagoList".equals(pageLasT));
 			redisplayAction(8, !"ING".equalsIgnoreCase(cp.getEstado()));
-			String nombreFile = cp.getIdPeriodoPago().getDescripcion().trim().replace(" ", "_") + "_" + cp.getIdLlave().getNumero() + "_" + cp.getObservacion();
+			String nombreFile = "JAAP_" + GregorianCalendar.getInstance().getTimeInMillis();
 			setNombreArchivo(nombreFile);
 
 		} catch (Exception e) {

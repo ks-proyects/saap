@@ -1,10 +1,14 @@
 package org.ec.jap.bo.saap;
 
+import java.util.List;
+
 import javax.ejb.Local;
 
 import org.ec.jap.dao.saap.DetallePlanillaDAO;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
 import org.ec.jap.entiti.saap.DetallePlanilla;
+import org.ec.jap.entiti.saap.Lectura;
+import org.ec.jap.entiti.saap.PeriodoPago;
 import org.ec.jap.entiti.saap.RegistroEconomico;
 import org.ec.jap.entiti.saap.Usuario;
 
@@ -25,4 +29,20 @@ public interface DetallePlanillaBO extends DetallePlanillaDAO {
 	 * @throws Exception
 	 */
 	void descartarPago(CabeceraPlanilla planilla, Usuario usuario) throws Exception;
+
+	DetallePlanilla crearDetalleAlcantarillado(Usuario currentUser, CabeceraPlanilla cp, RegistroEconomico registroEconomicoAlcantarillado, Integer cantidad, Double valor, String ppDescripcion) throws Exception;
+
+	DetallePlanilla traspasarDetalle(CabeceraPlanilla planillaNueva, DetallePlanilla detallePlanilla);
+
+	DetallePlanilla traspasarDetalleInconompleto(CabeceraPlanilla planillaNueva, DetallePlanilla detalleIncompleto);
+
+	DetallePlanilla crearDetalleBasico(CabeceraPlanilla cp, RegistroEconomico registroEconomicoBasico, Lectura lectura, PeriodoPago periodoPago) throws Exception;
+
+	/**
+	 * Obtiene los detalles de la plnilla no pagadas
+	 * @param planillaNoPagada
+	 * @return
+	 * @throws Exception
+	 */
+	List<DetallePlanilla> findPlanillasNoPagadas(CabeceraPlanilla planillaNoPagada, String namedQuery) throws Exception;
 }

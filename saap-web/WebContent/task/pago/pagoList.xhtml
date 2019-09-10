@@ -15,11 +15,11 @@
 				<h:panelGrid styleClass="Table" columns="3"
 					columnClasses="label,value,value">
 					<h:outputLabel value="Filtro" />
-					<h:inputText value="#{pagoListBean.filtro}" size="50">
+					<h:inputText value="#{pagoListBean.filtroFact.valorCadena}" size="50">
 						<f:ajax event="keyup" render="table" execute="maxResult"
 							listener="#{pagoListBean.changeName}" />
 					</h:inputText>
-					<rich:inputNumberSpinner value="#{pagoListBean.cantidadResultados}"
+					<rich:inputNumberSpinner value="#{pagoListBean.filtroCan.valorEntero}"
 						id="maxResult" title="Cantidad Máxima de Registros a mostrar." />
 				</h:panelGrid>
 				<rich:dataScroller for="table" maxPages="5" id="scroll" />
@@ -62,7 +62,7 @@
 							<h:outputText value="Usuario" />
 						</f:facet>
 						<h:outputText
-							value="#{cab.idLlave.idUsuario.nombres} #{cab.idLlave.idUsuario.apellidos}" />
+							value="#{cab.usuarioDesc}"/>
 					</rich:column>
 
 					<rich:column>

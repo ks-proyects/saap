@@ -38,13 +38,10 @@ import org.ec.jap.entiti.sistema.UsuarioRol;
  */
 @Entity
 @Table(name = "usuario", schema = "saap")
-@NamedQueries({
-		@NamedQuery(name = "Usuario.findByFilters", query = " SELECT u,(SELECT SUM(asi.numeroRayas) FROM Asistencia asi inner join asi.actividad act inner join act.tipoActividad tact inner join act.idPeriodoPago per WHERE asi.idUsuario=u AND ((act.actividad=:actividad OR :actividad=0) AND (tact.tipoActividad=:tipoActividad OR :tipoActividad=0)) AND (per.idPeriodoPago=:idPeriodoPago OR :idPeriodoPago=0) AND (per.anio=:anio OR :anio=0)) FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario  ORDER BY upper(CONCAT(u.nombres,' ',u.apellidos)), u.fechaIngreso DESC"),
-		@NamedQuery(name = "Usuario.findAllActivos", query = "SELECT u FROM Usuario u WHERE  u.estado='ACT'"),
-		@NamedQuery(name = "Usuario.findByCedNom", query = " SELECT u FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario AND (upper(u.cedula) LIKE upper(CONCAT('%',:filtro,'%'))  OR upper(CONCAT(u.nombres,' ',u.apellidos)) LIKE upper(CONCAT('%',:filtro,'%'))) ORDER BY upper(CONCAT(u.nombres,' ',u.apellidos)), u.fechaIngreso DESC"),
-		@NamedQuery(name = "Usuario.findByCedulaAndId", query = "SELECT COUNT(u.idUsuario) FROM Usuario u WHERE u.cedula = :cedula and u.tipoUsuario=:tipoUsuario and u.idUsuario != :idUsuario"),
-		@NamedQuery(name = "Usuario.findByCedula", query = "SELECT COUNT(u.idUsuario) FROM Usuario u WHERE u.cedula = :cedula and u.tipoUsuario=:tipoUsuario "),
-		@NamedQuery(name = "Usuario.findByUsername", query = "SELECT u FROM Usuario u WHERE u.username = :username and u in (SELECT up.idUsuario FROM UsuarioPerfil up)") })
+@NamedQueries({ @NamedQuery(name = "Usuario.findByFilters", query = " SELECT u,(SELECT SUM(asi.numeroRayas) FROM Asistencia asi inner join asi.actividad act inner join act.tipoActividad tact inner join act.idPeriodoPago per WHERE asi.idUsuario=u AND ((act.actividad=:actividad OR :actividad=0) AND (tact.tipoActividad=:tipoActividad OR :tipoActividad=0)) AND (per.idPeriodoPago=:idPeriodoPago OR :idPeriodoPago=0) AND (per.anio=:anio OR :anio=0)) FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario  ORDER BY upper(CONCAT(u.nombres,' ',u.apellidos)), u.fechaIngreso DESC"), @NamedQuery(name = "Usuario.findAllActivos", query = "SELECT u FROM Usuario u WHERE  u.estado='ACT'"),
+		@NamedQuery(name = "Usuario.findByCedNom", query = " SELECT u FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario AND (upper(u.cedula) LIKE upper(CONCAT('%',:filtro,'%'))  OR upper(CONCAT(u.nombres,' ',u.apellidos)) LIKE upper(CONCAT('%',:filtro,'%'))) ORDER BY upper(CONCAT(u.nombres,' ',u.apellidos)), u.fechaIngreso DESC"), @NamedQuery(name = "Usuario.findByCedulaAndId", query = "SELECT COUNT(u.idUsuario) FROM Usuario u WHERE u.cedula = :cedula and u.tipoUsuario=:tipoUsuario and u.idUsuario != :idUsuario"), @NamedQuery(name = "Usuario.findByCedula", query = "SELECT COUNT(u.idUsuario) FROM Usuario u WHERE u.cedula = :cedula and u.tipoUsuario=:tipoUsuario "),
+		@NamedQuery(name = "Usuario.findByUsername", query = "SELECT u FROM Usuario u WHERE u.username = :username and u in (SELECT up.idUsuario FROM UsuarioPerfil up)"),
+		@NamedQuery(name = "Usuario.findBySinLLave", query = "SELECT u FROM Usuario u WHERE u.poseeAlcant=true and u.cantAlcant > 0 and u not in (SELECT ll.idUsuario FROM Llave ll) ")})
 @AuditoriaAnot(entityType = "USU")
 public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -124,6 +121,12 @@ public class Usuario implements Serializable {
 	@Column(name = "es_comunero")
 	private String esComunero;
 
+	@Column(name = "posee_alcant")
+	private Boolean poseeAlcant;
+
+	@Column(name = "cant_alcant")
+	private Integer cantAlcant;
+
 	@NotNull(message = "El campo FECHA NACIMIENTO es obligatorio.")
 	@Column(name = "fecha_nacimiento")
 	private Date fechaNacimiento;;
@@ -154,6 +157,9 @@ public class Usuario implements Serializable {
 	@OneToMany(mappedBy = "idUsuario")
 	private List<Llave> llaveList;
 
+	@OneToMany(mappedBy = "idUsuario")
+	private List<CabeceraPlanilla> facturaList;
+
 	@OneToMany(mappedBy = "usuario")
 	private List<Auditoria> auditoriaList;
 
@@ -167,6 +173,14 @@ public class Usuario implements Serializable {
 	private Double cantidadRayas;
 
 	public Usuario() {
+	}
+
+	public List<CabeceraPlanilla> getFacturaList() {
+		return facturaList;
+	}
+
+	public void setFacturaList(List<CabeceraPlanilla> facturaList) {
+		this.facturaList = facturaList;
 	}
 
 	public Usuario(Integer idUsuario) {
@@ -405,6 +419,22 @@ public class Usuario implements Serializable {
 
 	public void setCantidadRayas(Double cantidadRayas) {
 		this.cantidadRayas = cantidadRayas;
+	}
+
+	public Boolean getPoseeAlcant() {
+		return poseeAlcant;
+	}
+
+	public void setPoseeAlcant(Boolean poseeAlcant) {
+		this.poseeAlcant = poseeAlcant;
+	}
+
+	public Integer getCantAlcant() {
+		return cantAlcant;
+	}
+
+	public void setCantAlcant(Integer cantAlcant) {
+		this.cantAlcant = cantAlcant;
 	}
 
 	@Override

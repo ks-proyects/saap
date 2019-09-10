@@ -41,7 +41,7 @@ import javax.validation.constraints.Size;
 		@NamedQuery(name = "Lectura.findLastByPeridoAndLlave", query = "SELECT MAX(r.idLectura) FROM Lectura r where  r.idLlave=:idLlave AND  r.usuarioNuevo!=:usuarioNuevo "),
 		@NamedQuery(name = "Lectura.findByPer", query = "SELECT  r FROM Lectura r inner join r.idPeriodoPago pp inner join r.idLlave ll inner join ll.idUsuario u WHERE pp=:p AND (UPPER(ll.numero) LIKE UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.nombres) LIKE UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) LIKE UPPER(CONCAT('%',:filtro,'%'))  OR UPPER(u.cedula) LIKE UPPER(CONCAT('%',:filtro,'%')) ) ORDER BY cast(ll.numero,int)"),
 		@NamedQuery(name = "Lectura.findByAnioAndMes", query = "SELECT DISTINCT r FROM Lectura r inner join r.idPeriodoPago pp WHERE r.idLlave=:llave AND pp.anio=:anio AND pp.mes=:mes"),
-		@NamedQuery(name = "Lectura.findByPerido", query = "SELECT  cp,ll FROM  CabeceraPlanilla cp inner join cp.idLlave ll   where  cp.estado=:estado AND cp.idPeriodoPago.idPeriodoPago=:idPeriodoPago"),
+		@NamedQuery(name = "Lectura.findByPerido", query = "SELECT  cp,ll FROM  CabeceraPlanilla cp left outer join cp.idLlave ll   where  cp.estado=:estado AND cp.idPeriodoPago.idPeriodoPago=:idPeriodoPago"),
 		@NamedQuery(name = "Lectura.findByPeridoAndLlave", query = "SELECT r FROM Lectura r where  r.idLlave.idLlave=:idLlave and r.estado='ING' AND r.idPeriodoPago=:idPeriodoPago"),
 		@NamedQuery(name = "Lectura.findByUser", query = "SELECT r FROM Lectura r inner join r.idLlave ll where ll=:idLlave AND ( r.idPeriodoPago.idPeriodoPago=:idPeriodoPago or :idPeriodoPago=0) ORDER BY r.fechaRegistro DESC"), })
 public class Lectura implements Serializable {

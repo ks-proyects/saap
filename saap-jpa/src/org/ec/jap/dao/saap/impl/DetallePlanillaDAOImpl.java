@@ -19,4 +19,5 @@ public class DetallePlanillaDAOImpl extends SistemaImple<DetallePlanilla, Intege
 		super(DetallePlanilla.class);
 	}
 
+	
 }

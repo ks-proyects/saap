@@ -85,6 +85,19 @@
 					<h:outputLabel for="txtEmail" value="Email:" />
 					<h:inputText id="txtEmail" value="#{usuarioEditBean.usuario.email}"
 						readonly="#{usuarioEditBean.readOnly1}" />
+					<h:outputText value="" />
+					<h:outputText value="" />
+
+
+					<h:outputLabel for="txtAlcantarillado"
+						value="Tiene Alcantarillado:" />
+					<h:selectBooleanCheckbox id="txtAlcantarillado"
+						 disabled="#{usuarioEditBean.readOnly1}"
+						value="#{usuarioEditBean.usuario.poseeAlcant}" />
+					<h:outputLabel for="txtAcometidas" value="Acometidas: " />
+					<h:inputText id="txtAcometidas"
+						value="#{usuarioEditBean.usuario.cantAlcant}"
+						readonly="#{usuarioEditBean.readOnly1}" />
 				</h:panelGrid>
 
 				<rich:dataTable value="#{usuarioEditBean.listLlaves}" var="llave"

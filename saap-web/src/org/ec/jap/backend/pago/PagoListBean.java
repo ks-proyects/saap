@@ -17,7 +17,9 @@ import javax.faces.event.AjaxBehaviorEvent;
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.saap.CabeceraPlanillaBO;
+import org.ec.jap.bo.sistema.FiltroBO;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
+import org.ec.jap.entiti.sistema.Filtro;
 import org.ec.jap.utilitario.Utilitario;
 
 /**
@@ -32,8 +34,10 @@ public class PagoListBean extends Bean {
 	CabeceraPlanillaBO cabeceraPlanillaBO;
 
 	private List<CabeceraPlanilla> cabeceraPlanillas;
-	private String filtro;
-	private Integer cantidadResultados;
+	Filtro filtroCan;
+	Filtro filtroFact;
+	@EJB
+	FiltroBO filtroBO;
 
 	public PagoListBean() {
 		super();
@@ -43,7 +47,6 @@ public class PagoListBean extends Bean {
 	public void init() {
 		try {
 			super.init();
-			cantidadResultados=10;
 			search(null);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -53,11 +56,15 @@ public class PagoListBean extends Bean {
 
 	public void search(ActionEvent event) {
 		try {
+
+			filtroCan = filtroBO.getFiltro(getUsuarioCurrent(), "FILTRO_CAN", getPage(), filtroCan != null ? filtroCan.getValorEntero() : "", filtroCan, false);
+			filtroFact = filtroBO.getFiltro(getUsuarioCurrent(), "FILTRO_FACT", getPage(), filtroFact != null ? filtroFact.getValorCadena() : 0, filtroFact, false);
 			setNombreArchivo("Pagos-" + Calendar.getInstance().get(Calendar.YEAR) + "-" + Utilitario.mes(Calendar.getInstance().get(Calendar.MONTH)));
 			map = new HashMap<>();
-			map.put("filtro", filtro != null ? filtro : "%");
+			map.put("filtro", filtroFact.getValorCadena() != null ? filtroFact.getValorCadena() : "%");
 			map.put("estado", "CERR");
-			cabeceraPlanillas = cabeceraPlanillaBO.findAllByNamedQuery(cantidadResultados,"CabeceraPlanilla.findByPerAbiertActFilters", map);
+			cabeceraPlanillas = cabeceraPlanillaBO.findAllByNamedQuery(filtroCan.getValorEntero(), "CabeceraPlanilla.findByPerAbiertActFilters", map);
+			Runtime.getRuntime().gc();
 		} catch (Exception e) {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
@@ -66,10 +73,11 @@ public class PagoListBean extends Bean {
 
 	public void changeName(AjaxBehaviorEvent event) {
 		try {
-			map.put("filtro", filtro != null ? filtro : "%");
-			map.put("filtro", filtro != null ? filtro : "%");
+			map.put("filtro", filtroFact.getValorCadena() != null ? filtroFact.getValorCadena() : "%");
+			map.put("filtro", filtroFact.getValorCadena() != null ? filtroFact.getValorCadena() : "%");
 			map.put("estado", "CERR");
-			cabeceraPlanillas = cabeceraPlanillaBO.findAllByNamedQuery(cantidadResultados,"CabeceraPlanilla.findByPerAbiertActFilters", map);
+			cabeceraPlanillas = cabeceraPlanillaBO.findAllByNamedQuery(filtroCan.getValorEntero(), "CabeceraPlanilla.findByPerAbiertActFilters", map);
+			Runtime.getRuntime().gc();
 		} catch (Exception e) {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
@@ -84,31 +92,19 @@ public class PagoListBean extends Bean {
 		this.cabeceraPlanillas = cabeceraPlanillas;
 	}
 
-	public String getFiltro() {
-		return filtro;
+	public Filtro getFiltroFact() {
+		return filtroFact;
 	}
 
-	public void setFiltro(String filtro) {
-		this.filtro = filtro;
+	public void setFiltroFact(Filtro filtroFact) {
+		this.filtroFact = filtroFact;
 	}
 
-	public Integer getCantidadResultados() {
-		return cantidadResultados;
+	public Filtro getFiltroCan() {
+		return filtroCan;
 	}
 
-	public void setCantidadResultados(Integer cantidadResultados) {
-		this.cantidadResultados = cantidadResultados;
+	public void setFiltroCan(Filtro filtroCan) {
+		this.filtroCan = filtroCan;
 	}
-	
-
-//	public Integer getTotalPagado() {
-//		Integer total = 0;
-//		for (CabeceraPlanilla cp : cabeceraPlanillas) {
-//			if (!"ING".equalsIgnoreCase(cp.getEstado())) {
-//				total++;
-//			}
-//		}
-//		return total;
-//	}
-
 }

@@ -176,10 +176,10 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 					List<PeriodoPago> periodoPago = periodoPagoBO.findAllByNamedQuery("PeriodoPago.findAbiertoCerrado");
 					if (periodoPago.size() > 0)
 						throw new EJBTransactionRolledbackException("No puede abrir un periodo de pago si existen periodos de pago sin finalizar o en estado abierto.");
-					cabeceraPlanillaBO.iniciarCabeceraPlanilla(usuario, (Integer) idDocumento);
+					cabeceraPlanillaBO.abrirPeriodoPago(usuario, (Integer) idDocumento);
 					break;
 				case "ABIE":
-					cabeceraPlanillaBO.regenerarPlanillasDePeriodo(usuario, (Integer) idDocumento);
+					cabeceraPlanillaBO.regenerarPeriodoPago(usuario, (Integer) idDocumento);
 					break;
 				case "CERR":
 					cabeceraPlanillaBO.regenerarPeriodoCerrado(usuario, (Integer) idDocumento);
@@ -194,7 +194,7 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 					cabeceraPlanillaBO.regenerarPeriodoCerrado(usuario, (Integer) idDocumento);
 					break;
 				case "ABIE":
-					cabeceraPlanillaBO.cerrarLecturasAPlanilla(usuario, (Integer) idDocumento);
+					cabeceraPlanillaBO.cerrarPeriodoPago(usuario, (Integer) idDocumento);
 					break;
 				default:
 					break;
@@ -206,7 +206,7 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 				case "CERR":
 					cabeceraPlanillaBO.regenerarPeriodoCerrado(usuario, (Integer) idDocumento);
 				case "ABIE":
-					cabeceraPlanillaBO.cerrarLecturasAPlanilla(usuario, (Integer) idDocumento);
+					cabeceraPlanillaBO.cerrarPeriodoPago(usuario, (Integer) idDocumento);
 				default:
 					break;
 				}

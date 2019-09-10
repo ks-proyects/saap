@@ -19,7 +19,7 @@ public interface CabeceraPlanillaBO extends CabeceraPlanillaDAO {
 	 * @param idPeriodoPago
 	 * @throws Exception
 	 */
-	public void iniciarCabeceraPlanilla(Usuario usuario, Integer idPeriodoPago) throws Exception;
+	public void abrirPeriodoPago(Usuario usuario, Integer idPeriodoPago) throws Exception;
 
 	/**
 	 * Una vez ingresada todas las lecturas se debe cerrar el periodo en el cual
@@ -29,7 +29,7 @@ public interface CabeceraPlanillaBO extends CabeceraPlanillaDAO {
 	 * @param idPeriodoPago
 	 * @throws Exception
 	 */
-	public void cerrarLecturasAPlanilla(Usuario usuario, Integer idPeriodoPago) throws Exception;
+	public void cerrarPeriodoPago(Usuario usuario, Integer idPeriodoPago) throws Exception;
 
 	/**
 	 * Método que se invoca al finalizar un periodo de pago
@@ -57,7 +57,7 @@ public interface CabeceraPlanillaBO extends CabeceraPlanillaDAO {
 	 * @param idPeriodoPago
 	 * @throws Exception
 	 */
-	public void regenerarPlanillasDePeriodo(Usuario usuario, Integer idPeriodoPago) throws Exception;
+	public void regenerarPeriodoPago(Usuario usuario, Integer idPeriodoPago) throws Exception;
 
 	/**
 	 * Método encargado de regenerar los calculos del consumo de agua potable de

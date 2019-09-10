@@ -11,6 +11,7 @@ import org.ec.jap.bo.saap.ParametroBO;
 import org.ec.jap.bo.saap.RangoConsumoBO;
 import org.ec.jap.dao.saap.impl.LecturaDAOImpl;
 import org.ec.jap.entiti.saap.Lectura;
+import org.ec.jap.entiti.saap.Llave;
 import org.ec.jap.entiti.saap.RangoConsumo;
 import org.ec.jap.entiti.saap.Usuario;
 import org.ec.jap.enumerations.Formapago;
@@ -226,7 +227,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 			if (lectura.getSinLectura() || !lectura.getEsModificable()) {
 				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0)) || lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
 					lectura.setMetros3(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
-					
+
 					lectura.setMetros3Exceso(0.0);
 					lectura.setValorMetro3Exceso(0.0);
 					if (lectura.getMetros3() > 0) {
@@ -292,5 +293,14 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
 		return mensaje;
 
+	}
+	
+	@Override
+	public Integer findLecturaAnterior(Llave llave, Boolean usuarioNuevo)throws Exception{
+		HashMap<String, Object> mapAux = new HashMap<>();
+		mapAux.put("idLlave", llave);
+		mapAux.put("usuarioNuevo", usuarioNuevo);
+		Integer idLecturaAnteriorIngresada = findIntegerByNamedQuery("Lectura.findLastByPeridoAndLlave", mapAux);
+		return idLecturaAnteriorIngresada; 
 	}
 }

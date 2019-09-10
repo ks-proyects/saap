@@ -343,5 +343,9 @@ public class DetallePlanilla implements Serializable {
 	public String toString() {
 		return "org.ec.jap.entiti.DetallePlanilla[ idDetallePlanilla=" + idDetallePlanilla + " ]";
 	}
+	public void initValue(){
+		this.estado="ING";
+		this.valorPagado=0.0;
+	}
 
 }

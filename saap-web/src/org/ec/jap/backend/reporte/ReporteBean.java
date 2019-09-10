@@ -92,6 +92,7 @@ public class ReporteBean extends Bean {
 		}
 		servletOutputStream.flush();
 		servletOutputStream.close();
+		Runtime.getRuntime().gc();
 	}
 
 	protected String getCompileFileName(Integer idReport) {
