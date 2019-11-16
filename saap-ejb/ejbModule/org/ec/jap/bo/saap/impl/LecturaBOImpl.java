@@ -146,6 +146,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 		String aplicaMetodoCobroAnt = parametroBO.getString("", usuario.getIdComunidad().getIdComunidad(), "APLTITAA");
 		Boolean esMetodoAnterior = "SI".equalsIgnoreCase(aplicaMetodoCobroAnt);
 		lectura.setValorBasico(0.0);
+		lectura.setModifiqued(true);
 		if (lectura.getSinLectura()) {
 			lectura.setLecturaIngresada(0.0);
 			lectura.setMetros3(0.0);
@@ -226,8 +227,8 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 			lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
 			if (lectura.getSinLectura() || !lectura.getEsModificable()) {
 				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0)) || lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
+					
 					lectura.setMetros3(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
-
 					lectura.setMetros3Exceso(0.0);
 					lectura.setValorMetro3Exceso(0.0);
 					if (lectura.getMetros3() > 0) {
