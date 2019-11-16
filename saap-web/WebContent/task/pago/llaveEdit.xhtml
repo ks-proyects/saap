@@ -31,6 +31,12 @@
 					<h:outputLabel for="txtCedula" value="* Cédula:" />
 					<h:outputText id="txtCedula"
 						value="#{llaveEditBean.usuario.cedula}" />
+					<h:outputLabel for="txtActivo" value="Activo:" />
+					<h:selectOneMenu id="txtActivo"
+						value="#{llaveEditBean.llave.activo}">
+						<f:selectItem itemLabel="NO" itemValue="NO" />
+						<f:selectItem itemLabel="SI" itemValue="SI" />
+					</h:selectOneMenu>
 					<h:outputLabel for="txtTipoLlave" value="Tipo de Llave:" />
 					<h:outputText id="txtTipoLlave"
 						value="#{llaveEditBean.llave.idTarifa.tipoLlave.descripcion}" />

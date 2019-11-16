@@ -20,7 +20,7 @@
 							listener="#{pagoListBean.changeName}" />
 					</h:inputText>
 					<rich:inputNumberSpinner value="#{pagoListBean.filtroCan.valorEntero}"
-						id="maxResult" title="Cantidad Máxima de Registros a mostrar." />
+						id="maxResult" title="Cantidad Máxima de Registros a mostrar." maxValue="500" />
 				</h:panelGrid>
 				<rich:dataScroller for="table" maxPages="5" id="scroll" />
 				<rich:dataTable columnClasses="columDerecha,columnIxquierdo"

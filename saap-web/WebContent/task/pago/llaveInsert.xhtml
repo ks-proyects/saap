@@ -37,7 +37,7 @@
 						<f:selectItems value="#{llaveInsertBean.itemTarifa}" />
 					</h:selectOneMenu>
 					<h:outputLabel for="txtUbicacion" value="Ubicación:" />
-					<h:selectOneMenu value="#{llaveInsertBean.llave.ubicacion}"
+					<h:selectOneMenu id="txtUbicacion" value="#{llaveInsertBean.llave.ubicacion}"
 						disabled="#{llaveInsertBean.readOnly1}">
 						<f:selectItem itemLabel="GRUPO1" itemValue="GRUPO1" />
 						<f:selectItem itemLabel="GRUPO2" itemValue="GRUPO2" />
@@ -48,6 +48,12 @@
 					<h:outputText value="#{llaveInsertBean.llave.fechaRegistro}">
 						<f:convertDateTime pattern="dd/MM/yyyy" />
 					</h:outputText>
+					<h:outputLabel for="txtActivo" value="Activo:" />
+					<h:selectOneMenu id="txtActivo"
+						value="#{llaveInsertBean.llave.activo}">
+						<f:selectItem itemLabel="NO" itemValue="NO" />
+						<f:selectItem itemLabel="SI" itemValue="SI" />
+					</h:selectOneMenu>
 				</h:panelGrid>
 
 			</h:form>

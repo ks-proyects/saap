@@ -140,6 +140,12 @@
 						</f:facet>
 						<h:outputText value="#{llave.idTarifa.descripcion}" />
 					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Activo" />
+						</f:facet>
+						<h:outputText value="#{llave.activo}" />
+					</rich:column>
 				</rich:dataTable>
 				<br />
 				<rich:dataTable value="#{usuarioEditBean.listRepresentantes}"
