@@ -74,7 +74,6 @@ public class PagoListBean extends Bean {
 	public void changeName(AjaxBehaviorEvent event) {
 		try {
 			map.put("filtro", filtroFact.getValorCadena() != null ? filtroFact.getValorCadena() : "%");
-			map.put("filtro", filtroFact.getValorCadena() != null ? filtroFact.getValorCadena() : "%");
 			map.put("estado", "CERR");
 			cabeceraPlanillas = cabeceraPlanillaBO.findAllByNamedQuery(filtroCan.getValorEntero(), "CabeceraPlanilla.findByPerAbiertActFilters", map);
 			Runtime.getRuntime().gc();

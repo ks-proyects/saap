@@ -5,6 +5,7 @@ package org.ec.jap.backend.pagina;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -212,7 +213,7 @@ public class PageBean extends Bean {
 			tr.setDescripcion1("Comunidad: " + user.getIdComunidad().getNombre());
 			tr.setTipoEntidad(trace);
 			tr.setUsuario(user);
-			tr.setFecha(Calendar.getInstance().getTime());
+			tr.setFecha(GregorianCalendar.getInstance().getTime());
 			tr.setCambiosAtributos("Usuario:" + user.getNombres() + " " + user.getApellidos() + " Ingreso al Sistema");
 			auditoriaBO.save(getUsuarioCurrent(), tr);
 
