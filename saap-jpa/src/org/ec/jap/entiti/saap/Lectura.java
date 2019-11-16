@@ -26,24 +26,21 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.ec.jap.anotaciones.AuditoriaAnot;
+import org.ec.jap.anotaciones.AuditoriaMethod;
+
 /**
  * 
  * @author Freddy G Castillo C
  */
 @Entity
 @Table(name = "lectura")
-@NamedQueries({
-		@NamedQuery(name = "Lectura.findByPeriod", query = "SELECT r FROM Lectura r where  r.idLlave=:idLlave AND  r.idPeriodoPago=:idPeriodoPago "),
-		@NamedQuery(name = "Lectura.findByPeridoCerrModificable", query = "SELECT  cp,ll FROM  CabeceraPlanilla cp inner join cp.idLlave ll   where  cp.estado=:estado AND cp.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND ll IN (select lect.idLlave FROM Lectura lect WHERE lect.esModificable=:esModificable AND lect.idPeriodoPago=:idPeriodoPago)"),
-		@NamedQuery(name = "Lectura.findByPeridoCerr", query = "SELECT  cp,ll FROM  CabeceraPlanilla cp inner join cp.idLlave ll   where  cp.estado=:estado AND cp.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND ll IN (select lect.idLlave FROM Lectura lect WHERE lect.sinLectura=:sinLectura AND lect.idPeriodoPago=:idPeriodoPago)"),
-		@NamedQuery(name = "Lectura.findErroneoByPeriodoSN", query = "SELECT r FROM Lectura r where   r.idPeriodoPago.idPeriodoPago=:idPeriodoPago  AND r.sinLectura=:sinLectura AND r.lecturaIngresada<r.lecturaAnterior"),
-		@NamedQuery(name = "Lectura.findErroneoByPeriodo", query = "SELECT r FROM Lectura r where   r.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND r.usuarioNuevo!=:usuarioNuevo  AND r.sinLectura!=:sinLectura AND r.lecturaIngresada<r.lecturaAnterior"),
-		@NamedQuery(name = "Lectura.findLastByPeridoAndLlave", query = "SELECT MAX(r.idLectura) FROM Lectura r where  r.idLlave=:idLlave AND  r.usuarioNuevo!=:usuarioNuevo "),
-		@NamedQuery(name = "Lectura.findByPer", query = "SELECT  r FROM Lectura r inner join r.idPeriodoPago pp inner join r.idLlave ll inner join ll.idUsuario u WHERE pp=:p AND (UPPER(ll.numero) LIKE UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.nombres) LIKE UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) LIKE UPPER(CONCAT('%',:filtro,'%'))  OR UPPER(u.cedula) LIKE UPPER(CONCAT('%',:filtro,'%')) ) ORDER BY cast(ll.numero,int)"),
-		@NamedQuery(name = "Lectura.findByAnioAndMes", query = "SELECT DISTINCT r FROM Lectura r inner join r.idPeriodoPago pp WHERE r.idLlave=:llave AND pp.anio=:anio AND pp.mes=:mes"),
-		@NamedQuery(name = "Lectura.findByPerido", query = "SELECT  cp,ll FROM  CabeceraPlanilla cp left outer join cp.idLlave ll   where  cp.estado=:estado AND cp.idPeriodoPago.idPeriodoPago=:idPeriodoPago"),
-		@NamedQuery(name = "Lectura.findByPeridoAndLlave", query = "SELECT r FROM Lectura r where  r.idLlave.idLlave=:idLlave and r.estado='ING' AND r.idPeriodoPago=:idPeriodoPago"),
-		@NamedQuery(name = "Lectura.findByUser", query = "SELECT r FROM Lectura r inner join r.idLlave ll where ll=:idLlave AND ( r.idPeriodoPago.idPeriodoPago=:idPeriodoPago or :idPeriodoPago=0) ORDER BY r.fechaRegistro DESC"), })
+@NamedQueries({ @NamedQuery(name = "Lectura.findByPeriod", query = "SELECT r FROM Lectura r where  r.idLlave=:idLlave AND  r.idPeriodoPago=:idPeriodoPago "), 
+	@NamedQuery(name = "Lectura.findByPeridoCerrModificable", query = "SELECT  cp,ll FROM  CabeceraPlanilla cp inner join cp.idLlave ll   where  cp.estado=:estado AND cp.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND ll IN (select lect.idLlave FROM Lectura lect WHERE lect.esModificable=:esModificable AND lect.idPeriodoPago=:idPeriodoPago)"),
+		@NamedQuery(name = "Lectura.findByPeridoCerr", query = "SELECT  cp,ll FROM  CabeceraPlanilla cp inner join cp.idLlave ll   where  cp.estado=:estado AND cp.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND ll IN (select lect.idLlave FROM Lectura lect WHERE lect.sinLectura=:sinLectura AND lect.idPeriodoPago=:idPeriodoPago)"), @NamedQuery(name = "Lectura.findErroneoByPeriodoSN", query = "SELECT r FROM Lectura r where   r.idPeriodoPago.idPeriodoPago=:idPeriodoPago  AND r.sinLectura=:sinLectura AND r.lecturaIngresada<r.lecturaAnterior"), @NamedQuery(name = "Lectura.findErroneoByPeriodo", query = "SELECT r FROM Lectura r where   r.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND r.usuarioNuevo!=:usuarioNuevo  AND r.sinLectura!=:sinLectura AND r.lecturaIngresada<r.lecturaAnterior"),
+		@NamedQuery(name = "Lectura.findLastByPeridoAndLlave", query = "SELECT MAX(r.idLectura) FROM Lectura r where  r.idLlave=:idLlave AND  r.usuarioNuevo!=:usuarioNuevo "), @NamedQuery(name = "Lectura.findByPer", query = "SELECT  r FROM Lectura r inner join r.idPeriodoPago pp inner join r.idLlave ll inner join ll.idUsuario u WHERE pp=:p AND (UPPER(ll.numero) LIKE UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.nombres) LIKE UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) LIKE UPPER(CONCAT('%',:filtro,'%'))  OR UPPER(u.cedula) LIKE UPPER(CONCAT('%',:filtro,'%')) ) ORDER BY cast(ll.numero,int)"), @NamedQuery(name = "Lectura.findByAnioAndMes", query = "SELECT DISTINCT r FROM Lectura r inner join r.idPeriodoPago pp WHERE r.idLlave=:llave AND pp.anio=:anio AND pp.mes=:mes"),
+		@NamedQuery(name = "Lectura.findByPerido", query = "SELECT  cp,ll FROM  CabeceraPlanilla cp left outer join cp.idLlave ll   where  cp.estado=:estado AND cp.idPeriodoPago.idPeriodoPago=:idPeriodoPago"), @NamedQuery(name = "Lectura.findByPeridoAndLlave", query = "SELECT r FROM Lectura r where  r.idLlave.idLlave=:idLlave and r.estado='ING' AND r.idPeriodoPago=:idPeriodoPago"), @NamedQuery(name = "Lectura.findByUser", query = "SELECT r FROM Lectura r inner join r.idLlave ll where ll=:idLlave AND ( r.idPeriodoPago.idPeriodoPago=:idPeriodoPago or :idPeriodoPago=0) ORDER BY r.fechaRegistro DESC"), })
+@AuditoriaAnot(entityType = "LEC")
 public class Lectura implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -128,6 +125,9 @@ public class Lectura implements Serializable {
 	@Transient
 	private Boolean disabled;
 
+	@Transient
+	private Boolean modifiqued;
+
 	public Lectura() {
 	}
 
@@ -142,6 +142,7 @@ public class Lectura implements Serializable {
 		this.fechaRegistro = fechaRegistro;
 	}
 
+	@AuditoriaMethod(isIdEntity = true, disabled = true)
 	public Integer getIdLectura() {
 		return idLectura;
 	}
@@ -150,6 +151,7 @@ public class Lectura implements Serializable {
 		this.idLectura = idLectura;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public String getDescripcion() {
 		return descripcion;
 	}
@@ -158,6 +160,7 @@ public class Lectura implements Serializable {
 		this.descripcion = descripcion;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Double getMetros3() {
 		return metros3;
 	}
@@ -166,6 +169,7 @@ public class Lectura implements Serializable {
 		this.metros3 = metros3;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Date getFechaRegistro() {
 		return fechaRegistro;
 	}
@@ -174,6 +178,7 @@ public class Lectura implements Serializable {
 		this.fechaRegistro = fechaRegistro;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public String getEstado() {
 		return estado;
 	}
@@ -190,6 +195,7 @@ public class Lectura implements Serializable {
 		this.detallePlanillaList = detallePlanillaList;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public TipoRegistro getTipoRegistro() {
 		return tipoRegistro;
 	}
@@ -198,6 +204,12 @@ public class Lectura implements Serializable {
 		this.tipoRegistro = tipoRegistro;
 	}
 
+	@AuditoriaMethod(name = "Número")
+	public String getIdLlaveNumero() {
+		return idLlave.getNumero();
+	}
+
+	@AuditoriaMethod(disabled = true)
 	public Llave getIdLlave() {
 		return idLlave;
 	}
@@ -206,6 +218,7 @@ public class Lectura implements Serializable {
 		this.idLlave = idLlave;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public PeriodoPago getIdPeriodoPago() {
 		return idPeriodoPago;
 	}
@@ -214,6 +227,7 @@ public class Lectura implements Serializable {
 		this.idPeriodoPago = idPeriodoPago;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Boolean getReadOnly() {
 		if (idPeriodoPago != null && "CERR".equals(idPeriodoPago.getEstado())) {
 			if (sinLectura)
@@ -224,6 +238,12 @@ public class Lectura implements Serializable {
 		return false;
 	}
 
+	@AuditoriaMethod(methodToAudit = true, disabled = true)
+	public Boolean getValidToAudit() {
+		return modifiqued != null && modifiqued;
+	}
+
+	@AuditoriaMethod(name = "Lectura Nueva")
 	public Double getLecturaIngresada() {
 		return lecturaIngresada;
 	}
@@ -232,6 +252,7 @@ public class Lectura implements Serializable {
 		this.lecturaIngresada = lecturaIngresada;
 	}
 
+	@AuditoriaMethod(name = "Lectura Anterior")
 	public Double getLecturaAnterior() {
 		return lecturaAnterior;
 	}
@@ -240,6 +261,7 @@ public class Lectura implements Serializable {
 		this.lecturaAnterior = lecturaAnterior;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Double getMetros3Exceso() {
 		return metros3Exceso != null ? metros3Exceso : 0.0;
 	}
@@ -248,6 +270,7 @@ public class Lectura implements Serializable {
 		this.metros3Exceso = metros3Exceso;
 	}
 
+	@AuditoriaMethod(name = "Valor Metro3")
 	public Double getValorMetro3() {
 		return valorMetro3;
 	}
@@ -256,6 +279,7 @@ public class Lectura implements Serializable {
 		this.valorMetro3 = valorMetro3;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Double getValorMetro3Exceso() {
 		return valorMetro3Exceso == null ? 0.0 : valorMetro3Exceso;
 	}
@@ -264,6 +288,7 @@ public class Lectura implements Serializable {
 		this.valorMetro3Exceso = valorMetro3Exceso;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Boolean getSinLectura() {
 		return sinLectura;
 	}
@@ -272,6 +297,7 @@ public class Lectura implements Serializable {
 		this.sinLectura = sinLectura;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Boolean getUsuarioNuevo() {
 		return usuarioNuevo;
 	}
@@ -281,6 +307,7 @@ public class Lectura implements Serializable {
 
 	}
 
+	@AuditoriaMethod(name = "Valor Básico")
 	public Double getValorBasico() {
 		return valorBasico;
 	}
@@ -289,6 +316,7 @@ public class Lectura implements Serializable {
 		this.valorBasico = valorBasico;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Integer getNumeroMeses() {
 		return numeroMeses;
 	}
@@ -297,6 +325,7 @@ public class Lectura implements Serializable {
 		this.numeroMeses = numeroMeses;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Double getBasicoM3() {
 		return basicoM3 != null ? basicoM3 : 0.0;
 	}
@@ -310,6 +339,7 @@ public class Lectura implements Serializable {
 	 * 
 	 * @return el valor del atributo esModificable
 	 */
+	@AuditoriaMethod(disabled = true)
 	public Boolean getEsModificable() {
 		return esModificable;
 	}
@@ -326,6 +356,7 @@ public class Lectura implements Serializable {
 	 * 
 	 * @return el valor del atributo metros3Anterior
 	 */
+	@AuditoriaMethod(disabled = true)
 	public Double getMetros3Anterior() {
 		return metros3Anterior != null ? metros3Anterior : 0.0;
 	}
@@ -337,12 +368,22 @@ public class Lectura implements Serializable {
 		this.metros3Anterior = metros3Anterior;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Boolean getDisabled() {
 		return disabled == null ? true : disabled;
 	}
 
 	public void setDisabled(Boolean disabled) {
 		this.disabled = disabled;
+	}
+
+	@AuditoriaMethod(disabled = true)
+	public Boolean getModifiqued() {
+		return modifiqued;
+	}
+
+	public void setModifiqued(Boolean modifiqued) {
+		this.modifiqued = modifiqued;
 	}
 
 	@Override

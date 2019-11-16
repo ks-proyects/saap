@@ -26,6 +26,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.ec.jap.anotaciones.AuditoriaAnot;
+import org.ec.jap.anotaciones.AuditoriaMethod;
 import org.ec.jap.utilitario.Utilitario;
 
 /**
@@ -34,11 +36,32 @@ import org.ec.jap.utilitario.Utilitario;
  */
 @Entity
 @Table(name = "cabecera_planilla")
-@NamedQueries({ @NamedQuery(name = "CabeceraPlanilla.findConsulta", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idLlave ll inner join ll.idUsuario u INNER JOIN c.idPeriodoPago per WHERE per.estado='CERR' AND (  ll.numero = :filtro OR u.cedula = :filtro) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"), @NamedQuery(name = "CabeceraPlanilla.findConAbono", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND c.valorPagadoAbono!=0.0"), @NamedQuery(name = "CabeceraPlanilla.findSinPagar", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago "),
+@NamedQueries({
+		@NamedQuery(name = "CabeceraPlanilla.findConsulta", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idLlave ll inner join ll.idUsuario u INNER JOIN c.idPeriodoPago per WHERE per.estado='CERR' AND (  ll.numero = :filtro OR u.cedula = :filtro) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
+		@NamedQuery(name = "CabeceraPlanilla.findConAbono", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND c.valorPagadoAbono!=0.0"),
+		@NamedQuery(name = "CabeceraPlanilla.findSinPagar", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago "),
 		@NamedQuery(name = "CabeceraPlanilla.findAbono", query = "SELECT c FROM CabeceraPlanilla  c INNER JOIN c.idLlave ll   WHERE ll=:llave AND c IN (SELECT MAX(cp) from CabeceraPlanilla cp INNER JOIN cp.idLlave ll WHERE ll=:llave AND cp!=:cp )"),
-		@NamedQuery(name = "CabeceraPlanilla.findByPerAbiertActFilters", query = "SELECT c FROM CabeceraPlanilla  c LEFT OUTER JOIN c.idLlave ll LEFT OUTER join c.idUsuario u  WHERE c IN (SELECT dp.idCabeceraPlanilla FROM DetallePlanilla dp INNER JOIN dp.idCabeceraPlanilla cabp WHERE cabp.idPeriodoPago.estado=:estado) AND c.idPeriodoPago.estado=:estado AND ( UPPER(c.observacion) like  UPPER(CONCAT('%',:filtro,'%')) OR ll.numero like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%')  OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ) ORDER BY cast(ll.numero,int), c.fechaRegistro,c.observacion DESC"),
-		@NamedQuery(name = "CabeceraPlanilla.findNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago"), @NamedQuery(name = "CabeceraPlanilla.findAllNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND c.idLlave=:idLlave "), @NamedQuery(name = "CabeceraPlanilla.findAllNoPagAlcantiralado", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND c.idUsuario=:idUser "), @NamedQuery(name = "CabeceraPlanilla.findNewUser", query = "SELECT COUNT(c.idCabeceraPlanilla) FROM CabeceraPlanilla c WHERE c.idLlave=:idLlave AND c IN ( SELECT dp.idCabeceraPlanilla FROM DetallePlanilla dp INNER JOIN dp.idLectura l WHERE l.idLlave=:idLlave )"),
-		@NamedQuery(name = "CabeceraPlanilla.findByFilters", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idLlave ll inner join ll.idUsuario u WHERE  ll.numero like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%')  OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"), @NamedQuery(name = "CabeceraPlanilla.findAllIngresado", query = "SELECT c FROM CabeceraPlanilla c WHERE c.estado='ING'"), @NamedQuery(name = "CabeceraPlanilla.findByUsuarioAndEstado", query = "SELECT c FROM CabeceraPlanilla c inner join c.idLlave  ll where ll.idLlave=:idLlave AND c.estado=:estado") })
+		@NamedQuery(name = "CabeceraPlanilla.findByPerAbiertActFilters", query = "SELECT c FROM CabeceraPlanilla  c LEFT OUTER JOIN c.idLlave ll LEFT OUTER join c.idUsuario u  "
+				+ "WHERE c IN "
+				+ "	(SELECT dp.idCabeceraPlanilla FROM DetallePlanilla dp INNER JOIN dp.idCabeceraPlanilla cabp "
+				+ "	 	WHERE cabp.idCabeceraPlanilla=c.idCabeceraPlanilla and cabp.idPeriodoPago.estado=:estado ) "
+				+ "AND c.idPeriodoPago.estado=:estado "
+				+ "AND ( "
+				+ "     ll.numero like CONCAT('%',:filtro,'%') "
+				+ "     OR UPPER(ll.idUsuario.nombres) like  UPPER(CONCAT('%',:filtro,'%')) "
+				+ "     OR UPPER(ll.idUsuario.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) "
+				+ "     OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) "
+				+ "     OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) "
+				+ " ) "
+				+ " ORDER BY cast(ll.numero,int), c.fechaRegistro,c.observacion DESC"),
+		@NamedQuery(name = "CabeceraPlanilla.findNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago"),
+		@NamedQuery(name = "CabeceraPlanilla.findAllNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND c.idLlave=:idLlave "),
+		@NamedQuery(name = "CabeceraPlanilla.findAllNoPagAlcantiralado", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND c.idUsuario=:idUser "),
+		@NamedQuery(name = "CabeceraPlanilla.findNewUser", query = "SELECT COUNT(c.idCabeceraPlanilla) FROM CabeceraPlanilla c WHERE c.idLlave=:idLlave AND c IN ( SELECT dp.idCabeceraPlanilla FROM DetallePlanilla dp INNER JOIN dp.idLectura l WHERE l.idLlave=:idLlave )"),
+		@NamedQuery(name = "CabeceraPlanilla.findByFilters", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idLlave ll inner join ll.idUsuario u WHERE  ll.numero like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%')  OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
+		@NamedQuery(name = "CabeceraPlanilla.findAllIngresado", query = "SELECT c FROM CabeceraPlanilla c WHERE c.estado='ING'"),
+		@NamedQuery(name = "CabeceraPlanilla.findByUsuarioAndEstado", query = "SELECT c FROM CabeceraPlanilla c inner join c.idLlave  ll where ll.idLlave=:idLlave AND c.estado=:estado") })
+@AuditoriaAnot(entityType = "CABPLA")
 public class CabeceraPlanilla implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -123,7 +146,8 @@ public class CabeceraPlanilla implements Serializable {
 		this.idCabeceraPlanilla = idCabeceraPlanilla;
 	}
 
-	public CabeceraPlanilla(Integer idCabeceraPlanilla, Double subtotal, Double descuento, Double base, Double total, String estado) {
+	public CabeceraPlanilla(Integer idCabeceraPlanilla, Double subtotal, Double descuento, Double base, Double total,
+			String estado) {
 		this.idCabeceraPlanilla = idCabeceraPlanilla;
 		this.subtotal = subtotal;
 		this.descuento = descuento;
@@ -132,14 +156,31 @@ public class CabeceraPlanilla implements Serializable {
 		this.estado = estado;
 	}
 
+	@AuditoriaMethod(methodToAudit = true, disabled = true)
+	public Boolean getValidToAudit() {
+		return valorPagado != null && valorPagado > 0.0;
+	}
+
+	@AuditoriaMethod(isIdEntity = true, disabled = true)
 	public Integer getIdCabeceraPlanilla() {
 		return idCabeceraPlanilla;
+	}
+
+	@AuditoriaMethod(name = "LLave")
+	public String getIdLlaveNumero() {
+		return idLlave != null ? idLlave.getNumero() : "";
+	}
+
+	@AuditoriaMethod(name = "Usuario")
+	public String getUsuarioNombre() {
+		return idUsuario != null ? idUsuario.getNombres() : "";
 	}
 
 	public void setIdCabeceraPlanilla(Integer idCabeceraPlanilla) {
 		this.idCabeceraPlanilla = idCabeceraPlanilla;
 	}
 
+	@AuditoriaMethod(name = "Número de Factura")
 	public String getObservacion() {
 		return observacion;
 	}
@@ -148,6 +189,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.observacion = observacion;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Double getSubtotal() {
 		return subtotal;
 	}
@@ -156,6 +198,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.subtotal = subtotal;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Double getDescuento() {
 		return descuento;
 	}
@@ -164,6 +207,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.descuento = descuento;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Double getBase() {
 		return base;
 	}
@@ -172,6 +216,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.base = base;
 	}
 
+	@AuditoriaMethod(name = "Valor Factura")
 	public Double getTotal() {
 		return total;
 	}
@@ -180,6 +225,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.total = total;
 	}
 
+	@AuditoriaMethod(name = "Estado")
 	public String getEstado() {
 		return estado;
 	}
@@ -212,6 +258,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.idPeriodoPago = idPeriodoPago;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Date getFechaRegistro() {
 		return fechaRegistro;
 	}
@@ -220,6 +267,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.fechaRegistro = fechaRegistro;
 	}
 
+	@AuditoriaMethod(name = "Valor Pagado")
 	public Double getValorPagado() {
 		return valorPagado == null ? 0.0 : valorPagado;
 	}
@@ -228,6 +276,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.valorPagado = valorPagado;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Date getFechaPago() {
 		return fechaPago;
 	}
@@ -236,6 +285,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.fechaPago = fechaPago;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Double getCambioUsd() {
 		return cambioUsd != null ? cambioUsd : 0.0;
 	}
@@ -244,6 +294,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.cambioUsd = cambioUsd;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public Double getAbonoUsd() {
 		return abonoUsd != null ? abonoUsd : 0.0;
 	}
@@ -252,6 +303,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.abonoUsd = abonoUsd;
 	}
 
+	@AuditoriaMethod(name = "Valor Cancelado")
 	public Double getValorCancelado() {
 		return valorCancelado != null ? valorCancelado : 0.0;
 	}
@@ -265,6 +317,7 @@ public class CabeceraPlanilla implements Serializable {
 	 * 
 	 * @return el valor del atributo valorPagadoAbono
 	 */
+	@AuditoriaMethod(name = "Valor Abono")
 	public Double getValorPagadoAbono() {
 		return valorPagadoAbono != null ? valorPagadoAbono : 0.0;
 	}
@@ -281,6 +334,7 @@ public class CabeceraPlanilla implements Serializable {
 	 * 
 	 * @return el valor del atributo valorPendiente
 	 */
+	@AuditoriaMethod(name = "Valor Pendiente")
 	public Double getValorPendiente() {
 		try {
 			return Utilitario.redondear(total - valorPagado);
@@ -296,6 +350,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.valorPendiente = valorPendiente;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public String getObservacion1() {
 		return observacion1;
 	}
@@ -312,6 +367,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.idUsuario = idUsuario;
 	}
 
+	@AuditoriaMethod(disabled = true)
 	public String getUsuarioDesc() {
 		if (idUsuario != null) {
 			return idUsuario.getNombres().concat(" ").concat(idUsuario.getApellidos());
@@ -336,7 +392,8 @@ public class CabeceraPlanilla implements Serializable {
 			return false;
 		}
 		CabeceraPlanilla other = (CabeceraPlanilla) object;
-		if ((this.idCabeceraPlanilla == null && other.idCabeceraPlanilla != null) || (this.idCabeceraPlanilla != null && !this.idCabeceraPlanilla.equals(other.idCabeceraPlanilla))) {
+		if ((this.idCabeceraPlanilla == null && other.idCabeceraPlanilla != null)
+				|| (this.idCabeceraPlanilla != null && !this.idCabeceraPlanilla.equals(other.idCabeceraPlanilla))) {
 			return false;
 		}
 		return true;

@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -83,8 +84,9 @@ public abstract class DAOImpl<Entiti, Pk extends Serializable> implements DAO<En
 	public final List<Entiti> findAllByNamedQuery(String namedQuery, HashMap<String, Object> p) throws Exception {
 		return getQuery(namedQuery, p).getResultList();
 	}
+
 	@Override
-	public final List<Entiti> findAllByNamedQuery(Integer maxResult,String namedQuery, HashMap<String, Object> p) throws Exception {
+	public final List<Entiti> findAllByNamedQuery(Integer maxResult, String namedQuery, HashMap<String, Object> p) throws Exception {
 		return getQuery(namedQuery, p).setMaxResults(maxResult).getResultList();
 	}
 
@@ -252,106 +254,122 @@ public abstract class DAOImpl<Entiti, Pk extends Serializable> implements DAO<En
 				if ("S".equals(tipoEntidad.getEsActivo())) {
 					Auditoria auditoria = new Auditoria();
 					auditoria.setTipoEntidad(tipoEntidad);
-
+					Boolean isValidToAudit = true;
 					for (Method method : entiti.getClass().getMethods()) {
-						value = "";
-						field = "";
-						isIdEntity = false;
-						isIdEntity1 = false;
-						isIdEntity2 = false;
-						isEntityDescription = false;
-						isEntityDescription1 = false;
-						isEntityDescription2 = false;
-						metodoAuditable = false;
-						isDisabled = false;
-
 						if (method.getName().startsWith("get")) {
-							if (method.getReturnType().toString().endsWith("java.lang.String"))
-								metodoAuditable = true;
-							if (method.getReturnType().toString().endsWith("java.sql.Timestamp"))
-								metodoAuditable = true;
-							if (method.getReturnType().toString().endsWith("java.lang.Integer"))
-								metodoAuditable = true;
-							if (method.getReturnType().toString().endsWith("java.lang.Double"))
-								metodoAuditable = true;
-							if (method.getReturnType().toString().endsWith("java.lang.Boolean"))
-								metodoAuditable = true;
-							if (method.getReturnType().toString().endsWith("java.util.Date"))
-								metodoAuditable = true;
-							if (method.getReturnType().toString().equals("int"))
-								metodoAuditable = true;
-							if (method.getReturnType().toString().equals("boolean"))
-								metodoAuditable = true;
-							if (method.getReturnType().toString().endsWith("java.lang.BigDecimal"))
-								metodoAuditable = true;
-
-							// Verificamos las propiedades del método a auditar
-							if (metodoAuditable) {
-
-								anotation = method.getAnnotation(AuditoriaMethod.class);
-								if (anotation instanceof AuditoriaMethod) {
-									AuditoriaMethod sclTraceMethod = (AuditoriaMethod) anotation;
-									field = sclTraceMethod.name();
-									isDisabled = sclTraceMethod.disabled();
-									isIdEntity = sclTraceMethod.isIdEntity();
-									isIdEntity1 = sclTraceMethod.isIdEntity1();
-									isIdEntity2 = sclTraceMethod.isIdEntity2();
-									isEntityDescription = sclTraceMethod.isEntityDescription();
-									isEntityDescription1 = sclTraceMethod.isEntityDescription1();
-									isEntityDescription2 = sclTraceMethod.isEntityDescription2();
-								} else
-									field = "default";
-							}
-
-						}
-
-						if (metodoAuditable) {
-							object = method.invoke(entiti);
-							if (object != null) {
-								if (method.getReturnType().toString().endsWith("java.util.Timestamp")) {
-									Timestamp dateTime = (Timestamp) object;
-									SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-									value = dateFormat.format(dateTime.getTime());
-								} else if (method.getReturnType().toString().endsWith("java.util.Date")) {
-									Date date = (Date) object;
-									SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-									value = dateFormat.format(date);
-								} else if (method.getReturnType().toString().endsWith("boolean") || method.getReturnType().toString().endsWith("java.lang.Boolean")) {
-									value = (object.toString().toLowerCase().equals("true") ? "Verdadero" : "Falso");
-								} else
-									value = object.toString();
-
-								if (isIdEntity)
-									auditoria.setIdEntidad(Integer.valueOf(value));
-								if (isIdEntity1)
-									auditoria.setIdEntidad1(Integer.valueOf(value));
-								if (isIdEntity2)
-									auditoria.setIdEntidad2(Integer.valueOf(value));
-								if (isEntityDescription)
-									auditoria.setDescripcion(value);
-								if (isEntityDescription1)
-									auditoria.setDescripcion1(value);
-								if (isEntityDescription2)
-									auditoria.setDescripcion2(value);
-
-							} else
-								value = "Nulo";
-
-							if (!isDisabled) {
-								camposModificados.append(field.equals("default") ? method.getName().replace("get", "") : field);
-								camposModificados.append(" = ");
-								camposModificados.append(value);
-								camposModificados.append("; ");
+							anotation = method.getAnnotation(AuditoriaMethod.class);
+							if (method.getReturnType().toString().contains("Boolean") && anotation instanceof AuditoriaMethod) {
+								AuditoriaMethod sclTraceMethod = (AuditoriaMethod) anotation;
+								if (sclTraceMethod.methodToAudit()) {
+									object = method.invoke(entiti);
+									isValidToAudit = (Boolean)object;
+									break;
+								}
 							}
 						}
 					}
+					if (isValidToAudit) {
+						for (Method method : entiti.getClass().getMethods()) {
+							value = "";
+							field = "";
+							isIdEntity = false;
+							isIdEntity1 = false;
+							isIdEntity2 = false;
+							isEntityDescription = false;
+							isEntityDescription1 = false;
+							isEntityDescription2 = false;
+							metodoAuditable = false;
+							isDisabled = false;
 
-					auditoria.setDescripcion("INS".equals(traceType) ? "Registro" : "UPD".equals(traceType) ? "Actualizacion" : "DEL".equals(traceType) ? "Eliminacion" : "");
-					auditoria.setCambiosAtributos(camposModificados.toString());
-					auditoria.setUsuario(usuarioCurrent);
-					auditoria.setFecha(Calendar.getInstance().getTime());
-					em().persist(auditoria);
+							if (method.getName().startsWith("get")) {
+								if (method.getReturnType().toString().endsWith("java.lang.String"))
+									metodoAuditable = true;
+								if (method.getReturnType().toString().endsWith("java.sql.Timestamp"))
+									metodoAuditable = true;
+								if (method.getReturnType().toString().endsWith("java.lang.Integer"))
+									metodoAuditable = true;
+								if (method.getReturnType().toString().endsWith("java.lang.Double"))
+									metodoAuditable = true;
+								if (method.getReturnType().toString().endsWith("java.lang.Boolean"))
+									metodoAuditable = true;
+								if (method.getReturnType().toString().endsWith("java.util.Date"))
+									metodoAuditable = true;
+								if (method.getReturnType().toString().equals("int"))
+									metodoAuditable = true;
+								if (method.getReturnType().toString().equals("boolean"))
+									metodoAuditable = true;
+								if (method.getReturnType().toString().endsWith("java.lang.BigDecimal"))
+									metodoAuditable = true;
 
+								// Verificamos las propiedades del método a
+								// auditar
+								if (metodoAuditable) {
+
+									anotation = method.getAnnotation(AuditoriaMethod.class);
+									if (anotation instanceof AuditoriaMethod) {
+										AuditoriaMethod sclTraceMethod = (AuditoriaMethod) anotation;
+										field = sclTraceMethod.name();
+										isDisabled = sclTraceMethod.disabled();
+										isIdEntity = sclTraceMethod.isIdEntity();
+										isIdEntity1 = sclTraceMethod.isIdEntity1();
+										isIdEntity2 = sclTraceMethod.isIdEntity2();
+										isEntityDescription = sclTraceMethod.isEntityDescription();
+										isEntityDescription1 = sclTraceMethod.isEntityDescription1();
+										isEntityDescription2 = sclTraceMethod.isEntityDescription2();
+									} else
+										field = "default";
+								}
+
+							}
+
+							if (metodoAuditable) {
+								object = method.invoke(entiti);
+								if (object != null) {
+									if (method.getReturnType().toString().endsWith("java.util.Timestamp")) {
+										Timestamp dateTime = (Timestamp) object;
+										SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+										value = dateFormat.format(dateTime.getTime());
+									} else if (method.getReturnType().toString().endsWith("java.util.Date")) {
+										Date date = (Date) object;
+										SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+										value = dateFormat.format(date);
+									} else if (method.getReturnType().toString().endsWith("boolean") || method.getReturnType().toString().endsWith("java.lang.Boolean")) {
+										value = (object.toString().toLowerCase().equals("true") ? "Verdadero" : "Falso");
+									} else
+										value = object.toString();
+
+									if (isIdEntity)
+										auditoria.setIdEntidad(Integer.valueOf(value));
+									if (isIdEntity1)
+										auditoria.setIdEntidad1(Integer.valueOf(value));
+									if (isIdEntity2)
+										auditoria.setIdEntidad2(Integer.valueOf(value));
+									if (isEntityDescription)
+										auditoria.setDescripcion(value);
+									if (isEntityDescription1)
+										auditoria.setDescripcion1(value);
+									if (isEntityDescription2)
+										auditoria.setDescripcion2(value);
+
+								} else
+									value = "Nulo";
+
+								if (!isDisabled) {
+									camposModificados.append(field.equals("default") ? method.getName().replace("get", "") : field);
+									camposModificados.append(" = ");
+									camposModificados.append(value);
+									camposModificados.append("; ");
+								}
+							}
+						}
+
+						auditoria.setDescripcion("INS".equals(traceType) ? "Registro" : "UPD".equals(traceType) ? "Actualizacion" : "DEL".equals(traceType) ? "Eliminacion" : "");
+						auditoria.setCambiosAtributos(camposModificados.toString());
+						auditoria.setUsuario(usuarioCurrent);
+						auditoria.setFecha(GregorianCalendar.getInstance().getTime());
+						em().persist(auditoria);
+
+					}
 				}
 			} catch (Exception e) {
 				throw new EJBTransactionRolledbackException("Error en el registro de auditoría " + e.getMessage());

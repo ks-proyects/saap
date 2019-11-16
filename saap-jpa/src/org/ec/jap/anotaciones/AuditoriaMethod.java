@@ -82,4 +82,6 @@ public @interface AuditoriaMethod {
 	 * @return
 	 */
 	public boolean isEntityDescription2() default false;
+	
+	public boolean methodToAudit() default false;
 }

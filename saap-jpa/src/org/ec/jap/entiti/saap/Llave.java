@@ -18,13 +18,13 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "llave")
 @NamedQueries({
-		@NamedQuery(name = "Llave.findByActivoInactivo", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE u NOT IN (SELECT asi.idUsuario FROM Asistencia asi WHERE asi.actividad = :actividad) AND u.estado IN ('ACT','INAC','EDI') ORDER BY u.nombres"),
-		@NamedQuery(name = "Llave.findNewUser", query = "SELECT COUNT(l.idLlave) FROM Llave l inner join l.idUsuario u WHERE u=:idUsuario AND  l IN (SELECT le.idLectura from Lectura le)"),
+		@NamedQuery(name = "Llave.findByActivoInactivo", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE l.activo  IN ('SI') AND u NOT IN (SELECT asi.idUsuario FROM Asistencia asi WHERE asi.actividad = :actividad) AND u.estado IN ('ACT','INAC','EDI') ORDER BY u.nombres"),
+
 		@NamedQuery(name = "Llave.findAllByUser", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE UPPER(l.numero) like UPPER(CONCAT('%',:filtro,'%')) OR upper(u.cedula) LIKE upper(CONCAT('%',:filtro,'%'))  OR upper(CONCAT(u.nombres,u.apellidos)) LIKE upper(CONCAT('%',:filtro,'%')) ORDER BY cast(l.numero,int),u.nombres,u.apellidos"),
 		@NamedQuery(name = "Llave.findByUser", query = "SELECT l FROM Llave l where l.idUsuario.idUsuario=:idUsuario order by l.fechaRegistro, l.numero"),
-		@NamedQuery(name = "Llave.findAll", query = "SELECT l FROM Llave l"),
-		@NamedQuery(name = "Llave.findOfUsuariosActivos", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE u.estado IN ('ACT','EDI') ORDER BY l.numero"),
-		@NamedQuery(name = "Llave.findOfUsuariosActivosAndNotPeriodo", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE u.estado IN ('ACT','INAC') AND l NOT IN (SELECT le.idLlave FROM Lectura le WHERE le.idPeriodoPago=:idPeriodoPago)") })
+		@NamedQuery(name = "Llave.findOfUsuariosActivos", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE u.estado IN ('ACT','EDI') and l.activo IN ('SI') ORDER BY l.numero"),
+		@NamedQuery(name = "Llave.findOfUsuariosActivosAndNotPeriodo", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE u.estado IN ('ACT','INAC') AND l.activo IN ('SI') AND l NOT IN (SELECT le.idLlave FROM Lectura le WHERE le.idPeriodoPago=:idPeriodoPago and le.idLlave.idLlave=l.idLlave)"),
+		@NamedQuery(name = "Llave.findOfUsuariosActivosAndNotFactura", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE u.estado IN ('ACT','INAC') AND l.activo IN ('SI') AND l NOT IN (SELECT cp.idLlave FROM CabeceraPlanilla cp WHERE cp.idPeriodoPago=:idPeriodoPago and cp.idLlave.idLlave=l.idLlave)") })
 public class Llave implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -45,6 +45,10 @@ public class Llave implements Serializable {
 	@Size(min = 1, max = 2147483647)
 	@Column(name = "ll_estado")
 	private String estado;
+
+	@Column(name = "activo")
+	private String activo;
+
 	@Basic(optional = false)
 	@NotNull
 	@Column(name = "fecha_registro")
@@ -147,6 +151,14 @@ public class Llave implements Serializable {
 		this.cabeceraPlanillaList = cabeceraPlanillaList;
 	}
 
+	public String getActivo() {
+		return activo;
+	}
+
+	public void setActivo(String activo) {
+		this.activo = activo;
+	}
+
 	@Override
 	public int hashCode() {
 		int hash = 0;
@@ -162,7 +174,8 @@ public class Llave implements Serializable {
 			return false;
 		}
 		Llave other = (Llave) object;
-		if ((this.idLlave == null && other.idLlave != null) || (this.idLlave != null && !this.idLlave.equals(other.idLlave))) {
+		if ((this.idLlave == null && other.idLlave != null)
+				|| (this.idLlave != null && !this.idLlave.equals(other.idLlave))) {
 			return false;
 		}
 		return true;

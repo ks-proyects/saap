@@ -47,10 +47,8 @@ public class Auditoria implements Serializable {
 	@Size(max = 8000)
 	@Column(name = "cambios_atributos")
 	private String cambiosAtributos;
-	@Basic(optional = false)
-	@NotNull
-	@Column(name = "fecha")
-	@Temporal(TemporalType.DATE)
+	
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date fecha;
 
 	@JoinColumn(name = "tipo_entidad", referencedColumnName = "tipo_entidad")
