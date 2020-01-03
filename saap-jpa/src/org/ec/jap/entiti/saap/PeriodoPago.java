@@ -11,6 +11,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.ec.jap.anotaciones.AuditoriaAnot;
+import org.ec.jap.anotaciones.AuditoriaMethod;
+
 /**
  * 
  * @author Freddy G Castillo C
@@ -24,6 +27,7 @@ import javax.validation.constraints.Size;
 		@NamedQuery(name = "PeriodoPago.findAll", query = "SELECT p FROM PeriodoPago p ORDER BY p.fechaFin DESC"),
 		@NamedQuery(name = "PeriodoPago.findAbierto", query = "SELECT p FROM PeriodoPago p WHERE p.estado in ('ABIE','CERR')"),
 		@NamedQuery(name = "PeriodoPago.findAbiertoCerrado", query = "SELECT p FROM PeriodoPago p WHERE p.estado  in ('ABIE','CERR')") })
+@AuditoriaAnot(entityType = "PERPAG")
 public class PeriodoPago implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -88,6 +92,7 @@ public class PeriodoPago implements Serializable {
 		this.mes = mes;
 	}
 
+	@AuditoriaMethod(isIdEntity = true, disabled = true)
 	public Integer getIdPeriodoPago() {
 		return idPeriodoPago;
 	}
@@ -136,6 +141,7 @@ public class PeriodoPago implements Serializable {
 		this.mes = mes;
 	}
 
+	@AuditoriaMethod(name = "Estado")
 	public String getEstado() {
 		return estado;
 	}

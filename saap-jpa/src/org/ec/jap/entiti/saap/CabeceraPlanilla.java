@@ -86,6 +86,7 @@ public class CabeceraPlanilla implements Serializable {
 	private Double descuento;
 
 	@NotNull
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "fecha_registro")
 	private Date fechaRegistro;
 
@@ -180,7 +181,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.idCabeceraPlanilla = idCabeceraPlanilla;
 	}
 
-	@AuditoriaMethod(name = "Número de Factura")
+	@AuditoriaMethod(name = "Nï¿½mero de Factura")
 	public String getObservacion() {
 		return observacion;
 	}

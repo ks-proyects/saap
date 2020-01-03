@@ -86,6 +86,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	@EJB
 	protected GastoBO gastoBO;
 
+	
 	public CabeceraPlanillaBOImpl() {
 	}
 
