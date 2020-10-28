@@ -259,7 +259,8 @@ public class Utilitario {
 	}
 
 	public static void main(String[] arg) {
-		System.out.println(Utilitario.getMD5_Base64("freddy"));
+		
+		System.out.println(Utilitario.getMD5_Base64("hugoramiro"));
 
 	}
 

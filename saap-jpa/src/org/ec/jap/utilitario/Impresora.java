@@ -27,7 +27,7 @@ public class Impresora {
 
 	public static List<PrintService> getImpresoras(int numCopies) throws Exception {
 		PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
-		aset.add(new Copies(2));
+		aset.add(new Copies(numCopies));
 		PrintService[] services = PrintServiceLookup.lookupPrintServices(null, aset);
 		List<PrintService> printServices = new ArrayList<>();
 		for (int i = 0; i < services.length; i++) {

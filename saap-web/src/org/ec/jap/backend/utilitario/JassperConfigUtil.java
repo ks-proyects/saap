@@ -8,10 +8,6 @@ import java.sql.Connection;
 import java.util.Map;
 
 import javax.print.PrintService;
-import javax.print.attribute.AttributeSet;
-import javax.print.attribute.HashAttributeSet;
-import javax.print.attribute.PrintServiceAttributeSet;
-import javax.print.attribute.standard.Copies;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
