@@ -439,11 +439,14 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
 					detallePlanilla.setValorUnidad(0.0);
 					detallePlanilla.setOrdenStr("B");
-
-					DetallePlanilla detallePlanillaBasico = detallePlanillaBO.crearDetalleBasico(cp, registroEconomicoBasico, lectura, periodoPago);
-					registroEconomicoBasico.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
-					detallePlanillaBO.save(usuario, detallePlanillaBasico);
-					cantidadBasicoAplicados++;
+					
+					if(lectura!=null && lectura.getValorBasico()!=null && lectura.getValorBasico()>0) {
+						DetallePlanilla detallePlanillaBasico = detallePlanillaBO.crearDetalleBasico(cp, registroEconomicoBasico, lectura, periodoPago);
+						registroEconomicoBasico.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
+						detallePlanillaBO.save(usuario, detallePlanillaBasico);
+						cantidadBasicoAplicados++;	
+					}
+					
 
 					if (lectura.getUsuarioNuevo()) {
 						debeRegistrarDetalle = false;
@@ -656,7 +659,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						pama.put("cp", cp);
 						pama.put("desc", "Básico");
 						DetallePlanilla dpb = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByBasico", pama);
-						if (dpb == null) {
+						if (dpb == null && lectura.getValorBasico()!=null && lectura.getValorBasico()>0) {
 							detallePlanillaBasico = detallePlanillaBO.crearDetalleBasico(cp, registroEconomicoBasico, lectura, periodoPago);
 							registroEconomicoBasico.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
 							detallePlanillaBO.save(usuario, detallePlanillaBasico);
