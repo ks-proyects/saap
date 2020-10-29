@@ -15,9 +15,11 @@ import org.ec.jap.bo.saap.ActividadBO;
 import org.ec.jap.bo.saap.CabeceraPlanillaBO;
 import org.ec.jap.bo.saap.PeriodoPagoBO;
 import org.ec.jap.bo.saap.RegistroEconomicoBO;
+import org.ec.jap.bo.sistema.BackupDBBO;
 import org.ec.jap.bo.sistema.CambioEstadoBO;
 import org.ec.jap.bo.sistema.CambioEstadoCondicionBO;
 import org.ec.jap.bo.sistema.DocumentoAdjuntoBO;
+import org.ec.jap.bo.sistema.EmailBO;
 import org.ec.jap.bo.sistema.EntidadCambioEstadoBO;
 import org.ec.jap.dao.sistema.impl.CambioEstadoDAOImpl;
 import org.ec.jap.entiti.saap.PeriodoPago;
@@ -42,7 +44,22 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 	@EJB
 	DocumentoAdjuntoBO documentoAdjuntoBO;
 
+	@EJB
+	BackupDBBO backup;
+
+	@EJB
+	EmailBO emailBo;
+
 	public CambioEstadoBOImpl() {
+	}
+
+	public void generateBackupDb() {
+		try {
+			String pathFile = backup.executeCommand();
+			emailBo.enviarBackupDB(pathFile);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 
 	@Override
@@ -56,7 +73,8 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 			cambioEstadoCondicionBO.cumpleCondicion(cambioEstado, idDocumento);
 		}
 
-		verificarCambio(cambioEstado.getIdEstadoAnterior().getEstado(), cambioEstado.getIdEstadoNuevo().getEstado(), usuario, idDocumento, cambioEstado.getTipoEntidad().getTipoEntidad());
+		verificarCambio(cambioEstado.getIdEstadoAnterior().getEstado(), cambioEstado.getIdEstadoNuevo().getEstado(),
+				usuario, idDocumento, cambioEstado.getTipoEntidad().getTipoEntidad());
 
 		String updateStado = cambioEstado.getTipoEntidad().getSentenciaUpdate();
 		Query query = em().createQuery(updateStado);
@@ -79,13 +97,15 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-	public void cambiarEstado(Integer idCambioEstado, Usuario usuario, Object idDocumento, String motivo) throws Exception {
+	public void cambiarEstado(Integer idCambioEstado, Usuario usuario, Object idDocumento, String motivo)
+			throws Exception {
 		// TODO Auto-generated method stub
 		CambioEstado cambioEstado = findByPk(idCambioEstado);
 		if (cambioEstado == null)
 			return;
 
-		verificarCambio(cambioEstado.getIdEstadoAnterior().getEstado(), cambioEstado.getIdEstadoNuevo().getEstado(), usuario, idDocumento, cambioEstado.getTipoEntidad().getTipoEntidad());
+		verificarCambio(cambioEstado.getIdEstadoAnterior().getEstado(), cambioEstado.getIdEstadoNuevo().getEstado(),
+				usuario, idDocumento, cambioEstado.getTipoEntidad().getTipoEntidad());
 
 		String updateStado = cambioEstado.getTipoEntidad().getSentenciaUpdate();
 		Query query = em().createQuery(updateStado);
@@ -108,7 +128,8 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 	}
 
 	@Override
-	public void cambiarEstadoSinVerificar(Integer idCambioEstado, Usuario usuario, Object idDocumento, String motivo) throws Exception {
+	public void cambiarEstadoSinVerificar(Integer idCambioEstado, Usuario usuario, Object idDocumento, String motivo)
+			throws Exception {
 		// TODO Auto-generated method stub
 		CambioEstado cambioEstado = findByPk(idCambioEstado);
 		if (cambioEstado == null)
@@ -165,7 +186,8 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 	ActividadBO actividadBO;
 
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
-	public void verificarCambio(String estadoActual, String estadoNuevo, Usuario usuario, Object idDocumento, String tipoEntidad) throws Exception {
+	public void verificarCambio(String estadoActual, String estadoNuevo, Usuario usuario, Object idDocumento,
+			String tipoEntidad) throws Exception {
 
 		switch (tipoEntidad) {
 		case "PERPAG":
@@ -175,7 +197,8 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 				case "ING":
 					List<PeriodoPago> periodoPago = periodoPagoBO.findAllByNamedQuery("PeriodoPago.findAbiertoCerrado");
 					if (periodoPago.size() > 0)
-						throw new EJBTransactionRolledbackException("No puede abrir un periodo de pago si existen periodos de pago sin finalizar o en estado abierto.");
+						throw new EJBTransactionRolledbackException(
+								"No puede abrir un periodo de pago si existen periodos de pago sin finalizar o en estado abierto.");
 					cabeceraPlanillaBO.abrirPeriodoPago(usuario, (Integer) idDocumento);
 					break;
 				case "ABIE":
@@ -195,6 +218,7 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 					break;
 				case "ABIE":
 					cabeceraPlanillaBO.cerrarPeriodoPago(usuario, (Integer) idDocumento);
+
 					break;
 				default:
 					break;
@@ -207,6 +231,7 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 					cabeceraPlanillaBO.regenerarPeriodoCerrado(usuario, (Integer) idDocumento);
 				case "ABIE":
 					cabeceraPlanillaBO.cerrarPeriodoPago(usuario, (Integer) idDocumento);
+
 				default:
 					break;
 				}
@@ -214,9 +239,11 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 				break;
 			case "FIN":
 				cabeceraPlanillaBO.finalizarPlanilla(usuario, (Integer) idDocumento);
+				this.generateBackupDb();
 				break;
 			case "FINI":
 				cabeceraPlanillaBO.finalizarPlanilla(usuario, (Integer) idDocumento);
+				this.generateBackupDb();
 				break;
 
 			default:
@@ -334,7 +361,8 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 			cambioEstadoCondicionBO.cumpleCondicion(cambioEstado, idDocumento);
 		}
 
-		verificarCambio(cambioEstado.getIdEstadoAnterior().getEstado(), cambioEstado.getIdEstadoNuevo().getEstado(), usuario, idDocumento, cambioEstado.getTipoEntidad().getTipoEntidad());
+		verificarCambio(cambioEstado.getIdEstadoAnterior().getEstado(), cambioEstado.getIdEstadoNuevo().getEstado(),
+				usuario, idDocumento, cambioEstado.getTipoEntidad().getTipoEntidad());
 
 		String updateStado = cambioEstado.getTipoEntidad().getSentenciaUpdate();
 		Query query = em().createQuery(updateStado);

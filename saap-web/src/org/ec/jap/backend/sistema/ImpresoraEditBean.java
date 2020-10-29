@@ -16,6 +16,7 @@ import javax.print.PrintService;
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.sistema.BackupDBBO;
+import org.ec.jap.bo.sistema.EmailBO;
 import org.ec.jap.entiti.saap.Parametro;
 import org.ec.jap.utilitario.Impresora;
 
@@ -31,9 +32,8 @@ public class ImpresoraEditBean extends Bean {
 	Parametro isMatricialParam;
 
 	Boolean isMatricial;
+
 	
-	@EJB
-	BackupDBBO backup;
 
 	public ImpresoraEditBean() {
 		super();
@@ -58,8 +58,7 @@ public class ImpresoraEditBean extends Bean {
 			parametro = parametroBO.findByPk("NOMIMPR");
 			isMatricialParam = parametroBO.findByPk("ESIMPRMAT");
 			isMatricial = "SI".equalsIgnoreCase(isMatricialParam != null ? isMatricialParam.getValorString() : "");
-			String file= backup.executeCommand();
-			System.out.println(file);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
@@ -70,6 +69,7 @@ public class ImpresoraEditBean extends Bean {
 	@Override
 	public String guardar() {
 		try {
+			
 			isMatricialParam.setValorString(isMatricial ? "SI" : "NO");
 			parametroBO.update(getUsuarioCurrent(), isMatricialParam);
 			parametroBO.update(getUsuarioCurrent(), parametro);
@@ -101,7 +101,8 @@ public class ImpresoraEditBean extends Bean {
 	public List<SelectItem> getImpresoras() {
 		List<SelectItem> selectItems = new ArrayList<SelectItem>(0);
 		try {
-			Integer numCopies=parametroBO.getInteger("", getUsuarioCurrent().getIdComunidad().getIdComunidad(), "NUMCOP");
+			Integer numCopies = parametroBO.getInteger("", getUsuarioCurrent().getIdComunidad().getIdComunidad(),
+					"NUMCOP");
 			List<PrintService> list = Impresora.getImpresoras(numCopies);
 			selectItems.add(new SelectItem("-1", "SELECCIONE", "SELECCIONE"));
 			for (PrintService print : list) {

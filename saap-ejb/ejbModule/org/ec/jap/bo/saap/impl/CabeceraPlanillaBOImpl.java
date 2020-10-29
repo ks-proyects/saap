@@ -27,7 +27,9 @@ import org.ec.jap.bo.saap.RangoConsumoBO;
 import org.ec.jap.bo.saap.RegistroEconomicoBO;
 import org.ec.jap.bo.saap.TipoRegistroBO;
 import org.ec.jap.bo.saap.UsuarioBO;
+import org.ec.jap.bo.sistema.BackupDBBO;
 import org.ec.jap.bo.sistema.CambioEstadoBO;
+import org.ec.jap.bo.sistema.EmailBO;
 import org.ec.jap.dao.saap.impl.CabeceraPlanillaDAOImpl;
 import org.ec.jap.entiti.saap.Actividad;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
@@ -87,9 +89,11 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	protected GastoBO gastoBO;
 
 	
+
 	public CabeceraPlanillaBOImpl() {
 	}
 
+	
 	public List<CabeceraPlanilla> findPlanillasByLLaveAndStatus(Llave llave, String estatus) throws Exception {
 		HashMap<String, Object> p = new HashMap<>();
 		p.put("estado", estatus);
@@ -103,7 +107,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		p = new HashMap<>();
 		p.put("estado", status);
 		p.put("idUser", userAlcan);
-		List<CabeceraPlanilla> planillasNoPagadasAlca = findAllByNamedQuery("CabeceraPlanilla.findAllNoPagAlcantiralado", p);
+		List<CabeceraPlanilla> planillasNoPagadasAlca = findAllByNamedQuery(
+				"CabeceraPlanilla.findAllNoPagAlcantiralado", p);
 		return planillasNoPagadasAlca;
 	}
 
@@ -123,13 +128,15 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		String path = "0000000000000";
 		// Inasistencias los creamos al inicio para que en el transcurso
 		// registre ello
-		registroEconomicoBO.inicializar(periodoPago, "INASIS", "Multa Inasistencia " + periodoPago.getDescripcion(), 1, usuario);
+		registroEconomicoBO.inicializar(periodoPago, "INASIS", "Multa Inasistencia " + periodoPago.getDescripcion(), 1,
+				usuario);
 		// Gastos, lo creamos uno para que pueda registrar los gastos en todo
 		// este ciclo
 		registroEconomicoBO.inicializar(periodoPago, "GAST", "Gasto " + periodoPago.getDescripcion(), 1, usuario);
 		// Cuentas Por Pagar, para que las registre la cuentas por pagar de este
 		// mes
-		registroEconomicoBO.inicializar(periodoPago, "CUEPAG", "Valor Por Pagar " + periodoPago.getDescripcion(), 1, usuario);
+		registroEconomicoBO.inicializar(periodoPago, "CUEPAG", "Valor Por Pagar " + periodoPago.getDescripcion(), 1,
+				usuario);
 
 		for (Llave llave : llaves) {
 			numeroFactura++;
@@ -139,9 +146,11 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			// Obtenemos las planillas no pagadas
 			List<CabeceraPlanilla> planillasNoPagadas = findPlanillasByLLaveAndStatus(llave, "NOPAG");
 			for (CabeceraPlanilla planillaNoPagada : planillasNoPagadas) {
-				List<DetallePlanilla> detallePlanillasNoPagadas = detallePlanillaBO.findPlanillasNoPagadas(planillaNoPagada, "DetallePlanilla.findByCabecaraNoPag");
+				List<DetallePlanilla> detallePlanillasNoPagadas = detallePlanillaBO
+						.findPlanillasNoPagadas(planillaNoPagada, "DetallePlanilla.findByCabecaraNoPag");
 				for (DetallePlanilla detallePlanilla : detallePlanillasNoPagadas) {
-					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalle(planillaNueva, detallePlanilla);
+					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalle(planillaNueva,
+							detallePlanilla);
 					if (Constantes.origen_mes_Actual.equals(detallePlanilla.getOrigen())) {
 						detallePlanillaNuevo.setOrigen(Constantes.origen_no_pagado);
 					} else {
@@ -152,16 +161,19 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					planillaNueva.setTotal(planillaNueva.getTotal() + detallePlanillaNuevo.getValorTotal());
 				}
 				cambioEstadoBO.cambiarEstadoSinVerificar(22, usuario, planillaNoPagada.getIdCabeceraPlanilla(), "");
-				Query queryDetalle = em().createQuery("UPDATE DetallePlanilla SET estado='TRAS' where estado='NOPAG' AND idCabeceraPlanilla=:idCabeceraPlanilla");
+				Query queryDetalle = em().createQuery(
+						"UPDATE DetallePlanilla SET estado='TRAS' where estado='NOPAG' AND idCabeceraPlanilla=:idCabeceraPlanilla");
 				queryDetalle.setParameter("idCabeceraPlanilla", planillaNoPagada);
 				queryDetalle.executeUpdate();
 			}
 			// Obtenemos las planillas pagadas Incompletas
 			planillasNoPagadas = findPlanillasByLLaveAndStatus(llave, "INC");
 			for (CabeceraPlanilla planillasIncompletas : planillasNoPagadas) {
-				List<DetallePlanilla> detalleIncomepletos = detallePlanillaBO.findPlanillasNoPagadas(planillasIncompletas, "DetallePlanilla.findByCabecaraNoPagInc");
+				List<DetallePlanilla> detalleIncomepletos = detallePlanillaBO
+						.findPlanillasNoPagadas(planillasIncompletas, "DetallePlanilla.findByCabecaraNoPagInc");
 				for (DetallePlanilla detalleIncompleto : detalleIncomepletos) {
-					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalleInconompleto(planillaNueva, detalleIncompleto);
+					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalleInconompleto(planillaNueva,
+							detalleIncompleto);
 					detallePlanillaNuevo.setOrigen(Constantes.origen_pagado_incompleto);
 					detallePlanillaBO.save(usuario, detallePlanillaNuevo);
 					planillaNueva.setSubtotal(planillaNueva.getSubtotal() + detallePlanillaNuevo.getValorTotal());
@@ -169,11 +181,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				}
 				cambioEstadoBO.cambiarEstadoSinVerificar(36, usuario, planillasIncompletas.getIdCabeceraPlanilla(), "");
 				// Actualizamos el estado de los detalles
-				Query queryDetalle = em().createQuery("UPDATE DetallePlanilla SET estado='TRAS' where  idCabeceraPlanilla=:idCabeceraPlanilla AND estado IN ('ING','INC')");
+				Query queryDetalle = em().createQuery(
+						"UPDATE DetallePlanilla SET estado='TRAS' where  idCabeceraPlanilla=:idCabeceraPlanilla AND estado IN ('ING','INC')");
 				queryDetalle.setParameter("idCabeceraPlanilla", planillasIncompletas);
 				queryDetalle.executeUpdate();
 				// Actualizamos el estado de las lecturas a traspazadas
-				Query queryLecturas = em().createQuery(" UPDATE Lectura SET estado='TRAS' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=:idCabeceraPlanilla)");
+				Query queryLecturas = em().createQuery(
+						" UPDATE Lectura SET estado='TRAS' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=:idCabeceraPlanilla)");
 				queryLecturas.setParameter("idCabeceraPlanilla", planillasIncompletas);
 				queryLecturas.executeUpdate();
 			}
@@ -192,7 +206,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			lectura.setEsModificable(false);
 			lectura.setIdPeriodoPago(periodoPago);
 			lectura.setEstado("ING");
-			lectura.setDescripcion("Lectura de " + Utilitario.mes(periodoPago.getMes()) + " - " + periodoPago.getAnio().toString());
+			lectura.setDescripcion(
+					"Lectura de " + Utilitario.mes(periodoPago.getMes()) + " - " + periodoPago.getAnio().toString());
 			lectura.setMetros3(0.0);
 			lectura.setFechaRegistro(Calendar.getInstance().getTime());
 			lectura.setLecturaIngresada(0.0);
@@ -201,7 +216,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			lectura.setValorMetro3(0.0);
 			lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
 			if (lecturaAnterior != null) {
-				Double metros3Anterior = Utilitario.redondear(lecturaAnterior.getMetros3() + lecturaAnterior.getMetros3Exceso());
+				Double metros3Anterior = Utilitario
+						.redondear(lecturaAnterior.getMetros3() + lecturaAnterior.getMetros3Exceso());
 				lectura.setMetros3Anterior(metros3Anterior);
 				if (!lecturaAnterior.getSinLectura())
 					lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaIngresada() : 0.0);
@@ -209,7 +225,9 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaAnterior() : 0.0);
 			} else
 				lectura.setLecturaAnterior(0.0);
-			lectura.setNumeroMeses(lecturaAnterior != null ? (Utilitario.numeroMeses(lecturaAnterior.getIdPeriodoPago().getFechaInicio(), periodoPago.getFechaInicio())) : 1);
+			lectura.setNumeroMeses(lecturaAnterior != null ? (Utilitario
+					.numeroMeses(lecturaAnterior.getIdPeriodoPago().getFechaInicio(), periodoPago.getFechaInicio()))
+					: 1);
 			lecturaBO.save(usuario, lectura);
 			planillaNueva.setValorPendiente(planillaNueva.getTotal());
 			update(usuario, planillaNueva);
@@ -225,9 +243,11 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			// Obtenemos las planillas no pagadas
 			List<CabeceraPlanilla> planillasNoPagadas = findPlanillasByUserAndStatus(userAlcan, "NOPAG");
 			for (CabeceraPlanilla planillaNoPagada : planillasNoPagadas) {
-				List<DetallePlanilla> detallePlanillasNoPagadas = detallePlanillaBO.findPlanillasNoPagadas(planillaNoPagada, "DetallePlanilla.findByCabecaraNoPag");
+				List<DetallePlanilla> detallePlanillasNoPagadas = detallePlanillaBO
+						.findPlanillasNoPagadas(planillaNoPagada, "DetallePlanilla.findByCabecaraNoPag");
 				for (DetallePlanilla detallePlanilla : detallePlanillasNoPagadas) {
-					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalle(planillaNueva, detallePlanilla);
+					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalle(planillaNueva,
+							detallePlanilla);
 					if (Constantes.origen_mes_Actual.equals(detallePlanilla.getOrigen())) {
 						detallePlanillaNuevo.setOrigen(Constantes.origen_no_pagado);
 					} else {
@@ -238,7 +258,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					planillaNueva.setTotal(planillaNueva.getTotal() + detallePlanillaNuevo.getValorTotal());
 				}
 				cambioEstadoBO.cambiarEstadoSinVerificar(22, usuario, planillaNoPagada.getIdCabeceraPlanilla(), "");
-				Query queryDetalle = em().createQuery("UPDATE DetallePlanilla SET estado='TRAS' where estado='NOPAG' AND idCabeceraPlanilla=:idCabeceraPlanilla");
+				Query queryDetalle = em().createQuery(
+						"UPDATE DetallePlanilla SET estado='TRAS' where estado='NOPAG' AND idCabeceraPlanilla=:idCabeceraPlanilla");
 				queryDetalle.setParameter("idCabeceraPlanilla", planillaNoPagada);
 				queryDetalle.executeUpdate();
 			}
@@ -246,9 +267,11 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			// Obtenemos las planillas pagadas incompletas
 			List<CabeceraPlanilla> planillasNoPagadasAlca = findPlanillasByUserAndStatus(userAlcan, "INC");
 			for (CabeceraPlanilla planillasIncompletas : planillasNoPagadasAlca) {
-				List<DetallePlanilla> detalleIncomepletos = detallePlanillaBO.findPlanillasNoPagadas(planillasIncompletas, "DetallePlanilla.findByCabecaraNoPagInc");
+				List<DetallePlanilla> detalleIncomepletos = detallePlanillaBO
+						.findPlanillasNoPagadas(planillasIncompletas, "DetallePlanilla.findByCabecaraNoPagInc");
 				for (DetallePlanilla detalleIncompleto : detalleIncomepletos) {
-					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalleInconompleto(planillaNueva, detalleIncompleto);
+					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalleInconompleto(planillaNueva,
+							detalleIncompleto);
 					detallePlanillaNuevo.setOrigen(Constantes.origen_pagado_incompleto);
 					detallePlanillaBO.save(usuario, detallePlanillaNuevo);
 					planillaNueva.setSubtotal(planillaNueva.getSubtotal() + detallePlanillaNuevo.getValorTotal());
@@ -256,11 +279,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				}
 				cambioEstadoBO.cambiarEstadoSinVerificar(36, usuario, planillasIncompletas.getIdCabeceraPlanilla(), "");
 				// Actualizamos el estado de los detalles
-				Query queryDetalle = em().createQuery("UPDATE DetallePlanilla SET estado='TRAS' where  idCabeceraPlanilla=:idCabeceraPlanilla AND estado IN ('ING','INC')");
+				Query queryDetalle = em().createQuery(
+						"UPDATE DetallePlanilla SET estado='TRAS' where  idCabeceraPlanilla=:idCabeceraPlanilla AND estado IN ('ING','INC')");
 				queryDetalle.setParameter("idCabeceraPlanilla", planillasIncompletas);
 				queryDetalle.executeUpdate();
 				// Actualizamos el estado de las lecturas a traspazadas
-				Query queryLecturas = em().createQuery(" UPDATE Lectura SET estado='TRAS' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=:idCabeceraPlanilla)");
+				Query queryLecturas = em().createQuery(
+						" UPDATE Lectura SET estado='TRAS' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=:idCabeceraPlanilla)");
 				queryLecturas.setParameter("idCabeceraPlanilla", planillasIncompletas);
 				queryLecturas.executeUpdate();
 			}
@@ -288,15 +313,18 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		for (Llave idLlave : llaves) {
 			// Verificamos si el usuario de la JAAP es nuevo
 			numeroFactura++;
-			CabeceraPlanilla cabeceraPlanilla = iniciar(idPeriodoPago, idLlave, idLlave.getIdUsuario(), path, numeroFactura);
+			CabeceraPlanilla cabeceraPlanilla = iniciar(idPeriodoPago, idLlave, idLlave.getIdUsuario(), path,
+					numeroFactura);
 			save(usuario, cabeceraPlanilla);
 			cambioEstadoBO.cambiarEstadoSinVerificar(18, usuario, cabeceraPlanilla.getIdCabeceraPlanilla(), "");
 			// Obtenemos las planillas no pagadas
 			List<CabeceraPlanilla> planillasNoPagadas = findPlanillasByLLaveAndStatus(idLlave, "NOPAG");
 			for (CabeceraPlanilla planillaNoPagada : planillasNoPagadas) {
-				List<DetallePlanilla> detallePlanillas = detallePlanillaBO.findPlanillasNoPagadas(planillaNoPagada, "DetallePlanilla.findByCabecaraNoPag");
+				List<DetallePlanilla> detallePlanillas = detallePlanillaBO.findPlanillasNoPagadas(planillaNoPagada,
+						"DetallePlanilla.findByCabecaraNoPag");
 				for (DetallePlanilla detallePlanilla : detallePlanillas) {
-					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalle(cabeceraPlanilla, detallePlanilla);
+					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalle(cabeceraPlanilla,
+							detallePlanilla);
 					if (Constantes.origen_mes_Actual.equals(detallePlanilla.getOrigen())) {
 						detallePlanillaNuevo.setOrigen(Constantes.origen_no_pagado);
 					} else {
@@ -307,16 +335,19 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					cabeceraPlanilla.setTotal(cabeceraPlanilla.getTotal() + detallePlanillaNuevo.getValorTotal());
 				}
 				cambioEstadoBO.cambiarEstadoSinVerificar(22, usuario, planillaNoPagada.getIdCabeceraPlanilla(), "");
-				Query queryDetalle = em().createQuery("UPDATE DetallePlanilla SET estado='TRAS' where estado='NOPAG' AND idCabeceraPlanilla=:idCabeceraPlanilla");
+				Query queryDetalle = em().createQuery(
+						"UPDATE DetallePlanilla SET estado='TRAS' where estado='NOPAG' AND idCabeceraPlanilla=:idCabeceraPlanilla");
 				queryDetalle.setParameter("idCabeceraPlanilla", planillaNoPagada);
 				queryDetalle.executeUpdate();
 			}
 			// Obtenemos las planillas pagadas Incompletas
 			planillasNoPagadas = findPlanillasByLLaveAndStatus(idLlave, "INC");
 			for (CabeceraPlanilla planillasIncompletas : planillasNoPagadas) {
-				List<DetallePlanilla> detalleIncomepletos = detallePlanillaBO.findPlanillasNoPagadas(planillasIncompletas, "DetallePlanilla.findByCabecaraNoPagInc");
+				List<DetallePlanilla> detalleIncomepletos = detallePlanillaBO
+						.findPlanillasNoPagadas(planillasIncompletas, "DetallePlanilla.findByCabecaraNoPagInc");
 				for (DetallePlanilla detalleIncompleto : detalleIncomepletos) {
-					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalleInconompleto(cabeceraPlanilla, detalleIncompleto);
+					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO
+							.traspasarDetalleInconompleto(cabeceraPlanilla, detalleIncompleto);
 					detallePlanillaNuevo.setOrigen(Constantes.origen_pagado_incompleto);
 					detallePlanillaBO.save(usuario, detallePlanillaNuevo);
 					cabeceraPlanilla.setSubtotal(cabeceraPlanilla.getSubtotal() + detallePlanillaNuevo.getValorTotal());
@@ -324,11 +355,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				}
 				cambioEstadoBO.cambiarEstadoSinVerificar(36, usuario, planillasIncompletas.getIdCabeceraPlanilla(), "");
 				// Actualizamos el estado de los detalles
-				Query queryDetalle = em().createQuery("UPDATE DetallePlanilla SET estado='TRAS' where  idCabeceraPlanilla=:idCabeceraPlanilla AND estado IN ('ING','INC')");
+				Query queryDetalle = em().createQuery(
+						"UPDATE DetallePlanilla SET estado='TRAS' where  idCabeceraPlanilla=:idCabeceraPlanilla AND estado IN ('ING','INC')");
 				queryDetalle.setParameter("idCabeceraPlanilla", planillasIncompletas);
 				queryDetalle.executeUpdate();
 				// Actualizamos el estado de las lecturas a traspazadas
-				Query queryLecturas = em().createQuery(" UPDATE Lectura SET estado='TRAS' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=:idCabeceraPlanilla)");
+				Query queryLecturas = em().createQuery(
+						" UPDATE Lectura SET estado='TRAS' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=:idCabeceraPlanilla)");
 				queryLecturas.setParameter("idCabeceraPlanilla", planillasIncompletas);
 				queryLecturas.executeUpdate();
 			}
@@ -355,7 +388,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			lectura.setMetros3(0.0);
 			lectura.setFechaRegistro(Calendar.getInstance().getTime());
 			lectura.setLecturaIngresada(0.0);
-			lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaIngresada() : lectura.getLecturaAnterior() != null ? lectura.getLecturaAnterior() : 0.0);
+			lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaIngresada()
+					: lectura.getLecturaAnterior() != null ? lectura.getLecturaAnterior() : 0.0);
 			lecturaBO.save(usuario, lectura);
 			update(usuario, cabeceraPlanilla);
 			Runtime.getRuntime().gc();
@@ -364,7 +398,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		parametroBO.update(usuario, parametro);
 		Runtime.getRuntime().gc();
 	}
-	
 
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public void cerrarPeriodoPago(Usuario usuario, Integer idPeriodoPago) throws Exception {
@@ -395,14 +428,17 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		map.clear();
 		map.put("idPeriodoPago", periodoPago);
 		map.put("tipoRegistro", "INASIS");
-		RegistroEconomico registroEconomicoInasistencias = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType", map);
+		RegistroEconomico registroEconomicoInasistencias = registroEconomicoBO
+				.findByNamedQuery("RegistroEconomico.findByType", map);
 
 		// Cantidad de usuarios CON EL BASICO
 		Integer cantidadBasicoAplicados = 0;
 		Integer cantidadAlcantarilladosAplicados = 0;
-		RegistroEconomico registroEconomicoBasico = registroEconomicoBO.inicializar(periodoPago, "BASCON", " " + periodoPago.getDescripcion(), 0, usuario);
+		RegistroEconomico registroEconomicoBasico = registroEconomicoBO.inicializar(periodoPago, "BASCON",
+				" " + periodoPago.getDescripcion(), 0, usuario);
 
-		RegistroEconomico registroEconomicoAlcantarillado = registroEconomicoBO.inicializar(periodoPago, "ALCANCON", " " + periodoPago.getDescripcion(), 0, usuario);
+		RegistroEconomico registroEconomicoAlcantarillado = registroEconomicoBO.inicializar(periodoPago, "ALCANCON",
+				" " + periodoPago.getDescripcion(), 0, usuario);
 
 		// Variable que indica para que se elimine el registro economico de
 		// enasistencia en caso de que no exista ningun registro de ello
@@ -419,11 +455,15 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				map.put("idLlave", llave.getIdLlave());
 				map.put("idPeriodoPago", periodoPago);
 				Lectura lectura = lecturaBO.findByNamedQuery("Lectura.findByPeridoAndLlave", map);
-				if (cp.getIdUsuario() != null && cp.getIdUsuario().getPoseeAlcant() != null && cp.getIdUsuario().getPoseeAlcant() && valorAlcantarillado > 0) {
-					DetallePlanilla detalleAlcanta = detallePlanillaBO.crearDetalleAlcantarillado(usuario, cp, registroEconomicoAlcantarillado, cp.getIdUsuario().getCantAlcant(), valorAlcantarillado, periodoPago.getDescripcion());
+				if (cp.getIdUsuario() != null && cp.getIdUsuario().getPoseeAlcant() != null
+						&& cp.getIdUsuario().getPoseeAlcant() && valorAlcantarillado > 0) {
+					DetallePlanilla detalleAlcanta = detallePlanillaBO.crearDetalleAlcantarillado(usuario, cp,
+							registroEconomicoAlcantarillado, cp.getIdUsuario().getCantAlcant(), valorAlcantarillado,
+							periodoPago.getDescripcion());
 					cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + detalleAlcanta.getValorTotal()));
 					cp.setTotal(Utilitario.redondear(cp.getTotal() + detalleAlcanta.getValorTotal()));
-					registroEconomicoAlcantarillado.setValor(registroEconomicoBasico.getValor() + detalleAlcanta.getValorTotal());
+					registroEconomicoAlcantarillado
+							.setValor(registroEconomicoBasico.getValor() + detalleAlcanta.getValorTotal());
 					detallePlanillaBO.save(usuario, detalleAlcanta);
 					cantidadAlcantarilladosAplicados++;
 				}
@@ -439,14 +479,15 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
 					detallePlanilla.setValorUnidad(0.0);
 					detallePlanilla.setOrdenStr("B");
-					
-					if(lectura!=null && lectura.getValorBasico()!=null && lectura.getValorBasico()>0) {
-						DetallePlanilla detallePlanillaBasico = detallePlanillaBO.crearDetalleBasico(cp, registroEconomicoBasico, lectura, periodoPago);
-						registroEconomicoBasico.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
+
+					if (lectura != null && lectura.getValorBasico() != null && lectura.getValorBasico() > 0) {
+						DetallePlanilla detallePlanillaBasico = detallePlanillaBO.crearDetalleBasico(cp,
+								registroEconomicoBasico, lectura, periodoPago);
+						registroEconomicoBasico
+								.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
 						detallePlanillaBO.save(usuario, detallePlanillaBasico);
-						cantidadBasicoAplicados++;	
+						cantidadBasicoAplicados++;
 					}
-					
 
 					if (lectura.getUsuarioNuevo()) {
 						debeRegistrarDetalle = false;
@@ -459,10 +500,18 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						// llave
 						if (lectura.getMetros3() > 0) {
 							detallePlanilla.setValorUnidad(Utilitario.redondear(lectura.getValorMetro3()));
-							detallePlanilla.setValorTotal(Utilitario.redondear((lectura.getMetros3() != null && lectura.getValorMetro3() != null ? (lectura.getMetros3() * lectura.getValorMetro3()) : 0.0) + (lectura.getMetros3Exceso() != null && lectura.getValorMetro3Exceso() != null && lectura.getMetros3Exceso() > 0 && lectura.getValorMetro3Exceso() > 0 ? (lectura.getMetros3Exceso() * lectura.getValorMetro3Exceso()) : 0.0)));
+							detallePlanilla.setValorTotal(Utilitario.redondear((lectura.getMetros3() != null
+									&& lectura.getValorMetro3() != null
+											? (lectura.getMetros3() * lectura.getValorMetro3())
+											: 0.0)
+									+ (lectura.getMetros3Exceso() != null && lectura.getValorMetro3Exceso() != null
+											&& lectura.getMetros3Exceso() > 0 && lectura.getValorMetro3Exceso() > 0
+													? (lectura.getMetros3Exceso() * lectura.getValorMetro3Exceso())
+													: 0.0)));
 							detallePlanilla.setValorPagado(0.0);
 							detallePlanilla.setValorPendiente(detallePlanilla.getValorTotal());
-							detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3" + " " + periodoPago.getDescripcion());
+							detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3" + " "
+									+ periodoPago.getDescripcion());
 						}
 					}
 					if (debeRegistrarDetalle) {
@@ -476,11 +525,15 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					}
 				}
 			} else {
-				if (cp.getIdUsuario() != null && cp.getIdUsuario().getPoseeAlcant() != null && cp.getIdUsuario().getPoseeAlcant() && valorAlcantarillado > 0) {
-					DetallePlanilla alcantarillado = detallePlanillaBO.crearDetalleAlcantarillado(usuario, cp, registroEconomicoAlcantarillado, cp.getIdUsuario().getCantAlcant(), valorAlcantarillado, periodoPago.getDescripcion());
+				if (cp.getIdUsuario() != null && cp.getIdUsuario().getPoseeAlcant() != null
+						&& cp.getIdUsuario().getPoseeAlcant() && valorAlcantarillado > 0) {
+					DetallePlanilla alcantarillado = detallePlanillaBO.crearDetalleAlcantarillado(usuario, cp,
+							registroEconomicoAlcantarillado, cp.getIdUsuario().getCantAlcant(), valorAlcantarillado,
+							periodoPago.getDescripcion());
 					cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + alcantarillado.getValorTotal()));
 					cp.setTotal(Utilitario.redondear(cp.getTotal() + alcantarillado.getValorTotal()));
-					registroEconomicoAlcantarillado.setValor(registroEconomicoBasico.getValor() + alcantarillado.getValorTotal());
+					registroEconomicoAlcantarillado
+							.setValor(registroEconomicoBasico.getValor() + alcantarillado.getValorTotal());
 					detallePlanillaBO.save(usuario, alcantarillado);
 					cantidadAlcantarilladosAplicados++;
 				}
@@ -501,7 +554,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				cambioEstadoBO.cambiarEstadoSinVerificar(43, usuario, actividad.getActividad(), "");
 			}
 			registroEconomicoBO.update(usuario, registroEconomicoInasistencias);
-			cambioEstadoBO.cambiarEstadoSinVerificar(40, usuario, registroEconomicoInasistencias.getIdRegistroEconomico(), "");
+			cambioEstadoBO.cambiarEstadoSinVerificar(40, usuario,
+					registroEconomicoInasistencias.getIdRegistroEconomico(), "");
 
 		}
 
@@ -509,14 +563,14 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		map.clear();
 		map.put("idPeriodoPago", periodoPago);
 		map.put("tipoRegistro", tipoRegistroBO.findByPk("CUO"));
-		List<RegistroEconomico> registroEconomicos = registroEconomicoBO.findAllByNamedQuery("RegistroEconomico.findByPeriodoAndTipo", map);
+		List<RegistroEconomico> registroEconomicos = registroEconomicoBO
+				.findAllByNamedQuery("RegistroEconomico.findByPeriodoAndTipo", map);
 		for (RegistroEconomico registroEconomico : registroEconomicos) {
 			cambioEstadoBO.cambiarEstadoSinVerificar(40, usuario, registroEconomico.getIdRegistroEconomico(), "");
 		}
 		Runtime.getRuntime().gc();
 	}
 
-	
 	public void regenerarPlanillasPeriodoCerrado(Usuario usuario, Integer idPeriodoPago) throws Exception {
 		PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
 		// Obtenemos las llaves que no estan generadas las facturas del periodo
@@ -531,15 +585,18 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		for (Llave idLlave : llaves) {
 			// Verificamos si el usuario de la JAAP es nuevo
 			numeroFactura++;
-			CabeceraPlanilla cabeceraPlanilla = iniciar(idPeriodoPago, idLlave, idLlave.getIdUsuario(), path, numeroFactura);
+			CabeceraPlanilla cabeceraPlanilla = iniciar(idPeriodoPago, idLlave, idLlave.getIdUsuario(), path,
+					numeroFactura);
 			save(usuario, cabeceraPlanilla);
 			cambioEstadoBO.cambiarEstadoSinVerificar(18, usuario, cabeceraPlanilla.getIdCabeceraPlanilla(), "");
 			// Obtenemos las planillas no pagadas
 			List<CabeceraPlanilla> planillasNoPagadas = findPlanillasByLLaveAndStatus(idLlave, "NOPAG");
 			for (CabeceraPlanilla planillaNoPagada : planillasNoPagadas) {
-				List<DetallePlanilla> detallePlanillas = detallePlanillaBO.findPlanillasNoPagadas(planillaNoPagada, "DetallePlanilla.findByCabecaraNoPag");
+				List<DetallePlanilla> detallePlanillas = detallePlanillaBO.findPlanillasNoPagadas(planillaNoPagada,
+						"DetallePlanilla.findByCabecaraNoPag");
 				for (DetallePlanilla detallePlanilla : detallePlanillas) {
-					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalle(cabeceraPlanilla, detallePlanilla);
+					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalle(cabeceraPlanilla,
+							detallePlanilla);
 					if (Constantes.origen_mes_Actual.equals(detallePlanilla.getOrigen())) {
 						detallePlanillaNuevo.setOrigen(Constantes.origen_no_pagado);
 					} else {
@@ -550,16 +607,19 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					cabeceraPlanilla.setTotal(cabeceraPlanilla.getTotal() + detallePlanillaNuevo.getValorTotal());
 				}
 				cambioEstadoBO.cambiarEstadoSinVerificar(22, usuario, planillaNoPagada.getIdCabeceraPlanilla(), "");
-				Query queryDetalle = em().createQuery("UPDATE DetallePlanilla SET estado='TRAS' where estado='NOPAG' AND idCabeceraPlanilla=:idCabeceraPlanilla");
+				Query queryDetalle = em().createQuery(
+						"UPDATE DetallePlanilla SET estado='TRAS' where estado='NOPAG' AND idCabeceraPlanilla=:idCabeceraPlanilla");
 				queryDetalle.setParameter("idCabeceraPlanilla", planillaNoPagada);
 				queryDetalle.executeUpdate();
 			}
 			// Obtenemos las planillas pagadas Incompletas
 			planillasNoPagadas = findPlanillasByLLaveAndStatus(idLlave, "INC");
 			for (CabeceraPlanilla planillasIncompletas : planillasNoPagadas) {
-				List<DetallePlanilla> detalleIncomepletos = detallePlanillaBO.findPlanillasNoPagadas(planillasIncompletas, "DetallePlanilla.findByCabecaraNoPagInc");
+				List<DetallePlanilla> detalleIncomepletos = detallePlanillaBO
+						.findPlanillasNoPagadas(planillasIncompletas, "DetallePlanilla.findByCabecaraNoPagInc");
 				for (DetallePlanilla detalleIncompleto : detalleIncomepletos) {
-					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO.traspasarDetalleInconompleto(cabeceraPlanilla, detalleIncompleto);
+					DetallePlanilla detallePlanillaNuevo = detallePlanillaBO
+							.traspasarDetalleInconompleto(cabeceraPlanilla, detalleIncompleto);
 					detallePlanillaNuevo.setOrigen(Constantes.origen_pagado_incompleto);
 					detallePlanillaBO.save(usuario, detallePlanillaNuevo);
 					cabeceraPlanilla.setSubtotal(cabeceraPlanilla.getSubtotal() + detallePlanillaNuevo.getValorTotal());
@@ -567,11 +627,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				}
 				cambioEstadoBO.cambiarEstadoSinVerificar(36, usuario, planillasIncompletas.getIdCabeceraPlanilla(), "");
 				// Actualizamos el estado de los detalles
-				Query queryDetalle = em().createQuery("UPDATE DetallePlanilla SET estado='TRAS' where  idCabeceraPlanilla=:idCabeceraPlanilla AND estado IN ('ING','INC')");
+				Query queryDetalle = em().createQuery(
+						"UPDATE DetallePlanilla SET estado='TRAS' where  idCabeceraPlanilla=:idCabeceraPlanilla AND estado IN ('ING','INC')");
 				queryDetalle.setParameter("idCabeceraPlanilla", planillasIncompletas);
 				queryDetalle.executeUpdate();
 				// Actualizamos el estado de las lecturas a traspazadas
-				Query queryLecturas = em().createQuery(" UPDATE Lectura SET estado='TRAS' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=:idCabeceraPlanilla)");
+				Query queryLecturas = em().createQuery(
+						" UPDATE Lectura SET estado='TRAS' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=:idCabeceraPlanilla)");
 				queryLecturas.setParameter("idCabeceraPlanilla", planillasIncompletas);
 				queryLecturas.executeUpdate();
 			}
@@ -598,7 +660,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			lectura.setMetros3(0.0);
 			lectura.setFechaRegistro(Calendar.getInstance().getTime());
 			lectura.setLecturaIngresada(0.0);
-			lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaIngresada() : lectura.getLecturaAnterior() != null ? lectura.getLecturaAnterior() : 0.0);
+			lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaIngresada()
+					: lectura.getLecturaAnterior() != null ? lectura.getLecturaAnterior() : 0.0);
 			lecturaBO.save(usuario, lectura);
 			update(usuario, cabeceraPlanilla);
 			Runtime.getRuntime().gc();
@@ -607,7 +670,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		parametroBO.update(usuario, parametro);
 		Runtime.getRuntime().gc();
 	}
-	
+
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public void regenerarPeriodoCerrado(Usuario usuario, Integer idPeriodoPago) throws Exception {
 		regenerarPlanillasPeriodoCerrado(usuario, idPeriodoPago);
@@ -624,7 +687,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		map.clear();
 		map.put("idPeriodoPago", periodoPago);
 		map.put("tipoRegistro", "BASCON");
-		RegistroEconomico registroEconomicoBasico = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType", map);
+		RegistroEconomico registroEconomicoBasico = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType",
+				map);
 		// Cantidad de usuarios CON EL BASIC
 		Integer cantidadUsuariosConBasico = registroEconomicoBasico.getCantidadAplicados();
 		for (Object[] object : objects) {
@@ -641,7 +705,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					HashMap<String, Object> pama = new HashMap<>();
 					pama.put("idLectura", lectura);
 
-					DetallePlanilla detallePlanilla = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByLectura", pama);
+					DetallePlanilla detallePlanilla = detallePlanillaBO
+							.findByNamedQuery("DetallePlanilla.findByLectura", pama);
 					DetallePlanilla detallePlanillaBasico = null;
 					if (detallePlanilla == null) {
 						detallePlanilla = new DetallePlanilla();
@@ -659,9 +724,11 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						pama.put("cp", cp);
 						pama.put("desc", "Básico");
 						DetallePlanilla dpb = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByBasico", pama);
-						if (dpb == null && lectura.getValorBasico()!=null && lectura.getValorBasico()>0) {
-							detallePlanillaBasico = detallePlanillaBO.crearDetalleBasico(cp, registroEconomicoBasico, lectura, periodoPago);
-							registroEconomicoBasico.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
+						if (dpb == null && lectura.getValorBasico() != null && lectura.getValorBasico() > 0) {
+							detallePlanillaBasico = detallePlanillaBO.crearDetalleBasico(cp, registroEconomicoBasico,
+									lectura, periodoPago);
+							registroEconomicoBasico.setValor(
+									registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
 							detallePlanillaBO.save(usuario, detallePlanillaBasico);
 							cantidadUsuariosConBasico++;
 						}
@@ -671,10 +738,18 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					// cobramos el basico
 					if (lectura.getMetros3() > 0) {
 						detallePlanilla.setValorUnidad(Utilitario.redondear(lectura.getValorMetro3()));
-						detallePlanilla.setValorTotal(Utilitario.redondear((lectura.getMetros3() != null && lectura.getValorMetro3() != null ? (lectura.getMetros3() * lectura.getValorMetro3()) : 0.0) + (lectura.getMetros3Exceso() != null && lectura.getValorMetro3Exceso() != null && lectura.getMetros3Exceso() > 0 && lectura.getValorMetro3Exceso() > 0 ? (lectura.getMetros3Exceso() * lectura.getValorMetro3Exceso()) : 0.0)));
+						detallePlanilla.setValorTotal(
+								Utilitario.redondear((lectura.getMetros3() != null && lectura.getValorMetro3() != null
+										? (lectura.getMetros3() * lectura.getValorMetro3())
+										: 0.0)
+										+ (lectura.getMetros3Exceso() != null && lectura.getValorMetro3Exceso() != null
+												&& lectura.getMetros3Exceso() > 0 && lectura.getValorMetro3Exceso() > 0
+														? (lectura.getMetros3Exceso() * lectura.getValorMetro3Exceso())
+														: 0.0)));
 						detallePlanilla.setValorPendiente(detallePlanilla.getValorTotal());
 						detallePlanilla.setValorPagado(0.0);
-						detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3 " + periodoPago.getDescripcion());
+						detallePlanilla.setDescripcion(
+								Utilitario.redondear(lectura.getMetros3()) + " m3 " + periodoPago.getDescripcion());
 					}
 
 					if (lectura.getMetros3() > 0)
@@ -688,7 +763,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					// Recalculamos el valos de la planilla
 					map.clear();
 					map.put("idCabeceraPlanilla", cp);
-					List<DetallePlanilla> detallePlanillas = detallePlanillaBO.findAllByNamedQuery("DetallePlanilla.findByCabecara", map);
+					List<DetallePlanilla> detallePlanillas = detallePlanillaBO
+							.findAllByNamedQuery("DetallePlanilla.findByCabecara", map);
 					Double total = 0.0;
 					for (DetallePlanilla dp : detallePlanillas) {
 						total = total + dp.getValorTotal();
@@ -745,9 +821,11 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		List<CabeceraPlanilla> planillasNoPagadas = findAllByNamedQuery("CabeceraPlanilla.findNoPag", p);
 		for (CabeceraPlanilla cp : planillasNoPagadas) {
 			cambioEstadoBO.cambiarEstadoSinVerificar(20, usuario, cp.getIdCabeceraPlanilla(), "");
-			Query queryDetalle = em().createQuery(" UPDATE DetallePlanilla SET estado='NOPAG' where idCabeceraPlanilla=:idCabeceraPlanilla");
+			Query queryDetalle = em().createQuery(
+					" UPDATE DetallePlanilla SET estado='NOPAG' where idCabeceraPlanilla=:idCabeceraPlanilla");
 			queryDetalle.setParameter("idCabeceraPlanilla", cp);
-			Query queryLecturas = em().createQuery(" UPDATE Lectura SET estado='NOPAG' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=:idCabeceraPlanilla)");
+			Query queryLecturas = em().createQuery(
+					" UPDATE Lectura SET estado='NOPAG' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=:idCabeceraPlanilla)");
 			queryLecturas.setParameter("idCabeceraPlanilla", cp);
 			queryDetalle.executeUpdate();
 			queryLecturas.executeUpdate();
@@ -780,16 +858,19 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		map.clear();
 		map.put("idPeriodoPago", periodoPagoAn);
 		map.put("tipoRegistro", "CUEPAG");
-		registroEconomicoPorDevolverAnterior = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType", map);
+		registroEconomicoPorDevolverAnterior = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType",
+				map);
 
 		for (CabeceraPlanilla planillaActual : planillasPagadas) {
 			valorDevuelto += Utilitario.redondear(planillaActual.getValorPagadoAbono());
 			if (registroEconomicoPorDevolverAnterior != null) {
-				valorPagadoAbonoIngresado += Utilitario.redondear(registroEconomicoPorDevolverAnterior.getValor() - planillaActual.getValorPagadoAbono());
+				valorPagadoAbonoIngresado += Utilitario.redondear(
+						registroEconomicoPorDevolverAnterior.getValor() - planillaActual.getValorPagadoAbono());
 			}
 		}
 		if (registroEconomicoPorDevolverAnterior != null) {
-			valorRestantePorDevolver = Utilitario.redondear(registroEconomicoPorDevolverAnterior.getValor() - valorPagadoAbonoIngresado);
+			valorRestantePorDevolver = Utilitario
+					.redondear(registroEconomicoPorDevolverAnterior.getValor() - valorPagadoAbonoIngresado);
 			registroEconomicoPorDevolverAnterior.setValor(0.0);
 			registroEconomicoBO.update(usuario, registroEconomicoPorDevolverAnterior);
 		} else {
@@ -805,8 +886,10 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		Double totalIngresoPeriodo = 0.0;
 		Double totalPorDevolver = 0.0;
 		for (CabeceraPlanilla cabeceraPlanilla : planillasPagadas) {
-			totalIngresoPeriodo = totalIngresoPeriodo + (cabeceraPlanilla.getValorPagado() != null ? cabeceraPlanilla.getValorPagado() : 0.0);
-			totalPorDevolver = totalPorDevolver + (cabeceraPlanilla.getAbonoUsd() != null ? cabeceraPlanilla.getAbonoUsd() : 0.0);
+			totalIngresoPeriodo = totalIngresoPeriodo
+					+ (cabeceraPlanilla.getValorPagado() != null ? cabeceraPlanilla.getValorPagado() : 0.0);
+			totalPorDevolver = totalPorDevolver
+					+ (cabeceraPlanilla.getAbonoUsd() != null ? cabeceraPlanilla.getAbonoUsd() : 0.0);
 		}
 
 		// AL Valor Total de este mes actual tambien sumamos el valor pendiente
@@ -815,10 +898,12 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			totalPorDevolver += valorRestantePorDevolver;
 		// Registramos en caja por parte de servicios el valor pagado del
 		// periodo
-		cuentaBO.registrarAsiento(Constantes.numeroCaja, Constantes.cuentaCaja, Constantes.numeroServicio, Constantes.cuentaServicio, Utilitario.redondear(totalIngresoPeriodo), usuario);
+		cuentaBO.registrarAsiento(Constantes.numeroCaja, Constantes.cuentaCaja, Constantes.numeroServicio,
+				Constantes.cuentaServicio, Utilitario.redondear(totalIngresoPeriodo), usuario);
 
 		// Registramos en las cuentas por pagar de pero que estan en caja
-		cuentaBO.registrarAsiento(Constantes.numeroCuentasPorPagar, Constantes.cuentaCuentasPorPagar, Constantes.numeroCaja, Constantes.cuentaCaja, Utilitario.redondear(totalPorDevolver), usuario);
+		cuentaBO.registrarAsiento(Constantes.numeroCuentasPorPagar, Constantes.cuentaCuentasPorPagar,
+				Constantes.numeroCaja, Constantes.cuentaCaja, Utilitario.redondear(totalPorDevolver), usuario);
 
 		// Registramos en caja el valor total de los gastos
 
@@ -851,24 +936,28 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		map.put("idPeriodoPago", periodoPagoBO.findByPk(idPeriodoPago));
 		map.put("tipoRegistro", "CUEPAG");
 
-		RegistroEconomico registroEconomicoPorDevolver = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType", map);
+		RegistroEconomico registroEconomicoPorDevolver = registroEconomicoBO
+				.findByNamedQuery("RegistroEconomico.findByType", map);
 		if (registroEconomicoPorDevolver != null) {
 			if (totalPorDevolver.equals(0.0)) {
 				cambioEstadoBO.eliminarEntidad(8, registroEconomicoPorDevolver.getIdRegistroEconomico());
 			} else {
 				registroEconomicoPorDevolver.setValor(totalPorDevolver);
 				registroEconomicoBO.update(usuario, registroEconomicoPorDevolver);
-				cambioEstadoBO.cambiarEstadoSinVerificar(40, usuario, registroEconomicoPorDevolver.getIdRegistroEconomico(), "");
+				cambioEstadoBO.cambiarEstadoSinVerificar(40, usuario,
+						registroEconomicoPorDevolver.getIdRegistroEconomico(), "");
 			}
 		}
 
 		// Registramos los gastos en el libro diario
-		cuentaBO.registrarAsiento(Constantes.numeroGasto, Constantes.cuentaGasto, Constantes.numeroCaja, Constantes.cuentaCaja, Utilitario.redondear(totalGastos), usuario);
+		cuentaBO.registrarAsiento(Constantes.numeroGasto, Constantes.cuentaGasto, Constantes.numeroCaja,
+				Constantes.cuentaCaja, Utilitario.redondear(totalGastos), usuario);
 
 		// Registramos en caja el valor devuelto con pago mediante abono en los
 		// pagos por motivo de
 		// abonos
-		cuentaBO.registrarAsiento(Constantes.numeroCaja, Constantes.cuentaCaja, Constantes.numeroCuentasPorPagar, Constantes.cuentaCuentasPorPagar, Utilitario.redondear(valorDevuelto), usuario);
+		cuentaBO.registrarAsiento(Constantes.numeroCaja, Constantes.cuentaCaja, Constantes.numeroCuentasPorPagar,
+				Constantes.cuentaCuentasPorPagar, Utilitario.redondear(valorDevuelto), usuario);
 		Runtime.getRuntime().gc();
 	}
 
@@ -878,9 +967,11 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		CabeceraPlanilla cabeceraPlanilla = findByPk(idCabeceraPlanilla);
 		cabeceraPlanilla.setFechaPago(Calendar.getInstance().getTime());
 		update(usuario, cabeceraPlanilla);
-		Query queryDetalle = em().createQuery(" UPDATE DetallePlanilla SET estado='PAG',valorPendiente=0.0,valorPagado=valorTotal where idCabeceraPlanilla.idCabeceraPlanilla=:idCabeceraPlanilla");
+		Query queryDetalle = em().createQuery(
+				" UPDATE DetallePlanilla SET estado='PAG',valorPendiente=0.0,valorPagado=valorTotal where idCabeceraPlanilla.idCabeceraPlanilla=:idCabeceraPlanilla");
 		queryDetalle.setParameter("idCabeceraPlanilla", idCabeceraPlanilla);
-		Query queryLecturas = em().createQuery(" UPDATE Lectura SET estado='PAG' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla.idCabeceraPlanilla=:idCabeceraPlanilla)");
+		Query queryLecturas = em().createQuery(
+				" UPDATE Lectura SET estado='PAG' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla.idCabeceraPlanilla=:idCabeceraPlanilla)");
 		queryLecturas.setParameter("idCabeceraPlanilla", idCabeceraPlanilla);
 		queryDetalle.executeUpdate();
 		queryLecturas.executeUpdate();
@@ -911,11 +1002,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		map.clear();
 		map.put("idPeriodoPago", anterior.getIdPeriodoPago());
 		map.put("tipoRegistro", "CUEPAG");
-		RegistroEconomico registroEconomicoPorDevolver = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType", map);
+		RegistroEconomico registroEconomicoPorDevolver = registroEconomicoBO
+				.findByNamedQuery("RegistroEconomico.findByType", map);
 		Double valorAbonoAnterior = Utilitario.redondear(anterior.getAbonoUsd());
 
 		if (registroEconomicoPorDevolver != null) {
-			registroEconomicoPorDevolver.setValor(Utilitario.redondear(registroEconomicoPorDevolver.getValor() + valorAbonoAnterior));
+			registroEconomicoPorDevolver
+					.setValor(Utilitario.redondear(registroEconomicoPorDevolver.getValor() + valorAbonoAnterior));
 			registroEconomicoBO.update(usuario, registroEconomicoPorDevolver);
 		}
 
@@ -943,7 +1036,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	}
 
 	@Override
-	public void guardarPlanilla(Usuario usuario, Double valorAPagar, CabeceraPlanilla cp, CabeceraPlanilla anterior, Double valorAbono, Integer idCambioEstado, Object idDocumento) throws Exception {
+	public void guardarPlanilla(Usuario usuario, Double valorAPagar, CabeceraPlanilla cp, CabeceraPlanilla anterior,
+			Double valorAbono, Integer idCambioEstado, Object idDocumento) throws Exception {
 		Double valorMaximoAPagar = Utilitario.redondear(cp.getValorPendiente());
 		if (valorAPagar > valorMaximoAPagar) {
 			throw new Exception("El valor ingresado es mayor al valor pendiente");
@@ -962,10 +1056,12 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		map.clear();
 		map.put("idPeriodoPago", anterior.getIdPeriodoPago());
 		map.put("tipoRegistro", "CUEPAG");
-		RegistroEconomico registroEconomicoPorDevolver = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType", map);
+		RegistroEconomico registroEconomicoPorDevolver = registroEconomicoBO
+				.findByNamedQuery("RegistroEconomico.findByType", map);
 		if (registroEconomicoPorDevolver != null) {
 			if (registroEconomicoPorDevolver.getValor() > 0)
-				registroEconomicoPorDevolver.setValor(Utilitario.redondear(registroEconomicoPorDevolver.getValor() - anterior.getAbonoUsd()));
+				registroEconomicoPorDevolver.setValor(
+						Utilitario.redondear(registroEconomicoPorDevolver.getValor() - anterior.getAbonoUsd()));
 			else
 				// Si la cuenta ya no tiene ningun valor le seteamos con valor
 				// cero
@@ -985,20 +1081,24 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		} else {
 			map.clear();
 			map.put("idCabeceraPlanilla", cp);
-			List<DetallePlanilla> detallePlanillas = detallePlanillaBO.findAllByNamedQuery("DetallePlanilla.findByCabecaraSinPagar", map);
+			List<DetallePlanilla> detallePlanillas = detallePlanillaBO
+					.findAllByNamedQuery("DetallePlanilla.findByCabecaraSinPagar", map);
 
 			for (DetallePlanilla detallePlanilla : detallePlanillas) {
-				if (valorAPagar != 0.0 && !"PAG".equalsIgnoreCase(detallePlanilla.getEstado()) && !"INC".equalsIgnoreCase(detallePlanilla.getEstado())) {
+				if (valorAPagar != 0.0 && !"PAG".equalsIgnoreCase(detallePlanilla.getEstado())
+						&& !"INC".equalsIgnoreCase(detallePlanilla.getEstado())) {
 					if (valorAPagar >= Utilitario.redondear(detallePlanilla.getValorTotal())) {
 						detallePlanilla.setEstado("PAG");
 						detallePlanilla.setValorPagado(Utilitario.redondear(detallePlanilla.getValorTotal()));
-						valorAPagar = Utilitario.redondear(valorAPagar - Utilitario.redondear(detallePlanilla.getValorTotal()));
+						valorAPagar = Utilitario
+								.redondear(valorAPagar - Utilitario.redondear(detallePlanilla.getValorTotal()));
 					} else {
 						detallePlanilla.setEstado("INC");
 						detallePlanilla.setValorPagado(valorAPagar);
 						valorAPagar = 0.0;
 					}
-					detallePlanilla.setValorPendiente(Utilitario.redondear(detallePlanilla.getValorTotal() - detallePlanilla.getValorPagado()));
+					detallePlanilla.setValorPendiente(
+							Utilitario.redondear(detallePlanilla.getValorTotal() - detallePlanilla.getValorPagado()));
 					detallePlanillaBO.update(usuario, detallePlanilla);
 				}
 			}
@@ -1008,7 +1108,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	}
 
 	@Override
-	public void recalcularPlanilla(Usuario usuario, CabeceraPlanilla cabeceraPlanilla, Lectura lectura) throws Exception {
+	public void recalcularPlanilla(Usuario usuario, CabeceraPlanilla cabeceraPlanilla, Lectura lectura)
+			throws Exception {
 
 		if ("ING".equalsIgnoreCase(cabeceraPlanilla.getEstado())) {
 			lectura = lecturaBO.recalcularLectura(usuario, lectura);
@@ -1017,19 +1118,29 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			HashMap<String, Object> pama = new HashMap<>();
 			pama.put("idLectura", lectura);
 			pama.put("idCabeceraPlanilla", cabeceraPlanilla);
-			DetallePlanilla detallePlanilla = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
+			DetallePlanilla detallePlanilla = detallePlanillaBO
+					.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
 			// Si es mayor a cero realizamos el calculo caso contrario
 			// cobramos el basico
 			detallePlanilla.setValorUnidad(Utilitario.redondear(lectura.getValorMetro3()));
-			detallePlanilla.setValorTotal(Utilitario.redondear((lectura.getMetros3() != null && lectura.getValorMetro3() != null ? (lectura.getMetros3() * lectura.getValorMetro3()) : 0.0) + (lectura.getMetros3Exceso() != null && lectura.getValorMetro3Exceso() != null && lectura.getMetros3Exceso() > 0 && lectura.getValorMetro3Exceso() > 0 ? (lectura.getMetros3Exceso() * lectura.getValorMetro3Exceso()) : 0.0)));
+			detallePlanilla.setValorTotal(
+					Utilitario.redondear((lectura.getMetros3() != null && lectura.getValorMetro3() != null
+							? (lectura.getMetros3() * lectura.getValorMetro3())
+							: 0.0)
+							+ (lectura.getMetros3Exceso() != null && lectura.getValorMetro3Exceso() != null
+									&& lectura.getMetros3Exceso() > 0 && lectura.getValorMetro3Exceso() > 0
+											? (lectura.getMetros3Exceso() * lectura.getValorMetro3Exceso())
+											: 0.0)));
 			detallePlanilla.setValorPendiente(detallePlanilla.getValorTotal());
 			detallePlanilla.setValorPagado(0.0);
-			detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3 " + lectura.getIdPeriodoPago().getDescripcion());
+			detallePlanilla.setDescripcion(
+					Utilitario.redondear(lectura.getMetros3()) + " m3 " + lectura.getIdPeriodoPago().getDescripcion());
 			detallePlanillaBO.update(usuario, detallePlanilla);
 			// Recalculamos el valos de la planilla
 			map.clear();
 			map.put("idCabeceraPlanilla", cp);
-			List<DetallePlanilla> detallePlanillas = detallePlanillaBO.findAllByNamedQuery("DetallePlanilla.findByCabecara", map);
+			List<DetallePlanilla> detallePlanillas = detallePlanillaBO
+					.findAllByNamedQuery("DetallePlanilla.findByCabecara", map);
 			Double total = 0.0;
 			for (DetallePlanilla dp : detallePlanillas) {
 				total = total + dp.getValorTotal();
@@ -1051,11 +1162,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			HashMap<String, Object> pama = new HashMap<>();
 			pama.put("idLectura", lectura);
 			pama.put("idCabeceraPlanilla", cabeceraPlanilla);
-			DetallePlanilla detallePlanilla = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
+			DetallePlanilla detallePlanilla = detallePlanillaBO
+					.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
 			// Si es mayor a cero realizamos el calculo caso contrario
 			// cobramos el basico
 			if (lectura.getMetros3() > 0) {
-				detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3 " + lectura.getIdPeriodoPago().getDescripcion());
+				detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3 "
+						+ lectura.getIdPeriodoPago().getDescripcion());
 			}
 			if (lectura.getMetros3() > 0)
 				detallePlanillaBO.update(usuario, detallePlanilla);
@@ -1063,7 +1176,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		Runtime.getRuntime().gc();
 	}
 
-	protected CabeceraPlanilla iniciar(Integer idPeriodoPago, Llave idLlave, Usuario responsable, String path, Integer numeroFactura) throws Exception {
+	protected CabeceraPlanilla iniciar(Integer idPeriodoPago, Llave idLlave, Usuario responsable, String path,
+			Integer numeroFactura) throws Exception {
 		CabeceraPlanilla planillaNueva = new CabeceraPlanilla();
 		planillaNueva.setEstado(EstadoCabeceraPlanilla.ING.toString());
 		planillaNueva.setFechaRegistro(Calendar.getInstance().getTime());
@@ -1079,7 +1193,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			planillaNueva.setIdUsuario(responsable);
 		if (idLlave != null)
 			planillaNueva.setIdLlave(idLlave);
-		planillaNueva.setObservacion(path.substring(0, path.length() - numeroFactura.toString().length()) + numeroFactura.toString());
+		planillaNueva.setObservacion(
+				path.substring(0, path.length() - numeroFactura.toString().length()) + numeroFactura.toString());
 		planillaNueva.setIdPeriodoPago(periodoPagoBO.findByPk(idPeriodoPago));
 		return planillaNueva;
 	}
