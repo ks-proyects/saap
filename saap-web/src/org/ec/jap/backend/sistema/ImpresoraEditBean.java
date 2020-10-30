@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.faces.bean.ManagedBean;
@@ -15,8 +14,6 @@ import javax.print.PrintService;
 
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
-import org.ec.jap.bo.sistema.BackupDBBO;
-import org.ec.jap.bo.sistema.EmailBO;
 import org.ec.jap.entiti.saap.Parametro;
 import org.ec.jap.utilitario.Impresora;
 
@@ -32,8 +29,6 @@ public class ImpresoraEditBean extends Bean {
 	Parametro isMatricialParam;
 
 	Boolean isMatricial;
-
-	
 
 	public ImpresoraEditBean() {
 		super();
@@ -69,7 +64,6 @@ public class ImpresoraEditBean extends Bean {
 	@Override
 	public String guardar() {
 		try {
-			
 			isMatricialParam.setValorString(isMatricial ? "SI" : "NO");
 			parametroBO.update(getUsuarioCurrent(), isMatricialParam);
 			parametroBO.update(getUsuarioCurrent(), parametro);

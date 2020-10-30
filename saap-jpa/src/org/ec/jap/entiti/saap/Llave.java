@@ -23,8 +23,8 @@ import javax.validation.constraints.Size;
 		@NamedQuery(name = "Llave.findAllByUser", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE UPPER(l.numero) like UPPER(CONCAT('%',:filtro,'%')) OR upper(u.cedula) LIKE upper(CONCAT('%',:filtro,'%'))  OR upper(CONCAT(u.nombres,u.apellidos)) LIKE upper(CONCAT('%',:filtro,'%')) ORDER BY cast(l.numero,int),u.nombres,u.apellidos"),
 		@NamedQuery(name = "Llave.findByUser", query = "SELECT l FROM Llave l where l.idUsuario.idUsuario=:idUsuario order by l.fechaRegistro, l.numero"),
 		@NamedQuery(name = "Llave.findOfUsuariosActivos", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE u.estado IN ('ACT','EDI') and l.activo IN ('SI') ORDER BY l.numero"),
-		@NamedQuery(name = "Llave.findOfUsuariosActivosAndNotPeriodo", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE u.estado IN ('ACT','INAC') AND l.activo IN ('SI') AND l NOT IN (SELECT le.idLlave FROM Lectura le WHERE le.idPeriodoPago=:idPeriodoPago and le.idLlave.idLlave=l.idLlave)"),
-		@NamedQuery(name = "Llave.findOfUsuariosActivosAndNotFactura", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE u.estado IN ('ACT','INAC') AND l.activo IN ('SI') AND l NOT IN (SELECT cp.idLlave FROM CabeceraPlanilla cp WHERE cp.idPeriodoPago=:idPeriodoPago and cp.idLlave.idLlave=l.idLlave)") })
+		@NamedQuery(name = "Llave.findOfUsuariosActivosAndNotPeriodo", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE u.estado IN ('ACT','EDI') AND l.activo IN ('SI') AND l NOT IN (SELECT le.idLlave FROM Lectura le WHERE le.idPeriodoPago=:idPeriodoPago and le.idLlave.idLlave=l.idLlave)"),
+		@NamedQuery(name = "Llave.findOfUsuariosActivosAndNotFactura", query = "SELECT l FROM Llave l inner join l.idUsuario u WHERE u.estado IN ('ACT','EDI') AND l.activo IN ('SI') AND l NOT IN (SELECT cp.idLlave FROM CabeceraPlanilla cp WHERE cp.idPeriodoPago=:idPeriodoPago and cp.idLlave.idLlave=l.idLlave)") })
 public class Llave implements Serializable {
 
 	private static final long serialVersionUID = 1L;

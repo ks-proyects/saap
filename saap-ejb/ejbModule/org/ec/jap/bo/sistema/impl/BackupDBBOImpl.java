@@ -45,7 +45,7 @@ public class BackupDBBOImpl implements BackupDBBO {
 		File pgdump = new File(pathServer.concat("pg_dump.exe"));
 
 		if (pgdump.exists()) {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd");
 			pathOutput = pathOutput.concat(File.separator)
 					.concat(sdf.format(GregorianCalendar.getInstance().getTime()));
 			File backupFilePath = new File(pathOutput);

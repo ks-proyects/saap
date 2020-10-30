@@ -19,6 +19,7 @@ public class MailService {
 
 	/**
 	 * Método que envia en email a cualquier servidor
+	 * 
 	 * @param username
 	 * @param password
 	 * @param host
@@ -53,6 +54,7 @@ public class MailService {
 		try {
 			message.setFrom(new InternetAddress(from));
 			for (String to : tos) {
+				System.out.println("Enviando email a " + to);
 				message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
 			}
 			for (String cc : ccs) {

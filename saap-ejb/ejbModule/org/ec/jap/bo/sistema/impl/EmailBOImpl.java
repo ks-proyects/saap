@@ -67,7 +67,7 @@ public class EmailBOImpl implements EmailBO {
 		}
 
 		List<String> ccs = new ArrayList<String>();
-		ccs.add("freddy.geovanni@bayteq.com");
+		ccs.add("freddy.geovanni@gmail.com");
 		SimpleDateFormat sdf = new SimpleDateFormat(" yyyy MM dd");
 		String subject = "Respaldo Base de Datos SAAP ".concat(sdf.format(GregorianCalendar.getInstance().getTime()));
 		StringBuilder email = new StringBuilder();

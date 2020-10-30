@@ -51,7 +51,11 @@ function onClicTE(idAction, aplicaMotivo, idCambioEstado, idDocumentoEntidad) {
 					+ '&idDocumentoEntidad=' + idDocumentoEntidad, 450, 350);
 			return false;
 			break;
+		case "periodoPagoEdit":
+			showLoader();
+			break;
 		default:
+			
 			break;
 		}
 		break;
@@ -113,6 +117,7 @@ function muestraReloj() {
 }
 
 function onClic(idAction) {
+
 	switch (idAction) {
 	case "1":
 		switch (window.name) {
@@ -249,7 +254,7 @@ function ValidarLongitudNumerico(longitud, obj, e) {
 	}
 }
 /**
- * Método invocado para la abreviación mediante el teclado de los botones
+ * Mï¿½todo invocado para la abreviaciï¿½n mediante el teclado de los botones
  * 
  * @param e
  */

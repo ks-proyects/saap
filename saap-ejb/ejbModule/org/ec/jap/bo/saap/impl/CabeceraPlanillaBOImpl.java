@@ -27,9 +27,7 @@ import org.ec.jap.bo.saap.RangoConsumoBO;
 import org.ec.jap.bo.saap.RegistroEconomicoBO;
 import org.ec.jap.bo.saap.TipoRegistroBO;
 import org.ec.jap.bo.saap.UsuarioBO;
-import org.ec.jap.bo.sistema.BackupDBBO;
 import org.ec.jap.bo.sistema.CambioEstadoBO;
-import org.ec.jap.bo.sistema.EmailBO;
 import org.ec.jap.dao.saap.impl.CabeceraPlanillaDAOImpl;
 import org.ec.jap.entiti.saap.Actividad;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
@@ -137,7 +135,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		// mes
 		registroEconomicoBO.inicializar(periodoPago, "CUEPAG", "Valor Por Pagar " + periodoPago.getDescripcion(), 1,
 				usuario);
-
 		for (Llave llave : llaves) {
 			numeroFactura++;
 			CabeceraPlanilla planillaNueva = iniciar(idPeriodoPago, llave, llave.getIdUsuario(), path, numeroFactura);
