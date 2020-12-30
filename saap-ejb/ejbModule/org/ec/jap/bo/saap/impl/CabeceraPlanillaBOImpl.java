@@ -86,12 +86,9 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	@EJB
 	protected GastoBO gastoBO;
 
-	
-
 	public CabeceraPlanillaBOImpl() {
 	}
 
-	
 	public List<CabeceraPlanilla> findPlanillasByLLaveAndStatus(Llave llave, String estatus) throws Exception {
 		HashMap<String, Object> p = new HashMap<>();
 		p.put("estado", estatus);
@@ -477,15 +474,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					detallePlanilla.setValorUnidad(0.0);
 					detallePlanilla.setOrdenStr("B");
 
-					if (lectura != null && lectura.getValorBasico() != null && lectura.getValorBasico() > 0) {
-						DetallePlanilla detallePlanillaBasico = detallePlanillaBO.crearDetalleBasico(cp,
-								registroEconomicoBasico, lectura, periodoPago);
-						registroEconomicoBasico
-								.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
-						detallePlanillaBO.save(usuario, detallePlanillaBasico);
-						cantidadBasicoAplicados++;
-					}
-
 					if (lectura.getUsuarioNuevo()) {
 						debeRegistrarDetalle = false;
 					} else if (lectura.getSinLectura()) {
@@ -704,7 +692,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 
 					DetallePlanilla detallePlanilla = detallePlanillaBO
 							.findByNamedQuery("DetallePlanilla.findByLectura", pama);
-					DetallePlanilla detallePlanillaBasico = null;
 					if (detallePlanilla == null) {
 						detallePlanilla = new DetallePlanilla();
 						detallePlanilla.setEstado("ING");
@@ -716,20 +703,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						detallePlanilla.setValorTotal(0.0);
 						detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
 						detallePlanilla.setValorUnidad(0.0);
-						pama = new HashMap<>();
-						pama.put("regeco", registroEconomicoBasico);
-						pama.put("cp", cp);
-						pama.put("desc", "Básico");
-						DetallePlanilla dpb = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByBasico", pama);
-						if (dpb == null && lectura.getValorBasico() != null && lectura.getValorBasico() > 0) {
-							detallePlanillaBasico = detallePlanillaBO.crearDetalleBasico(cp, registroEconomicoBasico,
-									lectura, periodoPago);
-							registroEconomicoBasico.setValor(
-									registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
-							detallePlanillaBO.save(usuario, detallePlanillaBasico);
-							cantidadUsuariosConBasico++;
-						}
-
 					}
 					// Si es mayor a cero realizamos el calculo caso contrario
 					// cobramos el basico

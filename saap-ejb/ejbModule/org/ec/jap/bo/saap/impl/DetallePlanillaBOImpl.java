@@ -13,8 +13,6 @@ import org.ec.jap.bo.saap.RegistroEconomicoBO;
 import org.ec.jap.dao.saap.impl.DetallePlanillaDAOImpl;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
 import org.ec.jap.entiti.saap.DetallePlanilla;
-import org.ec.jap.entiti.saap.Lectura;
-import org.ec.jap.entiti.saap.PeriodoPago;
 import org.ec.jap.entiti.saap.RegistroEconomico;
 import org.ec.jap.entiti.saap.Usuario;
 import org.ec.jap.utilitario.Constantes;
@@ -191,25 +189,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		return detallePlanillaNuevo;
 	}
 
-	@Override
-	public DetallePlanilla crearDetalleBasico(CabeceraPlanilla cp, RegistroEconomico registroEconomicoBasico, Lectura lectura, PeriodoPago periodoPago) throws Exception {
-		DetallePlanilla detallePlanillaBasico = new DetallePlanilla();
-		detallePlanillaBasico.initValue();
-		detallePlanillaBasico.setIdCabeceraPlanilla(cp);
-		detallePlanillaBasico.setIdRegistroEconomico(registroEconomicoBasico);
-		detallePlanillaBasico.setFechaRegistro(Calendar.getInstance().getTime());
-		detallePlanillaBasico.setValorUnidad(Utilitario.redondear(lectura.getValorBasico()));
-		detallePlanillaBasico.setValorTotal(Utilitario.redondear(lectura.getValorBasico()));
-		detallePlanillaBasico.setValorPendiente(detallePlanillaBasico.getValorTotal());
-		detallePlanillaBasico.setDescripcion("Básico " + periodoPago.getDescripcion());
-		detallePlanillaBasico.setOrdenStr("B");
-		detallePlanillaBasico.setValorTotalOrigen(detallePlanillaBasico.getValorTotal());
-		detallePlanillaBasico.setOrigen(Constantes.origen_mes_Actual);
-		cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + detallePlanillaBasico.getValorTotal()));
-		cp.setTotal(Utilitario.redondear(cp.getTotal() + detallePlanillaBasico.getValorTotal()));
-		registroEconomicoBasico.setValor(registroEconomicoBasico.getValor() + detallePlanillaBasico.getValorTotal());
-		return detallePlanillaBasico;
-	}
+	
 
 	@Override
 	public List<DetallePlanilla> findPlanillasNoPagadas(CabeceraPlanilla planillaNoPagada, String namedQuery) throws Exception {
