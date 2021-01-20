@@ -17,6 +17,8 @@
 					columnClasses="label,value">
 					<h:outputLabel value="Periodo:" />
 					<h:outputLabel value="#{lecturaListBean.periodoPago.descripcion}" />
+					<h:outputLabel value="Epoca" />
+					<h:outputLabel value="#{lecturaListBean.periodoPago.epoca}" />
 					<h:outputLabel value="Filtro" />
 					<h:inputText value="#{lecturaListBean.filtro}">
 						<f:ajax event="keyup" render="table"
@@ -56,6 +58,14 @@
 						<h:outputText title="Cédula"
 							value="#{lect.idLlave.idUsuario.cedula}" />
 					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Tarifa" />
+						</f:facet>
+						<h:outputText title="Tarifa"
+							value="#{lect.idLlave.idUsuario.tarifa.descripcion}" />
+					</rich:column>
+					
 
 					<rich:column>
 						<f:facet name="header">

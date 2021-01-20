@@ -1000,7 +1000,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					cantidadMultaAtrazosAplicados++;
 					existenMultaAtrazos = true;
 				}
-				pn = verificarPlanillasIncompletas(llave, cpnpg, usuario);
+				pn = verificarPlanillasIncompletas(llave, pn, usuario);
 				lecturaBO.iniciarLecturaCero(periodoPago, llave, usuario);
 				pn.setValorPendiente(pn.getTotal());
 				update(usuario, pn);

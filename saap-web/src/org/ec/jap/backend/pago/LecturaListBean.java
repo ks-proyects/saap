@@ -99,7 +99,7 @@ public class LecturaListBean extends Bean {
 			if (periodoPago != null && "CERR".equals(periodoPago.getEstado())) {
 				mensaje = lecturaBO.guardarLecturasCerradas(getUsuarioCurrent(), lecturas);
 			} else {
-				mensaje = lecturaBO.guardarLecturas(getUsuarioCurrent(), lecturas);
+				mensaje = lecturaBO.guardarLecturas(getUsuarioCurrent(), lecturas, periodoPago);
 			}
 			lecturas = lecturaBO.findAllByNamedQuery("Lectura.findByPer", map);
 			if (!mensaje.isEmpty())

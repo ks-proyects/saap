@@ -31,8 +31,9 @@ import org.ec.jap.enumerations.Formapago;
 @Entity
 @Table(name = "rango_consumo")
 @NamedQueries({
-		@NamedQuery(name = "RangoConsumo.findByMaxTarifaAndValor", query = "SELECT r FROM RangoConsumo r WHERE r.idTarifa=:idTarifa AND  :valor > r.m3Minimo AND r.m3Maximo=-1 AND r.formaPago=:formaPago"),
-		@NamedQuery(name = "RangoConsumo.findByTarifaAndValor", query = "SELECT r FROM RangoConsumo r WHERE r.idTarifa=:idTarifa AND :valor between r.m3Minimo AND r.m3Maximo AND r.formaPago=:formaPago"),
+		@NamedQuery(name = "RangoConsumo.findByMaxTarifaAndValor", query = "SELECT r FROM RangoConsumo r WHERE  :valor > r.m3Minimo AND r.m3Maximo=-1 AND r.epoca=:epoca"),
+		@NamedQuery(name = "RangoConsumo.findByTarifaAndValor", query = "SELECT r FROM RangoConsumo r WHERE r.idTarifa=:idTarifa AND :valor between r.m3Minimo AND r.m3Maximo AND r.epoca=:epoca"),
+		@NamedQuery(name = "RangoConsumo.findByValorAndEpoca", query = "SELECT r FROM RangoConsumo r WHERE  :valor between r.m3Minimo AND r.m3Maximo AND r.epoca=:epoca"),
 		@NamedQuery(name = "RangoConsumo.findByTarifa", query = "select rac from RangoConsumo rac where rac.idTarifa=:idTarifa ORDER BY rac.epoca, rac.orden") })
 public class RangoConsumo implements Serializable {
 	private static final long serialVersionUID = 1L;

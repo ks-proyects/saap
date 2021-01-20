@@ -43,108 +43,59 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 	public LecturaBOImpl() {
 	}
 
-	@Override
-	public String guardarLecturas(Usuario usuario, List<Lectura> lecturas) throws Exception {
-		// Parametro que indica el método de calculo de los metros consumidos
-		String aplicaMetodoCobroAnt = parametroBO.getString("", usuario.getIdComunidad().getIdComunidad(), "APLTITAA");
-		Boolean esMetodoAnterior = "SI".equalsIgnoreCase(aplicaMetodoCobroAnt);
-		Double valorDiferencia = parametroBO.getNumerico("", usuario.getIdComunidad().getIdComunidad(), "DIFCONS");
-		String mensaje = "";
-		String mensajeAlerta = "";
-		for (Lectura lectura : lecturas) {
+	protected Lectura buildLectura(Lectura lectura, PeriodoPago pp) throws Exception {
+		lectura.setValorBasico(0.0);
+		if (lectura.getSinLectura()) {
+			lectura.setLecturaIngresada(0.0);
+			lectura.setMetros3(0.0);
+			lectura.setMetros3Exceso(0.0);
 			lectura.setValorBasico(0.0);
-			if (lectura.getSinLectura()) {
+			lectura.setValorMetro3(0.0);
+			lectura.setValorMetro3Exceso(0.0);
+			lectura.setUsuarioNuevo(false);
+		} else if (lectura.getUsuarioNuevo()) {
+			// OBTENEMOS LA LECTURA ANTERIOR QUE NO ESTE SIN LECTURA O DE UN
+			// USUARIO NUEVO SI NO EXISTE O EL VALOR DE
+			// CONSUMO ES CERO ACTUALIZAMOS LA LECTURA INGRESADA COMO
+			// LECTURA DE UN USUARIO NUEVO
+			lectura.setSinLectura(false);
+			if (lectura.getLecturaAnterior() == null || lectura.getLecturaAnterior() == 0.0) {
 				lectura.setLecturaIngresada(0.0);
 				lectura.setMetros3(0.0);
 				lectura.setMetros3Exceso(0.0);
 				lectura.setValorBasico(0.0);
 				lectura.setValorMetro3(0.0);
 				lectura.setValorMetro3Exceso(0.0);
-				lectura.setUsuarioNuevo(false);
-				// lectura.setLecturaIngresada(lectura.getLecturaAnterior());
-			} else if (lectura.getUsuarioNuevo()) {
-				// OBTENEMOS LA LECTURA ANTERIOR QUE NO ESTE SIN LECTURA O DE UN
-				// USUARIO NUEVO SI NO EXISTE O EL VALOR DE
-				// CONSUMO ES CERO ACTUALIZAMOS LA LECTURA INGRESADA COMO
-				// LECTURA DE UN USUARIO NUEVO
-				lectura.setSinLectura(false);
-				if (lectura.getLecturaAnterior() == null || lectura.getLecturaAnterior() == 0.0) {
-					lectura.setLecturaIngresada(0.0);
-					lectura.setMetros3(0.0);
-					lectura.setMetros3Exceso(0.0);
-					lectura.setValorBasico(0.0);
-					lectura.setValorMetro3(0.0);
-					lectura.setValorMetro3Exceso(0.0);// Si es un usuario nuevo
-														// no puede tener
-														// lecturas anteriores
-				} else {
-					lectura.setUsuarioNuevo(false);
-				}
+				// Si es un usuario nuevo no puede tener lecturas anteriores
 			} else {
-
-				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0))
-						|| lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
-					lectura.setMetros3(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
-					lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
-					lectura.setValorMetro3Exceso(0.0);
-					lectura.setMetros3Exceso(0.0);
-					if (lectura.getMetros3() > 0) {
-						if (!lectura.getMetros3().equals(0.0)) {
-							map = new HashMap<>(0);
-							map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
-							map.put("valor", lectura.getMetros3());
-							map.put("formaPago", "SI".equalsIgnoreCase(aplicaMetodoCobroAnt) ? Formapago.valueOf("A")
-									: Formapago.valueOf("N"));
-							RangoConsumo rangoConsumo = rangoConsumoBO
-									.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
-							// Si no esta en algun rango buscamos el exseso
-							if (rangoConsumo == null) {
-								// Para el caso de la modalidad anterior en el
-								// registro
-								// viene el valor por metro cubico y el valor de
-								// la
-								// mulata por exceso
-								rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor",
-										map);
-								Double metros3Exceso = esMetodoAnterior
-										? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo()))
-										: 0;
-								lectura.setMetros3Exceso(metros3Exceso);
-
-								lectura.setValorMetro3Exceso(
-										esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0);
-								lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo())
-										: lectura.getMetros3());// El
-								// valor
-								// basico
-								// consumido
-								// sera
-								// la
-								// diferencia
-								lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Minimo() : 0);
-							} else
-								lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Maximo() : 0);
-							lectura.setValorMetro3Exceso(esMetodoAnterior ? rangoConsumo.getValorExceso() : 0);
-							lectura.setValorMetro3(Utilitario.redondear(rangoConsumo.getValorM3()));
-						}
-					} else {
-						lectura.setLecturaIngresada(lectura.getLecturaAnterior());
-						lectura.setMetros3(0.0);
-						lectura.setMetros3Exceso(0.0);
-						lectura.setValorMetro3(0.0);
-						lectura.setValorMetro3Exceso(0.0);
-					}
-					Double totalM3 = Utilitario.redondear(lectura.getMetros3() + lectura.getMetros3Exceso());
-					Double diferencia = Math.abs(Utilitario.redondear(totalM3 - lectura.getMetros3Anterior()));
-					if (diferencia >= valorDiferencia) {
-						mensajeAlerta += lectura.getIdLlave().getNumero() + ", ";
-					}
-				} else {
-					mensaje += lectura.getIdLlave().getNumero() + ", ";
-				}
+				lectura.setUsuarioNuevo(false);
+			}
+		} else {
+			if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0))
+					|| lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
+				lectura = buildTarifa(lectura, pp);
 			}
 		}
+		return lectura;
+	}
 
+	@Override
+	public String guardarLecturas(Usuario usuario, List<Lectura> lecturas, PeriodoPago pp) throws Exception {
+		Double valorDiferencia = parametroBO.getNumerico("", usuario.getIdComunidad().getIdComunidad(), "DIFCONS");
+		String mensaje = "";
+		String mensajeAlerta = "";
+		for (Lectura lectura : lecturas) {
+			lectura = buildLectura(lectura, pp);
+			if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0))
+					|| lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
+				Double totalM3 = Utilitario.redondear(lectura.getMetros3() + lectura.getMetros3Exceso());
+				Double diferencia = Math.abs(Utilitario.redondear(totalM3 - lectura.getMetros3Anterior()));
+				if (diferencia >= valorDiferencia) {
+					mensajeAlerta += lectura.getIdLlave().getNumero() + ", ";
+				}
+			} else
+				mensaje += lectura.getIdLlave().getNumero() + ", ";
+		}
 		for (Lectura lectura : lecturas) {
 			update(usuario, lectura);
 		}
@@ -162,164 +113,80 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
 	@Override
 	public Lectura recalcularLectura(Usuario usuario, Lectura lectura) throws Exception {
-		// Parametro que indica el método de calculo de los metros consumidos
-		String aplicaMetodoCobroAnt = parametroBO.getString("", usuario.getIdComunidad().getIdComunidad(), "APLTITAA");
-		Boolean esMetodoAnterior = "SI".equalsIgnoreCase(aplicaMetodoCobroAnt);
 		lectura.setValorBasico(0.0);
 		lectura.setModifiqued(true);
-		if (lectura.getSinLectura()) {
-			lectura.setLecturaIngresada(0.0);
-			lectura.setMetros3(0.0);
-			lectura.setMetros3Exceso(0.0);
-			lectura.setValorBasico(0.0);
-			lectura.setValorMetro3(0.0);
-			lectura.setValorMetro3Exceso(0.0);
-			lectura.setUsuarioNuevo(false);
-			// lectura.setLecturaIngresada(lectura.getLecturaAnterior());
-		} else if (lectura.getUsuarioNuevo()) {
-			// OBTENEMOS LA LECTURA ANTERIOR QUE NO ESTE SIN LECTURA O DE UN
-			// USUARIO NUEVO SI NO EXISTE O EL VALOR DE
-			// CONSUMO ES CERO ACTUALIZAMOS LA LECTURA INGRESADA COMO
-			// LECTURA DE UN USUARIO NUEVO
-			lectura.setSinLectura(false);
-			if (lectura.getLecturaAnterior() == null || lectura.getLecturaAnterior() == 0.0) {
-				lectura.setLecturaIngresada(0.0);
-				lectura.setMetros3(0.0);
-				lectura.setMetros3Exceso(0.0);
-				lectura.setValorBasico(0.0);
-				lectura.setValorMetro3(0.0);
+		lectura = buildLectura(lectura, lectura.getIdPeriodoPago());
+		update(usuario, lectura);
+		return lectura;
+	}
+
+	protected Lectura buildTarifa(Lectura lectura, PeriodoPago pp) throws Exception {
+		Double consumo = Utilitario.redondear(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
+		lectura.setMetros3(consumo);
+		lectura.setValorBasico(0.0);
+		lectura.setValorMetro3Exceso(0.0);
+		lectura.setMetros3Exceso(0.0);
+		if (lectura.getMetros3() > 0) {
+			if (!lectura.getMetros3().equals(0.0)) {
+				map = new HashMap<>(0);
+				map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
+				map.put("valor", lectura.getMetros3());
+				map.put("epoca", pp.getEpoca());
+				RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
+				// Si
+				if (rangoConsumo == null) {
+					// En caso que no exista en la tarifa del usuario buscamos en todas las tarifas
+					// configuradas
+					map.clear();
+					map.put("valor", lectura.getMetros3());
+					map.put("epoca", pp.getEpoca());
+					RangoConsumo rangoAll = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByValorAndEpoca", map);
+					// Si no existe en ninguna buscamos
+					if (rangoAll == null) {
+
+						rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
+						lectura.setMetros3Exceso(0.0);
+						lectura.setValorMetro3Exceso(0.0);
+						lectura.setMetros3(lectura.getMetros3());// El
+						lectura.setBasicoM3(0.0);
+					}
+
+				} else
+					lectura.setBasicoM3(0.0);
 				lectura.setValorMetro3Exceso(0.0);
-			} else {
-				lectura.setUsuarioNuevo(false);
+				lectura.setValorMetro3(Utilitario.redondear(rangoConsumo.getValorM3()));
 			}
 		} else {
-
-			if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0))
-					|| lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
-				lectura.setMetros3(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
-				lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
-				lectura.setValorMetro3Exceso(0.0);
-				lectura.setMetros3Exceso(0.0);
-				if (lectura.getMetros3() > 0) {
-					if (!lectura.getMetros3().equals(0.0)) {
-						map = new HashMap<>(0);
-						map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
-						map.put("valor", lectura.getMetros3());
-						map.put("formaPago", esMetodoAnterior ? Formapago.valueOf("A") : Formapago.valueOf("N"));
-						RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor",
-								map);
-						if (rangoConsumo == null) {
-							rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
-							Double metros3Excso = esMetodoAnterior
-									? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo()))
-									: 0.0;
-							lectura.setMetros3Exceso(metros3Excso);
-							Double valorMetro3Exceso = esMetodoAnterior
-									? Utilitario.redondear(rangoConsumo.getValorExceso())
-									: 0.0;
-							lectura.setValorMetro3Exceso(valorMetro3Exceso);
-							lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo())
-									: lectura.getMetros3());
-							lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Minimo() : 0);
-						} else
-							lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Maximo() : 0);
-						lectura.setValorMetro3Exceso(
-								esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0);
-						lectura.setValorMetro3(Utilitario.redondear(rangoConsumo.getValorM3()));
-					}
-				} else {
-					lectura.setLecturaIngresada(lectura.getLecturaAnterior());
-					lectura.setMetros3(0.0);
-					lectura.setMetros3Exceso(0.0);
-					lectura.setValorMetro3(0.0);
-					lectura.setValorMetro3Exceso(0.0);
-				}
-			}
+			lectura.setLecturaIngresada(lectura.getLecturaAnterior());
+			lectura.setMetros3(0.0);
+			lectura.setMetros3Exceso(0.0);
+			lectura.setValorMetro3(0.0);
+			lectura.setValorMetro3Exceso(0.0);
 		}
-
-		update(usuario, lectura);
-
 		return lectura;
 	}
 
 	@Override
 	public String guardarLecturasCerradas(Usuario usuario, List<Lectura> lecturas) throws Exception {
-		// Parametro que indica el método de calculo de los metros consumidos
-		String aplicaMetodoCobroAnt = parametroBO.getString("", usuario.getIdComunidad().getIdComunidad(), "APLTITAA");
-		Boolean esMetodoAnterior = "SI".equalsIgnoreCase(aplicaMetodoCobroAnt);
 		Double valorDiferencia = parametroBO.getNumerico("", usuario.getIdComunidad().getIdComunidad(), "DIFCONS");
 		String mensaje = "";
 		String mensajeAlerta = "";
-
 		for (Lectura lectura : lecturas) {
 			lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
 			if (lectura.getSinLectura() || !lectura.getEsModificable()) {
 				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0))
 						|| lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
-
-					lectura.setMetros3(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
-					lectura.setMetros3Exceso(0.0);
-					lectura.setValorMetro3Exceso(0.0);
-					if (lectura.getMetros3() > 0) {
-						if (!lectura.getMetros3().equals(0.0)) {
-							map = new HashMap<>(0);
-							map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
-							map.put("valor", lectura.getMetros3());
-							map.put("formaPago", esMetodoAnterior ? Formapago.valueOf("A") : Formapago.valueOf("N"));
-							RangoConsumo rangoConsumo = rangoConsumoBO
-									.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
-							// Si no esta en algun rango buscamos el exseso
-							if (rangoConsumo == null) {
-								// Para el caso de la modalidad anterior en el
-								// registro
-								// viene el valor por metro cubico y el valor de
-								// la
-								// mulata por exceso
-								rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor",
-										map);
-								Double exceso = esMetodoAnterior
-										? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo()))
-										: 0;
-								lectura.setMetros3Exceso(exceso);
-								Double valorExceso = esMetodoAnterior
-										? Utilitario.redondear(rangoConsumo.getValorExceso())
-										: 0;
-								lectura.setValorMetro3Exceso(valorExceso);
-								lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo())
-										: lectura.getMetros3());// El
-								// valor
-								// basico
-								// consumido
-								// sera
-								// la
-								// diferencia
-								lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Minimo() : 0);
-							} else {
-								lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Maximo() : 0);
-
-							}
-							lectura.setValorMetro3Exceso(esMetodoAnterior ? rangoConsumo.getValorExceso() : 0);
-							lectura.setValorMetro3(Utilitario.redondear(rangoConsumo.getValorM3()));
-						}
-					} else {
-						lectura.setLecturaIngresada(lectura.getLecturaAnterior());
-						lectura.setMetros3(0.0);
-						lectura.setMetros3Exceso(0.0);
-						lectura.setValorMetro3(0.0);
-						lectura.setValorMetro3Exceso(0.0);
-					}
+					lectura = buildTarifa(lectura, lectura.getIdPeriodoPago());
 					Double totalM3 = Utilitario.redondear(lectura.getMetros3() + lectura.getMetros3Exceso());
 					Double diferencia = Math.abs(Utilitario.redondear(totalM3 - lectura.getMetros3Anterior()));
 					if (diferencia >= valorDiferencia) {
 						mensajeAlerta += lectura.getIdLlave().getNumero() + ", ";
 					}
 
-				} else {
+				} else
 					mensaje += lectura.getIdLlave().getNumero() + ", ";
-				}
 			}
 		}
-
 		for (Lectura lectura : lecturas) {
 			update(usuario, lectura);
 		}
@@ -330,7 +197,6 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 			mensaje = mensaje + "\n \n "
 					+ "Las lecturas de las siguientes llaves posiblemente este ingresadas incorrectamente : \n"
 					+ mensajeAlerta.substring(0, mensajeAlerta.length() - 2);
-
 		return mensaje;
 
 	}
