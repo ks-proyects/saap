@@ -7,7 +7,6 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
-import javax.faces.model.SelectItem;
 
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
@@ -35,7 +34,6 @@ public class TarifaEditBean extends Bean {
 	RangoConsumoBO rangoConsumoBO;
 
 	private Tarifa tarifa;
-	private String tipoLlave;
 	private List<RangoConsumo> rangoConsumos;
 
 	public TarifaEditBean() {
@@ -63,7 +61,6 @@ public class TarifaEditBean extends Bean {
 				redisplayAction(2, false);
 			} else {
 				tarifa = tarifaBO.findByPk(getParam1Integer());
-				tipoLlave = tarifa.getTipoLlave().getTipoLlave();
 				map.clear();
 				map.put("idTarifa", tarifa);
 				rangoConsumos = rangoConsumoBO.findAllByNamedQuery("RangoConsumo.findByTarifa", map);
@@ -77,7 +74,6 @@ public class TarifaEditBean extends Bean {
 	@Override
 	public String guardar() {
 		try {
-			tarifa.setTipoLlave(tipoLlaveBO.findByPk(tipoLlave));
 			if ("INS".equals(getAccion())) {
 				tarifaBO.save(getUsuarioCurrent(), this.tarifa);
 				setAccion("UPD");
@@ -118,28 +114,12 @@ public class TarifaEditBean extends Bean {
 		return "rangoConsumoEdit?faces-redirect=true";
 	}
 
-	public List<SelectItem> getTipoLlaveList() {
-		try {
-			return getSelectItems(getUsuarioCurrent(), null, "ListaValor.findTipoLlave");
-		} catch (Exception e) {
-		}
-		return null;
-	}
-
 	public Tarifa getTarifa() {
 		return tarifa;
 	}
 
 	public void setTarifa(Tarifa tarifa) {
 		this.tarifa = tarifa;
-	}
-
-	public String getTipoLlave() {
-		return tipoLlave;
-	}
-
-	public void setTipoLlave(String tipoLlave) {
-		this.tipoLlave = tipoLlave;
 	}
 
 	public List<RangoConsumo> getRangoConsumos() {

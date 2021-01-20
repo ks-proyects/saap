@@ -52,7 +52,8 @@ public class RegistroEconomicoBOImpl extends RegistroEconomicoDAOImpl implements
 		Integer count = 0;
 		if (!"ABIE".equals(registroEconomico.getIdPeriodoPago().getEstado()))
 			throw new EJBTransactionRolledbackException("El periodo ya ha sido cerrado o aún no esta abierto");
-		List<CabeceraPlanilla> cabeceraPlanillas = cabeceraPlanillaBO.findAllByNamedQuery("CabeceraPlanilla.findAllIngresado");
+		List<CabeceraPlanilla> cabeceraPlanillas = cabeceraPlanillaBO
+				.findAllByNamedQuery("CabeceraPlanilla.findAllIngresado");
 		for (CabeceraPlanilla cabeceraPlanilla : cabeceraPlanillas) {
 			DetallePlanilla detallePlanilla = new DetallePlanilla();
 			map = new HashMap<>();
@@ -94,7 +95,8 @@ public class RegistroEconomicoBOImpl extends RegistroEconomicoDAOImpl implements
 				cabeceraPlanilla.setSubtotal(cabeceraPlanilla.getSubtotal() + detallePlanilla.getValorTotal());
 				cabeceraPlanilla.setTotal(cabeceraPlanilla.getTotal() + detallePlanilla.getValorTotal());
 				cabeceraPlanillaBO.update(usuario, cabeceraPlanilla);
-			} else if (Utilitario.redondear(detallePlanilla.getValorTotal()) != Utilitario.redondear(registroEconomico.getValor())) {
+			} else if (Utilitario.redondear(detallePlanilla.getValorTotal()) != Utilitario
+					.redondear(registroEconomico.getValor())) {
 				cabeceraPlanilla.setSubtotal(cabeceraPlanilla.getSubtotal() - detallePlanilla.getValorTotal());
 				cabeceraPlanilla.setTotal(cabeceraPlanilla.getTotal() - detallePlanilla.getValorTotal());
 
@@ -113,7 +115,8 @@ public class RegistroEconomicoBOImpl extends RegistroEconomicoDAOImpl implements
 	}
 
 	@Override
-	public List<UsuarioPagoDTO> getUsuarioPagoDTOs(RegistroEconomico registroEconomico, String filtro, Usuario usuario) throws Exception {
+	public List<UsuarioPagoDTO> getUsuarioPagoDTOs(RegistroEconomico registroEconomico, String filtro, Usuario usuario)
+			throws Exception {
 		// TODO Auto-generated method stub
 		List<UsuarioPagoDTO> dtos = new ArrayList<>();
 		HashMap<String, Object> p = new HashMap<>();
@@ -127,16 +130,20 @@ public class RegistroEconomicoBOImpl extends RegistroEconomicoDAOImpl implements
 			DetallePlanilla detallePlanilla = (DetallePlanilla) objects[4];
 
 			if (detallePlanilla != null) {
-				cabeceraPlanilla.setSubtotal(Utilitario.redondear((cabeceraPlanilla.getSubtotal() - detallePlanilla.getValorTotal())));
-				cabeceraPlanilla.setTotal(Utilitario.redondear(cabeceraPlanilla.getTotal() - detallePlanilla.getValorTotal()));
+				cabeceraPlanilla.setSubtotal(
+						Utilitario.redondear((cabeceraPlanilla.getSubtotal() - detallePlanilla.getValorTotal())));
+				cabeceraPlanilla
+						.setTotal(Utilitario.redondear(cabeceraPlanilla.getTotal() - detallePlanilla.getValorTotal()));
 
 				detallePlanilla.setValorTotal(Utilitario.redondear(registroEconomico.getValor()));
 				detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
 				detallePlanilla.setValorPendiente(detallePlanilla.getValorTotal());
 				detallePlanilla.setValorUnidad(Utilitario.redondear(registroEconomico.getValor()));
 
-				cabeceraPlanilla.setSubtotal(Utilitario.redondear(cabeceraPlanilla.getSubtotal() + detallePlanilla.getValorTotal()));
-				cabeceraPlanilla.setTotal(Utilitario.redondear(cabeceraPlanilla.getTotal() + detallePlanilla.getValorTotal()));
+				cabeceraPlanilla.setSubtotal(
+						Utilitario.redondear(cabeceraPlanilla.getSubtotal() + detallePlanilla.getValorTotal()));
+				cabeceraPlanilla
+						.setTotal(Utilitario.redondear(cabeceraPlanilla.getTotal() + detallePlanilla.getValorTotal()));
 
 				detallePlanillaBO.update(usuario, detallePlanilla);
 				cabeceraPlanillaBO.update(usuario, cabeceraPlanilla);
@@ -146,7 +153,8 @@ public class RegistroEconomicoBOImpl extends RegistroEconomicoDAOImpl implements
 			dto.setCabeceraPlanilla(cabeceraPlanilla);
 			dto.setSeleccionado("S".equals(objects[2].toString()));
 			String estado = (objects[3] != null ? (String) objects[3] : "");
-			dto.setEstadoDescripcion("PAG".equals(estado) ? "Pagado" : "NOPAG".equals(estado) ? "No Pagado" : "ING".equals(estado) ? "Ingresado" : "");
+			dto.setEstadoDescripcion("PAG".equals(estado) ? "Pagado"
+					: "NOPAG".equals(estado) ? "No Pagado" : "ING".equals(estado) ? "Ingresado" : "");
 			dto.setDetallePlanilla(detallePlanilla);
 			dtos.add(dto);
 		}
@@ -157,7 +165,8 @@ public class RegistroEconomicoBOImpl extends RegistroEconomicoDAOImpl implements
 	CambioEstadoBO cambioEstadoBO;
 
 	@Override
-	public RegistroEconomico inicializar(PeriodoPago periodoPago, String tipoRegistro, String descripcion, Integer cantidadAplicados, Usuario usuario) throws Exception {
+	public RegistroEconomico inicializar(PeriodoPago periodoPago, String tipoRegistro, String descripcion,
+			Integer cantidadAplicados, Usuario usuario) throws Exception {
 		RegistroEconomico registroEconomico = new RegistroEconomico();
 		registroEconomico.setTipoRegistro(tipoRegistroBO.findByPk(tipoRegistro));
 		registroEconomico.setIdPeriodoPago(periodoPago);
@@ -170,5 +179,36 @@ public class RegistroEconomicoBOImpl extends RegistroEconomicoDAOImpl implements
 		cambioEstadoBO.cambiarEstadoSinVerificar(8, usuario, registroEconomico.getIdRegistroEconomico(), "");
 		cambioEstadoBO.cambiarEstadoSinVerificar(9, usuario, registroEconomico.getIdRegistroEconomico(), "");
 		return registroEconomico;
+	}
+
+	@Override
+	public RegistroEconomico getByPeriodo(PeriodoPago periodoPago, String tipo) throws Exception {
+		map.clear();
+		map.put("idPeriodoPago", periodoPago);
+		map.put("tipoRegistro", tipoRegistroBO.findByPk(tipo));
+		List<RegistroEconomico> registroEconomicos = findAllByNamedQuery("RegistroEconomico.findByPeriodoAndTipo", map);
+		return registroEconomicos.size() > 0 ? registroEconomicos.get(0) : null;
+	}
+
+	@Override
+	public RegistroEconomico iniciarPeriodPago(PeriodoPago periodoPago, Usuario usuario) throws Exception {
+		inicializar(periodoPago, "INASIS", "Multa Inasistencia " + periodoPago.getDescripcion(), 1, usuario);
+		// Gastos, lo creamos uno para que pueda registrar los gastos en todo
+		// este ciclo
+		inicializar(periodoPago, "GAST", "Gasto " + periodoPago.getDescripcion(), 1, usuario);
+		// Cuentas Por Pagar, para que las registre la cuentas por pagar de este
+		// mes
+		inicializar(periodoPago, "CUEPAG", "Valor Por Pagar " + periodoPago.getDescripcion(), 1, usuario);
+
+		RegistroEconomico reg = inicializar(periodoPago, "MULAGU", "Multa Consumo " + periodoPago.getDescripcion(), 0,
+				usuario);
+		return reg;
+	}
+
+	@Override
+	public RegistroEconomico iniciarMulta(PeriodoPago periodoPago, Usuario usuario) throws Exception {
+		RegistroEconomico reg = inicializar(periodoPago, "MULAGU", "Multa Consumo " + periodoPago.getDescripcion(), 0,
+				usuario);
+		return reg;
 	}
 }

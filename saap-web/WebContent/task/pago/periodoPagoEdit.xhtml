@@ -32,6 +32,12 @@
 					<rich:calendar disabled="#{periodoPagoEditBean.readOnly1}"
 						datePattern="dd/MM/yyyy"
 						value="#{periodoPagoEditBean.periodoPago.fechaFin}" />
+					<h:outputLabel value="Epoca:" />
+					<h:selectOneMenu disabled="#{periodoPagoEditBean.readOnly1}"
+						value="#{periodoPagoEditBean.epoca}">
+						<f:selectItems value="#{periodoPagoEditBean.epocas}" />
+					</h:selectOneMenu>
+						
 				</h:panelGrid>
 
 

@@ -38,6 +38,14 @@
 						onkeypress="return ValidarNumerico('%d',this,event);"
 						value="#{usuarioEditBean.usuario.cedula}" />
 
+					<h:outputLabel for="txtTarifa" value="* Tarifa:" />
+					<h:selectOneMenu id="txtTarifa"
+						readonly="#{usuarioEditBean.readOnly1}"
+						disabled="#{usuarioEditBean.readOnly1}"
+						value="#{usuarioEditBean.idTarifa}">
+						<f:selectItems value="#{usuarioEditBean.tarifas}" />
+					</h:selectOneMenu>
+
 					<h:outputLabel for="txtEsComunero" value="Es Comunero:" />
 					<h:selectOneMenu id="txtEsComunero"
 						readonly="#{usuarioEditBean.readOnly1}"
@@ -92,12 +100,17 @@
 					<h:outputLabel for="txtAlcantarillado"
 						value="Tiene Alcantarillado:" />
 					<h:selectBooleanCheckbox id="txtAlcantarillado"
-						 disabled="#{usuarioEditBean.readOnly1}"
+						disabled="#{usuarioEditBean.readOnly1}"
 						value="#{usuarioEditBean.usuario.poseeAlcant}" />
 					<h:outputLabel for="txtAcometidas" value="Acometidas: " />
 					<h:inputText id="txtAcometidas"
 						value="#{usuarioEditBean.usuario.cantAlcant}"
 						readonly="#{usuarioEditBean.readOnly1}" />
+
+					<h:outputLabel for="txtAplicaDescuento" value="Aplica Descuento:" />
+					<h:selectBooleanCheckbox id="txtAplicaDescuento"
+						disabled="#{usuarioEditBean.readOnly1}"
+						value="#{usuarioEditBean.usuario.tieneDescuento}" />
 				</h:panelGrid>
 
 				<rich:dataTable value="#{usuarioEditBean.listLlaves}" var="llave"
@@ -132,14 +145,9 @@
 						<f:facet name="header">
 							<h:outputText value="Tarifa" />
 						</f:facet>
-						<h:outputText value="#{llave.idTarifa.descripcion}" />
+						<h:outputText value="#{llave.idUsuario.tarifa.descripcion}" />
 					</rich:column>
-					<rich:column>
-						<f:facet name="header">
-							<h:outputText value="Tarifa" />
-						</f:facet>
-						<h:outputText value="#{llave.idTarifa.descripcion}" />
-					</rich:column>
+
 					<rich:column>
 						<f:facet name="header">
 							<h:outputText value="Activo" />

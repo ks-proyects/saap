@@ -120,6 +120,9 @@ public abstract class Bean extends Actions {
 	public <ID> List<SelectItem> getSelectItems(Identificador<ID>[] identificadores) throws Exception {
 		return getSelectItems(null, null, null, false, false, false, TipoListaValor.ENUM, identificadores);
 	}
+	public <ID> List<SelectItem> getSelectItems(Identificador<ID>[] identificadores,Boolean seleccione) throws Exception {
+		return getSelectItems(null, null, null, false, false, seleccione, TipoListaValor.ENUM, identificadores);
+	}
 
 	/**
 	 * Método que genera un {@link List} de {@link SelectItem} en base a un

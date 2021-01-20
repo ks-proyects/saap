@@ -8,7 +8,8 @@ import javax.persistence.NamedQuery;
 import org.ec.jap.utilitario.Utilitario;
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "ConsumoDTO.findConsumo", query = "SELECT new ConsumoDTO(pp.descripcion,count(d),sum(lec.metros3)+sum(lec.metros3Exceso),sum(d.valorTotal),sum(d.valorPagado),sum(lec.valorMetro3)/count(d)) FROM DetallePlanilla d inner join d.idCabeceraPlanilla cp inner join cp.idPeriodoPago pp inner join d.idLectura lec inner join cp.idLlave ll inner join ll.idTarifa tar where lec.idPeriodoPago=pp and (pp.anio=? or ?=0) and (d.ordenStr=? OR d.ordenStr=?) and (tar.idTarifa=? or ?=0) group by pp.anio, pp.mes,pp.descripcion order by pp.anio,pp.mes"), })
+@NamedQueries({
+		@NamedQuery(name = "ConsumoDTO.findConsumo", query = "SELECT new ConsumoDTO(pp.descripcion,count(d),sum(lec.metros3)+sum(lec.metros3Exceso),sum(d.valorTotal),sum(d.valorPagado),sum(lec.valorMetro3)/count(d)) FROM DetallePlanilla d inner join d.idCabeceraPlanilla cp inner join cp.idPeriodoPago pp inner join d.idLectura lec inner join cp.idLlave ll inner join ll.idUsuario.tarifa tar where lec.idPeriodoPago=pp and (pp.anio=? or ?=0) and (d.ordenStr=? OR d.ordenStr=?) and (tar.idTarifa=? or ?=0) group by pp.anio, pp.mes,pp.descripcion order by pp.anio,pp.mes"), })
 public class ConsumoDTO {
 
 	@Id
@@ -27,8 +28,8 @@ public class ConsumoDTO {
 		// TODO Auto-generated constructor stub
 	}
 
-	public ConsumoDTO(String descripcion, Long numeroPagos, Double consumoM3,
-			Double valorTotal, Double valorRecaudado, Double valorMetro3) {
+	public ConsumoDTO(String descripcion, Long numeroPagos, Double consumoM3, Double valorTotal, Double valorRecaudado,
+			Double valorMetro3) {
 		super();
 		this.descripcion = descripcion;
 		this.numeroPagos = numeroPagos;

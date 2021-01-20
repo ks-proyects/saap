@@ -17,6 +17,7 @@ import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.saap.EstadoCivilBO;
 import org.ec.jap.bo.saap.LlaveBO;
 import org.ec.jap.bo.saap.RepresentanteBO;
+import org.ec.jap.bo.saap.TarifaBO;
 import org.ec.jap.bo.saap.UsuarioBO;
 import org.ec.jap.bo.sistema.ComunidadBO;
 import org.ec.jap.entiti.saap.Llave;
@@ -45,10 +46,14 @@ public class UsuarioEditBean extends Bean {
 	LlaveBO llaveBO;
 
 	@EJB
+	TarifaBO tarifaBO;
+
+	@EJB
 	RepresentanteBO representanteBO;
 
 	private Usuario usuario;
 	private Integer idEstadoCivil;
+	private Integer idTarifa;
 	private List<Llave> listLlaves;
 	private List<Representante> listRepresentantes;
 
@@ -79,6 +84,7 @@ public class UsuarioEditBean extends Bean {
 				usuario = new Usuario();
 			} else {
 				usuario = usuarioBO.findByPk(getParam1Integer());
+				idTarifa = usuario.getTarifa()!=null?usuario.getTarifa().getIdTarifa():-1;
 				map = new HashMap<>();
 				map.put("idUsuario", usuario.getIdUsuario());
 				listLlaves = llaveBO.findAllByNamedQuery("Llave.findByUser", map);
@@ -96,9 +102,11 @@ public class UsuarioEditBean extends Bean {
 	public String generalAccion() {
 		// TODO Auto-generated method stub
 		try {
-			Integer numMaxLlaves = parametroBO.getInteger("", getUsuarioCurrent().getIdComunidad().getIdComunidad(), "NUMLLAV");
+			Integer numMaxLlaves = parametroBO.getInteger("", getUsuarioCurrent().getIdComunidad().getIdComunidad(),
+					"NUMLLAV");
 			if (listLlaves.size() >= numMaxLlaves) {
-				displayMessage("El número de llaves permitidas por usuario es: " + numMaxLlaves.toString() + ". No puede asignar más llaves.", Mensaje.SEVERITY_WARN);
+				displayMessage("El número de llaves permitidas por usuario es: " + numMaxLlaves.toString()
+						+ ". No puede asignar más llaves.", Mensaje.SEVERITY_WARN);
 				return getPage().getNombre();
 			} else {
 				setAccion("INS");
@@ -121,30 +129,32 @@ public class UsuarioEditBean extends Bean {
 	@Override
 	public String guardar() {
 		try {
+			usuario.setTarifa(tarifaBO.findByPk(idTarifa));
 			usuario.setEdad(UtilitarioFecha.getEdad(usuario.getFechaNacimiento()));
 			usuario.setIdEstadoCivil(estadoCivilBO.findByPk(idEstadoCivil));
 			if ("INS".equals(getAccion())) {
-				map= new HashMap<>();
+				map = new HashMap<>();
 				usuario.setTipoUsuario(getParam20String());
 				map.put("cedula", usuario.getCedula());
-				
-				Integer numReg=((Long)representanteBO.findObjectByNamedQuery("Representante.findByCed", map)).intValue();
-				if(numReg>0)
-				{
-					displayMessage("Esta persona no puede ser un representante y un usuario de la JAAP a la misma vez.", Mensaje.SEVERITY_WARN);
+
+				Integer numReg = ((Long) representanteBO.findObjectByNamedQuery("Representante.findByCed", map))
+						.intValue();
+				if (numReg > 0) {
+					displayMessage("Esta persona no puede ser un representante y un usuario de la JAAP a la misma vez.",
+							Mensaje.SEVERITY_WARN);
 					return "";
 				}
-				
-				map= new HashMap<>();
+
+				map = new HashMap<>();
 				map.put("tipoUsuario", usuario.getTipoUsuario());
 				map.put("cedula", usuario.getCedula());
-				numReg=((Long)usuarioBO.findObjectByNamedQuery("Usuario.findByCedula", map)).intValue();
-				if(numReg>0)
-				{
-					displayMessage("Ya existe una persona con este número de cédula como un usuario de la JAAP.", Mensaje.SEVERITY_WARN);
+				numReg = ((Long) usuarioBO.findObjectByNamedQuery("Usuario.findByCedula", map)).intValue();
+				if (numReg > 0) {
+					displayMessage("Ya existe una persona con este número de cédula como un usuario de la JAAP.",
+							Mensaje.SEVERITY_WARN);
 					return "";
 				}
-				
+
 				usuario.setEstado("ING");
 				usuario.setUsername(usuario.getNombres().toLowerCase().replace(" ", ""));
 				usuario.setIdComunidad(comunidadBO.findByPk(1));
@@ -155,17 +165,17 @@ public class UsuarioEditBean extends Bean {
 				cambioEstadoBO.cambiarEstadoSinVerificar(12, getUsuarioCurrent(), usuario.getIdUsuario(), "");
 
 			} else {
-				map= new HashMap<>();
+				map = new HashMap<>();
 				map.put("tipoUsuario", usuario.getTipoUsuario());
 				map.put("cedula", usuario.getCedula());
 				map.put("idUsuario", usuario.getIdUsuario());
-				Integer numReg=((Long)usuarioBO.findObjectByNamedQuery("Usuario.findByCedulaAndId", map)).intValue();
-				if(numReg>0)
-				{
-					displayMessage("Ya existe una persona con este número de cédula como un usuario de la JAAP.", Mensaje.SEVERITY_WARN);
+				Integer numReg = ((Long) usuarioBO.findObjectByNamedQuery("Usuario.findByCedulaAndId", map)).intValue();
+				if (numReg > 0) {
+					displayMessage("Ya existe una persona con este número de cédula como un usuario de la JAAP.",
+							Mensaje.SEVERITY_WARN);
 					return "";
 				}
-				
+
 				usuarioBO.update(getUsuarioCurrent(), usuario);
 			}
 			displayMessage(Mensaje.saveMessaje, Mensaje.SEVERITY_INFO);
@@ -194,6 +204,16 @@ public class UsuarioEditBean extends Bean {
 		HashMap<String, Object> map = new HashMap<>(0);
 		try {
 			return getSelectItems(getUsuarioCurrent(), map, "ListaValor.findEstadoCivil");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new ArrayList<SelectItem>(0);
+	}
+
+	public List<SelectItem> getTarifas() {
+		HashMap<String, Object> map = new HashMap<>(0);
+		try {
+			return getSelectItems(getUsuarioCurrent(), map, "ListaValor.findTarifaConsu");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -231,5 +251,14 @@ public class UsuarioEditBean extends Bean {
 	public void setListRepresentantes(List<Representante> listRepresentantes) {
 		this.listRepresentantes = listRepresentantes;
 	}
+
+	public Integer getIdTarifa() {
+		return idTarifa;
+	}
+
+	public void setIdTarifa(Integer idTarifa) {
+		this.idTarifa = idTarifa;
+	}
+	
 
 }

@@ -7,12 +7,14 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import org.apache.log4j.Logger;
 import org.ec.jap.bo.saap.CabeceraPlanillaBO;
 import org.ec.jap.bo.saap.DetallePlanillaBO;
 import org.ec.jap.bo.saap.RegistroEconomicoBO;
 import org.ec.jap.dao.saap.impl.DetallePlanillaDAOImpl;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
 import org.ec.jap.entiti.saap.DetallePlanilla;
+import org.ec.jap.entiti.saap.Llave;
 import org.ec.jap.entiti.saap.RegistroEconomico;
 import org.ec.jap.entiti.saap.Usuario;
 import org.ec.jap.utilitario.Constantes;
@@ -24,6 +26,7 @@ import org.ec.jap.utilitario.Utilitario;
 @Stateless
 public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements DetallePlanillaBO {
 
+	private static final Logger log = Logger.getLogger(DetallePlanillaBOImpl.class.getName());
 	@EJB
 	CabeceraPlanillaBO cabeceraPlanillaBO;
 
@@ -37,7 +40,8 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 	}
 
 	@Override
-	public void asignarMulta(Usuario usuario, CabeceraPlanilla planilla, RegistroEconomico registroEconomico) throws Exception {
+	public void asignarMulta(Usuario usuario, CabeceraPlanilla planilla, RegistroEconomico registroEconomico)
+			throws Exception {
 
 		DetallePlanilla detallePlanilla = new DetallePlanilla();
 		detallePlanilla.setEstado("ING");
@@ -58,7 +62,33 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 	}
 
 	@Override
-	public void quitarMulta(Usuario usuario, CabeceraPlanilla planilla, RegistroEconomico registroEconomico, DetallePlanilla detallePlanilla) throws Exception {
+	public Double crearMulta(CabeceraPlanilla planillaNoPagada, CabeceraPlanilla planillaNueva,
+			RegistroEconomico multaAtrazoMes, Llave llave, Usuario usuario) throws Exception {
+		Double multa = llave.getIdUsuario().getTarifa().getMultaNoPago() != null ? llave.getIdTarifa().getMultaNoPago() : 0.0;
+		log.info(String.format("Valor Multa: ", multa));
+		if (multa > 0.0) {
+			DetallePlanilla detallePlanilla = new DetallePlanilla();
+			detallePlanilla.setEstado("ING");
+			detallePlanilla.setIdCabeceraPlanilla(planillaNueva);
+			detallePlanilla.setIdRegistroEconomico(multaAtrazoMes);
+			detallePlanilla.setValorTotal(multa);
+			detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
+			detallePlanilla.setValorUnidad(multa);
+			detallePlanilla.setValorPagado(0.0);
+			detallePlanilla.setValorPendiente(multa);
+			detallePlanilla.setOrdenStr("AA");
+			detallePlanilla.setDescripcion("Multa Consumo " + planillaNoPagada.getIdPeriodoPago().getDescripcion());
+			detallePlanilla.setValorTotalOrigen(detallePlanilla.getValorTotal());
+			detallePlanilla.setOrigen(Constantes.origen_mes_Actual);
+			save(usuario, detallePlanilla);
+		}
+		return multa;
+
+	}
+
+	@Override
+	public void quitarMulta(Usuario usuario, CabeceraPlanilla planilla, RegistroEconomico registroEconomico,
+			DetallePlanilla detallePlanilla) throws Exception {
 
 		planilla.setSubtotal(planilla.getSubtotal() - detallePlanilla.getValorTotal());
 		planilla.setTotal(planilla.getTotal() - detallePlanilla.getValorTotal());
@@ -97,16 +127,18 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 	}
 
 	@Override
-	public DetallePlanilla crearDetalleAlcantarillado(Usuario currentUser, CabeceraPlanilla cp, RegistroEconomico registroEconomicoAlcantarillado, Integer cantidad, Double valor, String ppDescripcion) throws Exception {
+	public DetallePlanilla crearDetalleAlcantarillado(Usuario currentUser, CabeceraPlanilla cp,
+			RegistroEconomico registroEconomicoAlcantarillado, Integer cantidad, Double valor, String ppDescripcion)
+			throws Exception {
 		DetallePlanilla detallePlanillaBasico = new DetallePlanilla();
 		detallePlanillaBasico.initValue();
 		detallePlanillaBasico.setIdCabeceraPlanilla(cp);
 		detallePlanillaBasico.setIdRegistroEconomico(registroEconomicoAlcantarillado);
 		detallePlanillaBasico.setFechaRegistro(Calendar.getInstance().getTime());
 		detallePlanillaBasico.setValorUnidad(Utilitario.redondear(valor));
-		detallePlanillaBasico.setValorTotal(Utilitario.redondear(valor*cantidad));
+		detallePlanillaBasico.setValorTotal(Utilitario.redondear(valor * cantidad));
 		detallePlanillaBasico.setValorPendiente(detallePlanillaBasico.getValorTotal());
-		detallePlanillaBasico.setDescripcion("Servicio de Alcantarillado " + ppDescripcion+" ("+cantidad+")");
+		detallePlanillaBasico.setDescripcion("Servicio de Alcantarillado " + ppDescripcion + " (" + cantidad + ")");
 		detallePlanillaBasico.setOrdenStr("B");
 		detallePlanillaBasico.setValorTotalOrigen(detallePlanillaBasico.getValorTotal());
 		detallePlanillaBasico.setOrigen(Constantes.origen_mes_Actual);
@@ -121,7 +153,9 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		detallePlanillaNuevo.setIdLectura(detallePlanilla.getIdLectura());
 		detallePlanillaNuevo.setIdRegistroEconomico(detallePlanilla.getIdRegistroEconomico());
 		detallePlanillaNuevo.setValorTotal(detallePlanilla.getValorTotal());
-		detallePlanillaNuevo.setFechaRegistro(detallePlanilla.getFechaRegistro() != null ? detallePlanilla.getFechaRegistro() : Calendar.getInstance().getTime());
+		detallePlanillaNuevo
+				.setFechaRegistro(detallePlanilla.getFechaRegistro() != null ? detallePlanilla.getFechaRegistro()
+						: Calendar.getInstance().getTime());
 		detallePlanillaNuevo.setValorUnidad(detallePlanilla.getValorUnidad());
 		detallePlanillaNuevo.setValorPendiente(detallePlanillaNuevo.getValorTotal());
 		if (detallePlanilla.getIdRegistroEconomico() != null) {
@@ -142,23 +176,29 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		} else if (detallePlanilla.getIdLectura() != null) {
 			detallePlanillaNuevo.setOrdenStr("A");
 		} else {
-			detallePlanillaNuevo.setOrdenStr(detallePlanilla.getOrdenStr() + detallePlanilla.getOrdenStr().substring(0, 1));
+			detallePlanillaNuevo
+					.setOrdenStr(detallePlanilla.getOrdenStr() + detallePlanilla.getOrdenStr().substring(0, 1));
 		}
 		detallePlanillaNuevo.setIdCabeceraPlanilla(planillaNueva);
 		detallePlanillaNuevo.setDescripcion(detallePlanilla.getDescripcion());
-		detallePlanillaNuevo.setValorTotalOrigen(detallePlanilla.getValorTotalOrigen() == null ? detallePlanilla.getValorTotal() : detallePlanilla.getValorTotalOrigen());
-		
+		detallePlanillaNuevo
+				.setValorTotalOrigen(detallePlanilla.getValorTotalOrigen() == null ? detallePlanilla.getValorTotal()
+						: detallePlanilla.getValorTotalOrigen());
+
 		return detallePlanillaNuevo;
 	}
 
 	@Override
-	public DetallePlanilla traspasarDetalleInconompleto(CabeceraPlanilla planillaNueva, DetallePlanilla detalleIncompleto) {
+	public DetallePlanilla traspasarDetalleInconompleto(CabeceraPlanilla planillaNueva,
+			DetallePlanilla detalleIncompleto) {
 		DetallePlanilla detallePlanillaNuevo = new DetallePlanilla();
 		detallePlanillaNuevo.initValue();
 		detallePlanillaNuevo.setIdLectura(detalleIncompleto.getIdLectura());
 		detallePlanillaNuevo.setIdRegistroEconomico(detalleIncompleto.getIdRegistroEconomico());
 		detallePlanillaNuevo.setValorTotal(detalleIncompleto.getValorPendiente());
-		detallePlanillaNuevo.setFechaRegistro(detalleIncompleto.getFechaRegistro() != null ? detalleIncompleto.getFechaRegistro() : Calendar.getInstance().getTime());
+		detallePlanillaNuevo
+				.setFechaRegistro(detalleIncompleto.getFechaRegistro() != null ? detalleIncompleto.getFechaRegistro()
+						: Calendar.getInstance().getTime());
 		detallePlanillaNuevo.setValorPendiente(detallePlanillaNuevo.getValorTotal());
 		detallePlanillaNuevo.setValorUnidad(detalleIncompleto.getValorUnidad());
 		detallePlanillaNuevo.setIdCabeceraPlanilla(planillaNueva);
@@ -181,18 +221,19 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		} else if (detalleIncompleto.getIdLectura() != null) {
 			detallePlanillaNuevo.setOrdenStr("A");
 		} else {
-			detallePlanillaNuevo.setOrdenStr(detalleIncompleto.getOrdenStr() + detalleIncompleto.getOrdenStr().substring(0, 1));
+			detallePlanillaNuevo
+					.setOrdenStr(detalleIncompleto.getOrdenStr() + detalleIncompleto.getOrdenStr().substring(0, 1));
 		}
 
-		detallePlanillaNuevo.setValorTotalOrigen(detalleIncompleto.getValorTotalOrigen() == null ? detalleIncompleto.getValorTotal() : detalleIncompleto.getValorTotalOrigen());
+		detallePlanillaNuevo
+				.setValorTotalOrigen(detalleIncompleto.getValorTotalOrigen() == null ? detalleIncompleto.getValorTotal()
+						: detalleIncompleto.getValorTotalOrigen());
 		detallePlanillaNuevo.setOrigen(Constantes.origen_pagado_incompleto);
 		return detallePlanillaNuevo;
 	}
 
-	
-
 	@Override
-	public List<DetallePlanilla> findPlanillasNoPagadas(CabeceraPlanilla planillaNoPagada, String namedQuery) throws Exception {
+	public List<DetallePlanilla> findDetalles(CabeceraPlanilla planillaNoPagada, String namedQuery) throws Exception {
 		HashMap<String, Object> p = new HashMap<>(0);
 		p.put("idCabeceraPlanilla", planillaNoPagada);
 		List<DetallePlanilla> detallePlanillasNoPagadas = findAllByNamedQuery(namedQuery, p);

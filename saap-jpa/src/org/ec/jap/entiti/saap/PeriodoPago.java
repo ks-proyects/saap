@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 
 import org.ec.jap.anotaciones.AuditoriaAnot;
 import org.ec.jap.anotaciones.AuditoriaMethod;
+import org.ec.jap.enumerations.EpocaEnum;
 
 /**
  * 
@@ -20,9 +21,9 @@ import org.ec.jap.anotaciones.AuditoriaMethod;
  */
 @Entity
 @Table(name = "periodo_pago")
-@NamedQueries({ 
-	@NamedQuery(name = "PeriodoPago.findByFechas", query = "SELECT p FROM PeriodoPago p WHERE p.fechaInicio=:fechaInicio and p.fechaFin=:fechaFin ORDER BY p.idPeriodoPago DESC "),
-	@NamedQuery(name = "PeriodoPago.findByAnio", query = "SELECT p FROM PeriodoPago p WHERE  UPPER(p.descripcion) like UPPER(CONCAT('%',:filtro,'%')) ORDER BY p.fechaFin DESC"),
+@NamedQueries({
+		@NamedQuery(name = "PeriodoPago.findByFechas", query = "SELECT p FROM PeriodoPago p WHERE p.fechaInicio=:fechaInicio and p.fechaFin=:fechaFin ORDER BY p.idPeriodoPago DESC "),
+		@NamedQuery(name = "PeriodoPago.findByAnio", query = "SELECT p FROM PeriodoPago p WHERE  UPPER(p.descripcion) like UPPER(CONCAT('%',:filtro,'%')) ORDER BY p.fechaFin DESC"),
 		@NamedQuery(name = "PeriodoPago.findMaxMes", query = "SELECT MAX(p.fechaFin) FROM PeriodoPago p"),
 		@NamedQuery(name = "PeriodoPago.findAll", query = "SELECT p FROM PeriodoPago p ORDER BY p.fechaFin DESC"),
 		@NamedQuery(name = "PeriodoPago.findAbierto", query = "SELECT p FROM PeriodoPago p WHERE p.estado in ('ABIE','CERR')"),
@@ -36,7 +37,7 @@ public class PeriodoPago implements Serializable {
 	private Integer idPeriodoPago;
 	@Basic(optional = false)
 	@NotNull
-	@Size(min = 1, max = 2147483647)
+	@Size(min = 1, max = 1024)
 	@Column(name = "descripcion")
 	private String descripcion;
 	@Basic(optional = false)
@@ -61,6 +62,9 @@ public class PeriodoPago implements Serializable {
 	@Column(name = "pp_estado")
 	private String estado;
 
+	@Enumerated(EnumType.STRING)
+	private EpocaEnum epoca;
+
 	@OneToMany(mappedBy = "idPeriodoPago")
 	private List<CabeceraPlanilla> cabeceraPlanillaList;
 
@@ -83,7 +87,8 @@ public class PeriodoPago implements Serializable {
 		this.idPeriodoPago = idPeriodoPago;
 	}
 
-	public PeriodoPago(Integer idPeriodoPago, String descripcion, Date fechaInicio, Date fechaFin, Integer anio, Integer mes) {
+	public PeriodoPago(Integer idPeriodoPago, String descripcion, Date fechaInicio, Date fechaFin, Integer anio,
+			Integer mes) {
 		this.idPeriodoPago = idPeriodoPago;
 		this.descripcion = descripcion;
 		this.fechaInicio = fechaInicio;
@@ -189,6 +194,15 @@ public class PeriodoPago implements Serializable {
 	public void setGastoList(List<Gasto> gastoList) {
 		this.gastoList = gastoList;
 	}
+	
+
+	public EpocaEnum getEpoca() {
+		return epoca;
+	}
+
+	public void setEpoca(EpocaEnum epoca) {
+		this.epoca = epoca;
+	}
 
 	@Override
 	public int hashCode() {
@@ -205,7 +219,8 @@ public class PeriodoPago implements Serializable {
 			return false;
 		}
 		PeriodoPago other = (PeriodoPago) object;
-		if ((this.idPeriodoPago == null && other.idPeriodoPago != null) || (this.idPeriodoPago != null && !this.idPeriodoPago.equals(other.idPeriodoPago))) {
+		if ((this.idPeriodoPago == null && other.idPeriodoPago != null)
+				|| (this.idPeriodoPago != null && !this.idPeriodoPago.equals(other.idPeriodoPago))) {
 			return false;
 		}
 		return true;
@@ -215,5 +230,6 @@ public class PeriodoPago implements Serializable {
 	public String toString() {
 		return "org.ec.jap.entiti.PeriodoPago[ idPeriodoPago=" + idPeriodoPago + " ]";
 	}
+	
 
 }

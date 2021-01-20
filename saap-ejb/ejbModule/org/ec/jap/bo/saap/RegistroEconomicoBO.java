@@ -23,14 +23,14 @@ public interface RegistroEconomicoBO extends RegistroEconomicoDAO {
 	public void aplicarCuota(Usuario usuario, Integer idRegistroEconomico) throws Exception;
 
 	/**
-	 * Obtiene todos los usuarios de la JAAP q esten activos y que tengan una
-	 * llave
+	 * Obtiene todos los usuarios de la JAAP q esten activos y que tengan una llave
 	 * 
 	 * @param registroEconomico
 	 * @return
 	 * @throws Exception
 	 */
-	public List<UsuarioPagoDTO> getUsuarioPagoDTOs(RegistroEconomico registroEconomico, String filtro, Usuario usuario) throws Exception;
+	public List<UsuarioPagoDTO> getUsuarioPagoDTOs(RegistroEconomico registroEconomico, String filtro, Usuario usuario)
+			throws Exception;
 
 	/**
 	 * Método que inicializa un registro economico
@@ -42,6 +42,36 @@ public interface RegistroEconomicoBO extends RegistroEconomicoDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public RegistroEconomico inicializar(PeriodoPago periodoPago, String tipoRegistro, String descripcion, Integer cantidadAplicados, Usuario usuario) throws Exception;
+	public RegistroEconomico inicializar(PeriodoPago periodoPago, String tipoRegistro, String descripcion,
+			Integer cantidadAplicados, Usuario usuario) throws Exception;
+
+	/**
+	 * Inicializa los registros apra el perido de pago
+	 * 
+	 * @param periodoPago
+	 * @param usuario
+	 * @return
+	 * @throws Exception
+	 */
+	RegistroEconomico iniciarPeriodPago(PeriodoPago periodoPago, Usuario usuario) throws Exception;
+
+	/**
+	 * Obtiene un registro economico preexistente
+	 * 
+	 * @param periodoPago
+	 * @param tipo
+	 * @return
+	 * @throws Exception
+	 */
+	RegistroEconomico getByPeriodo(PeriodoPago periodoPago, String tipo) throws Exception;
+
+	/**
+	 * Crea un registro de multas
+	 * @param periodoPago
+	 * @param usuario
+	 * @return
+	 * @throws Exception
+	 */
+	RegistroEconomico iniciarMulta(PeriodoPago periodoPago, Usuario usuario) throws Exception;
 
 }

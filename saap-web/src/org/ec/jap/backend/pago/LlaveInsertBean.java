@@ -9,14 +9,11 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
-import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.saap.LlaveBO;
-import org.ec.jap.bo.saap.TarifaBO;
-import org.ec.jap.bo.saap.TipoLlaveBO;
 import org.ec.jap.bo.saap.UsuarioBO;
 import org.ec.jap.entiti.saap.Llave;
 import org.ec.jap.entiti.saap.Usuario;
@@ -31,16 +28,12 @@ public class LlaveInsertBean extends Bean {
 
 	@EJB
 	UsuarioBO usuarioBO;
-	@EJB
-	TipoLlaveBO tipoLlaveBO;
-	@EJB
-	TarifaBO tarifaBO;
+
 	@EJB
 	LlaveBO llaveBO;
 
 	private Llave llave;
-	private Integer idTarifa;
-	private String tipoLlave;
+
 	private Usuario usuario;
 	private List<SelectItem> itemTarifa;
 	private List<SelectItem> itemTipoLlave;
@@ -69,15 +62,13 @@ public class LlaveInsertBean extends Bean {
 			if ("INS".equals(getAccion())) {
 				llave = new Llave();
 				usuario = usuarioBO.findByPk(getParam1Integer());
-				tipoLlave = itemTipoLlave.size() > 0 ? itemTipoLlave.get(0).getValue().toString() : "";
+
 			} else {
 				llave = llaveBO.findByPk(getParam2Integer());
-				idTarifa = llave.getIdTarifa().getIdTarifa();
-				tipoLlave = llave.getIdTarifa().getTipoLlave().getTipoLlave();
 				usuario = llave.getIdUsuario();
 			}
 			setNivelBloqueo("ING".equals(usuario.getEstado()) || "EDI".equals(usuario.getEstado()) ? 1 : 0);
-			changeTipoLlave(null);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
@@ -88,7 +79,6 @@ public class LlaveInsertBean extends Bean {
 	public String guardar() {
 		try {
 
-			llave.setIdTarifa(tarifaBO.findByPk(idTarifa));
 			if ("INS".equals(getAccion())) {
 				llave.setEstado("ING");
 				llave.setFechaRegistro(Calendar.getInstance().getTime());
@@ -129,9 +119,11 @@ public class LlaveInsertBean extends Bean {
 			map = new HashMap<>();
 			map.put("idUsuario", usuarioBO.findByPk(getParam1Integer()).getIdUsuario());
 			List<Llave> listLlaves = llaveBO.findAllByNamedQuery("Llave.findByUser", map);
-			Integer numMaxLlaves = parametroBO.getInteger("", getUsuarioCurrent().getIdComunidad().getIdComunidad(), "NUMLLAV");
+			Integer numMaxLlaves = parametroBO.getInteger("", getUsuarioCurrent().getIdComunidad().getIdComunidad(),
+					"NUMLLAV");
 			if (listLlaves.size() >= numMaxLlaves) {
-				displayMessage("El número de llaves permitidas por usuario es: " + numMaxLlaves.toString() + ". No puede asignar más llaves.", Mensaje.SEVERITY_WARN);
+				displayMessage("El número de llaves permitidas por usuario es: " + numMaxLlaves.toString()
+						+ ". No puede asignar más llaves.", Mensaje.SEVERITY_WARN);
 				return getPage().getNombre();
 			} else {
 				return super.nuevo();
@@ -140,18 +132,6 @@ public class LlaveInsertBean extends Bean {
 		} catch (Exception e) {
 			displayMessage(Mensaje.errorMessaje, Mensaje.SEVERITY_FATAL);
 			return getPage().getOutcome();
-		}
-	}
-
-	public void changeTipoLlave(ValueChangeEvent event) {
-		tipoLlave = event != null ? event.getNewValue().toString() : tipoLlave;
-		HashMap<String, Object> map = new HashMap<>(0);
-		try {
-			map.put("tipoLlave", tipoLlave);
-			itemTarifa = getSelectItems(getUsuarioCurrent(), map, "ListaValor.findTarifa");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
@@ -177,22 +157,6 @@ public class LlaveInsertBean extends Bean {
 
 	public void setLlave(Llave llave) {
 		this.llave = llave;
-	}
-
-	public Integer getIdTarifa() {
-		return idTarifa;
-	}
-
-	public void setIdTarifa(Integer idTarifa) {
-		this.idTarifa = idTarifa;
-	}
-
-	public String getTipoLlave() {
-		return tipoLlave;
-	}
-
-	public void setTipoLlave(String tipoLlave) {
-		this.tipoLlave = tipoLlave;
 	}
 
 	public Usuario getUsuario() {

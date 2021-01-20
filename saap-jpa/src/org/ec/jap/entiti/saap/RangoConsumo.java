@@ -21,6 +21,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.ec.jap.enumerations.EpocaEnum;
 import org.ec.jap.enumerations.Formapago;
 
 /**
@@ -32,7 +33,7 @@ import org.ec.jap.enumerations.Formapago;
 @NamedQueries({
 		@NamedQuery(name = "RangoConsumo.findByMaxTarifaAndValor", query = "SELECT r FROM RangoConsumo r WHERE r.idTarifa=:idTarifa AND  :valor > r.m3Minimo AND r.m3Maximo=-1 AND r.formaPago=:formaPago"),
 		@NamedQuery(name = "RangoConsumo.findByTarifaAndValor", query = "SELECT r FROM RangoConsumo r WHERE r.idTarifa=:idTarifa AND :valor between r.m3Minimo AND r.m3Maximo AND r.formaPago=:formaPago"),
-		@NamedQuery(name = "RangoConsumo.findByTarifa", query = "select rac from RangoConsumo rac where rac.idTarifa=:idTarifa ORDER BY rac.orden") })
+		@NamedQuery(name = "RangoConsumo.findByTarifa", query = "select rac from RangoConsumo rac where rac.idTarifa=:idTarifa ORDER BY rac.epoca, rac.orden") })
 public class RangoConsumo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -59,7 +60,6 @@ public class RangoConsumo implements Serializable {
 	@ManyToOne
 	private Tarifa idTarifa;
 
-	@NotNull(message = "El campo FORMA DE PAGO es obligatorio.")
 	@Enumerated(EnumType.STRING)
 	@Column(name = "forma_pago")
 	private Formapago formaPago;
@@ -69,6 +69,9 @@ public class RangoConsumo implements Serializable {
 
 	@NotNull(message = "El campo ORDEN es obligatorio.")
 	private Integer orden;
+
+	@Enumerated(EnumType.STRING)
+	private EpocaEnum epoca;
 
 	public RangoConsumo() {
 	}
@@ -82,6 +85,14 @@ public class RangoConsumo implements Serializable {
 		this.m3Minimo = m3Minimo;
 		this.m3Maximo = m3Maximo;
 		this.valorM3 = valorM3;
+	}
+
+	public EpocaEnum getEpoca() {
+		return epoca;
+	}
+
+	public void setEpoca(EpocaEnum epoca) {
+		this.epoca = epoca;
 	}
 
 	public Integer getIdRangoConsumo() {
@@ -163,7 +174,8 @@ public class RangoConsumo implements Serializable {
 			return false;
 		}
 		RangoConsumo other = (RangoConsumo) object;
-		if ((this.idRangoConsumo == null && other.idRangoConsumo != null) || (this.idRangoConsumo != null && !this.idRangoConsumo.equals(other.idRangoConsumo))) {
+		if ((this.idRangoConsumo == null && other.idRangoConsumo != null)
+				|| (this.idRangoConsumo != null && !this.idRangoConsumo.equals(other.idRangoConsumo))) {
 			return false;
 		}
 		return true;

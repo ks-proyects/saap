@@ -38,10 +38,14 @@ import org.ec.jap.entiti.sistema.UsuarioRol;
  */
 @Entity
 @Table(name = "usuario", schema = "saap")
-@NamedQueries({ @NamedQuery(name = "Usuario.findByFilters", query = " SELECT u,(SELECT SUM(asi.numeroRayas) FROM Asistencia asi inner join asi.actividad act inner join act.tipoActividad tact inner join act.idPeriodoPago per WHERE asi.idUsuario=u AND ((act.actividad=:actividad OR :actividad=0) AND (tact.tipoActividad=:tipoActividad OR :tipoActividad=0)) AND (per.idPeriodoPago=:idPeriodoPago OR :idPeriodoPago=0) AND (per.anio=:anio OR :anio=0)) FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario  ORDER BY upper(CONCAT(u.nombres,' ',u.apellidos)), u.fechaIngreso DESC"), @NamedQuery(name = "Usuario.findAllActivos", query = "SELECT u FROM Usuario u WHERE  u.estado='ACT'"),
-		@NamedQuery(name = "Usuario.findByCedNom", query = " SELECT u FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario AND (upper(u.cedula) LIKE upper(CONCAT('%',:filtro,'%'))  OR upper(CONCAT(u.nombres,' ',u.apellidos)) LIKE upper(CONCAT('%',:filtro,'%'))) ORDER BY upper(CONCAT(u.nombres,' ',u.apellidos)), u.fechaIngreso DESC"), @NamedQuery(name = "Usuario.findByCedulaAndId", query = "SELECT COUNT(u.idUsuario) FROM Usuario u WHERE u.cedula = :cedula and u.tipoUsuario=:tipoUsuario and u.idUsuario != :idUsuario"), @NamedQuery(name = "Usuario.findByCedula", query = "SELECT COUNT(u.idUsuario) FROM Usuario u WHERE u.cedula = :cedula and u.tipoUsuario=:tipoUsuario "),
+@NamedQueries({
+		@NamedQuery(name = "Usuario.findByFilters", query = " SELECT u,(SELECT SUM(asi.numeroRayas) FROM Asistencia asi inner join asi.actividad act inner join act.tipoActividad tact inner join act.idPeriodoPago per WHERE asi.idUsuario=u AND ((act.actividad=:actividad OR :actividad=0) AND (tact.tipoActividad=:tipoActividad OR :tipoActividad=0)) AND (per.idPeriodoPago=:idPeriodoPago OR :idPeriodoPago=0) AND (per.anio=:anio OR :anio=0)) FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario  ORDER BY upper(CONCAT(u.nombres,' ',u.apellidos)), u.fechaIngreso DESC"),
+		@NamedQuery(name = "Usuario.findAllActivos", query = "SELECT u FROM Usuario u WHERE  u.estado='ACT'"),
+		@NamedQuery(name = "Usuario.findByCedNom", query = " SELECT u FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario AND (upper(u.cedula) LIKE upper(CONCAT('%',:filtro,'%'))  OR upper(CONCAT(u.nombres,' ',u.apellidos)) LIKE upper(CONCAT('%',:filtro,'%'))) ORDER BY upper(CONCAT(u.nombres,' ',u.apellidos)), u.fechaIngreso DESC"),
+		@NamedQuery(name = "Usuario.findByCedulaAndId", query = "SELECT COUNT(u.idUsuario) FROM Usuario u WHERE u.cedula = :cedula and u.tipoUsuario=:tipoUsuario and u.idUsuario != :idUsuario"),
+		@NamedQuery(name = "Usuario.findByCedula", query = "SELECT COUNT(u.idUsuario) FROM Usuario u WHERE u.cedula = :cedula and u.tipoUsuario=:tipoUsuario "),
 		@NamedQuery(name = "Usuario.findByUsername", query = "SELECT u FROM Usuario u WHERE u.username = :username and u in (SELECT up.idUsuario FROM UsuarioPerfil up)"),
-		@NamedQuery(name = "Usuario.findBySinLLave", query = "SELECT u FROM Usuario u WHERE u.estado IN ('ACT','EDI') AND u.poseeAlcant=true and u.cantAlcant > 0 and u not in (SELECT ll.idUsuario FROM Llave ll where ll.activo in ('SI') and ll.idUsuario.idUsuario=u.idUsuario) ")})
+		@NamedQuery(name = "Usuario.findBySinLLave", query = "SELECT u FROM Usuario u WHERE u.estado IN ('ACT','EDI') AND u.poseeAlcant=true and u.cantAlcant > 0 and u not in (SELECT ll.idUsuario FROM Llave ll where ll.activo in ('SI') and ll.idUsuario.idUsuario=u.idUsuario) ") })
 @AuditoriaAnot(entityType = "USU")
 public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -142,6 +146,10 @@ public class Usuario implements Serializable {
 	@ManyToOne(optional = false)
 	private Comunidad idComunidad;
 
+	@JoinColumn(name = "id_tarifa", referencedColumnName = "id_tarifa")
+	@ManyToOne
+	private Tarifa tarifa;
+
 	@OneToMany(mappedBy = "idUsuario")
 	private List<UsuarioRol> usuarioRolList;
 
@@ -169,8 +177,15 @@ public class Usuario implements Serializable {
 	@Column(name = "fecha_ingreso")
 	private Date fechaIngreso;
 
+	@Size(max = 16)
+	@Column(name = "aplica_descuento")
+	private String aplicaDescuento;
+
 	@Transient
 	private Double cantidadRayas;
+
+	@Transient
+	private Boolean tieneDescuento;
 
 	public Usuario() {
 	}
@@ -437,6 +452,31 @@ public class Usuario implements Serializable {
 		this.cantAlcant = cantAlcant;
 	}
 
+	public String getAplicaDescuento() {
+		return aplicaDescuento;
+	}
+
+	public void setAplicaDescuento(String aplicaDescuento) {
+		this.aplicaDescuento = aplicaDescuento;
+	}
+
+	public Boolean getTieneDescuento() {
+		return aplicaDescuento != null ? "SI".equalsIgnoreCase(aplicaDescuento) : false;
+	}
+
+	public void setTieneDescuento(Boolean tieneDescuento) {
+		aplicaDescuento = tieneDescuento ? "SI" : "NO";
+		this.tieneDescuento = tieneDescuento;
+	}
+
+	public Tarifa getTarifa() {
+		return tarifa;
+	}
+
+	public void setTarifa(Tarifa tarifa) {
+		this.tarifa = tarifa;
+	}
+
 	@Override
 	public int hashCode() {
 		int hash = 0;
@@ -452,7 +492,8 @@ public class Usuario implements Serializable {
 			return false;
 		}
 		Usuario other = (Usuario) object;
-		if ((this.idUsuario == null && other.idUsuario != null) || (this.idUsuario != null && !this.idUsuario.equals(other.idUsuario))) {
+		if ((this.idUsuario == null && other.idUsuario != null)
+				|| (this.idUsuario != null && !this.idUsuario.equals(other.idUsuario))) {
 			return false;
 		}
 		return true;

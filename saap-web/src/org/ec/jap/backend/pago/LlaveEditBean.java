@@ -82,7 +82,7 @@ public class LlaveEditBean extends Bean {
 				usuario = llave.getIdUsuario();
 				map = new HashMap<>();
 				map.put("idLlave", llave);
-				map.put("idPeriodoPago", idPeriodoPago!=null?idPeriodoPago:0);
+				map.put("idPeriodoPago", idPeriodoPago != null ? idPeriodoPago : 0);
 				lecturasList = lecturaBO.findAllByNamedQuery("Lectura.findByUser", map);
 			}
 		} catch (Exception e) {
@@ -142,9 +142,11 @@ public class LlaveEditBean extends Bean {
 			map = new HashMap<>();
 			map.put("idUsuario", usuarioBO.findByPk(getParam1Integer()).getIdUsuario());
 			List<Llave> listLlaves = llaveBO.findAllByNamedQuery("Llave.findByUser", map);
-			Integer numMaxLlaves = parametroBO.getInteger("", getUsuarioCurrent().getIdComunidad().getIdComunidad(), "NUMLLAV");
+			Integer numMaxLlaves = parametroBO.getInteger("", getUsuarioCurrent().getIdComunidad().getIdComunidad(),
+					"NUMLLAV");
 			if (listLlaves.size() >= numMaxLlaves) {
-				displayMessage("El número de llaves permitidas por usuario es: " + numMaxLlaves.toString() + ". No puede asignar más llaves.", Mensaje.SEVERITY_WARN);
+				displayMessage("El número de llaves permitidas por usuario es: " + numMaxLlaves.toString()
+						+ ". No puede asignar más llaves.", Mensaje.SEVERITY_WARN);
 				return getPage().getNombre();
 			} else {
 				return super.nuevo();
@@ -155,12 +157,12 @@ public class LlaveEditBean extends Bean {
 			return getPage().getOutcome();
 		}
 	}
-	
+
 	public void valueChange(ValueChangeEvent event) {
-		idPeriodoPago=Integer.valueOf(event.getNewValue().toString());
+		idPeriodoPago = Integer.valueOf(event.getNewValue().toString());
 		map = new HashMap<>();
 		map.put("idLlave", llave);
-		map.put("idPeriodoPago", idPeriodoPago!=null?idPeriodoPago:0);
+		map.put("idPeriodoPago", idPeriodoPago != null ? idPeriodoPago : 0);
 		try {
 			lecturasList = lecturaBO.findAllByNamedQuery("Lectura.findByUser", map);
 		} catch (Exception e) {
@@ -172,16 +174,6 @@ public class LlaveEditBean extends Bean {
 		HashMap<String, Object> map = new HashMap<>(0);
 		try {
 			return getSelectItems(getUsuarioCurrent(), map, "ListaValor.findTipoLlave");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new ArrayList<SelectItem>(0);
-	}
-
-	public List<SelectItem> getItemTarifa() {
-		HashMap<String, Object> map = new HashMap<>(0);
-		try {
-			return getSelectItems(getUsuarioCurrent(), map, "ListaValor.findTarifa");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -7,6 +7,7 @@ import javax.ejb.Local;
 import org.ec.jap.dao.saap.DetallePlanillaDAO;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
 import org.ec.jap.entiti.saap.DetallePlanilla;
+import org.ec.jap.entiti.saap.Llave;
 import org.ec.jap.entiti.saap.RegistroEconomico;
 import org.ec.jap.entiti.saap.Usuario;
 
@@ -45,5 +46,18 @@ public interface DetallePlanillaBO extends DetallePlanillaDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	List<DetallePlanilla> findPlanillasNoPagadas(CabeceraPlanilla planillaNoPagada, String namedQuery) throws Exception;
+	List<DetallePlanilla> findDetalles(CabeceraPlanilla planillaNoPagada, String namedQuery) throws Exception;
+
+	/**
+	 * 
+	 * @param planillaNoPagada
+	 * @param planillaNueva
+	 * @param multaAtrazoMes
+	 * @param llave
+	 * @param usuario
+	 * @return
+	 * @throws Exception
+	 */
+	Double crearMulta(CabeceraPlanilla planillaNoPagada, CabeceraPlanilla planillaNueva,
+			RegistroEconomico multaAtrazoMes, Llave llave, Usuario usuario) throws Exception;
 }

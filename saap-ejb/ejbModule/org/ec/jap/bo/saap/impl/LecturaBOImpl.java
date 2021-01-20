@@ -1,18 +1,23 @@
 package org.ec.jap.bo.saap.impl;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
+import org.apache.log4j.Logger;
 import org.ec.jap.bo.saap.LecturaBO;
 import org.ec.jap.bo.saap.ParametroBO;
 import org.ec.jap.bo.saap.RangoConsumoBO;
+import org.ec.jap.bo.saap.TipoRegistroBO;
 import org.ec.jap.dao.saap.impl.LecturaDAOImpl;
 import org.ec.jap.entiti.saap.Lectura;
 import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.PeriodoPago;
 import org.ec.jap.entiti.saap.RangoConsumo;
+import org.ec.jap.entiti.saap.TipoRegistro;
 import org.ec.jap.entiti.saap.Usuario;
 import org.ec.jap.enumerations.Formapago;
 import org.ec.jap.utilitario.Utilitario;
@@ -23,10 +28,14 @@ import org.ec.jap.utilitario.Utilitario;
 @Stateless
 public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
+	private static final Logger log = Logger.getLogger(LecturaBOImpl.class.getName());
 	@EJB
 	private ParametroBO parametroBO;
 	@EJB
 	private RangoConsumoBO rangoConsumoBO;
+
+	@EJB
+	private TipoRegistroBO tipoRegistroBO;
 
 	/**
 	 * Default constructor.
@@ -73,7 +82,8 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 				}
 			} else {
 
-				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0)) || lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
+				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0))
+						|| lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
 					lectura.setMetros3(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
 					lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
 					lectura.setValorMetro3Exceso(0.0);
@@ -83,8 +93,10 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 							map = new HashMap<>(0);
 							map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
 							map.put("valor", lectura.getMetros3());
-							map.put("formaPago", "SI".equalsIgnoreCase(aplicaMetodoCobroAnt) ? Formapago.valueOf("A") : Formapago.valueOf("N"));
-							RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
+							map.put("formaPago", "SI".equalsIgnoreCase(aplicaMetodoCobroAnt) ? Formapago.valueOf("A")
+									: Formapago.valueOf("N"));
+							RangoConsumo rangoConsumo = rangoConsumoBO
+									.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
 							// Si no esta en algun rango buscamos el exseso
 							if (rangoConsumo == null) {
 								// Para el caso de la modalidad anterior en el
@@ -92,12 +104,17 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 								// viene el valor por metro cubico y el valor de
 								// la
 								// mulata por exceso
-								rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
-								Double metros3Exceso = esMetodoAnterior ? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo())) : 0;
+								rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor",
+										map);
+								Double metros3Exceso = esMetodoAnterior
+										? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo()))
+										: 0;
 								lectura.setMetros3Exceso(metros3Exceso);
 
-								lectura.setValorMetro3Exceso(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0);
-								lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo()) : lectura.getMetros3());// El
+								lectura.setValorMetro3Exceso(
+										esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0);
+								lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo())
+										: lectura.getMetros3());// El
 								// valor
 								// basico
 								// consumido
@@ -132,9 +149,12 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 			update(usuario, lectura);
 		}
 		if (!mensaje.isEmpty())
-			mensaje = "Debe registrar las lecturas de las siguientes llaves: \n " + mensaje.substring(0, mensaje.length() - 2);
+			mensaje = "Debe registrar las lecturas de las siguientes llaves: \n "
+					+ mensaje.substring(0, mensaje.length() - 2);
 		if (!mensajeAlerta.isEmpty())
-			mensaje = mensaje + "\n \n " + "Las lecturas de las siguientes llaves posiblemente este ingresadas incorrectamente : \n" + mensajeAlerta.substring(0, mensajeAlerta.length() - 2);
+			mensaje = mensaje + "\n \n "
+					+ "Las lecturas de las siguientes llaves posiblemente este ingresadas incorrectamente : \n"
+					+ mensajeAlerta.substring(0, mensajeAlerta.length() - 2);
 
 		return mensaje;
 
@@ -174,7 +194,8 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 			}
 		} else {
 
-			if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0)) || lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
+			if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0))
+					|| lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
 				lectura.setMetros3(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
 				lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
 				lectura.setValorMetro3Exceso(0.0);
@@ -185,18 +206,25 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 						map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
 						map.put("valor", lectura.getMetros3());
 						map.put("formaPago", esMetodoAnterior ? Formapago.valueOf("A") : Formapago.valueOf("N"));
-						RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
+						RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor",
+								map);
 						if (rangoConsumo == null) {
 							rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
-							Double metros3Excso = esMetodoAnterior ? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo())) : 0.0;
+							Double metros3Excso = esMetodoAnterior
+									? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo()))
+									: 0.0;
 							lectura.setMetros3Exceso(metros3Excso);
-							Double valorMetro3Exceso = esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0.0;
+							Double valorMetro3Exceso = esMetodoAnterior
+									? Utilitario.redondear(rangoConsumo.getValorExceso())
+									: 0.0;
 							lectura.setValorMetro3Exceso(valorMetro3Exceso);
-							lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo()) : lectura.getMetros3());
+							lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo())
+									: lectura.getMetros3());
 							lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Minimo() : 0);
 						} else
 							lectura.setBasicoM3(esMetodoAnterior ? rangoConsumo.getM3Maximo() : 0);
-						lectura.setValorMetro3Exceso(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0);
+						lectura.setValorMetro3Exceso(
+								esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0);
 						lectura.setValorMetro3(Utilitario.redondear(rangoConsumo.getValorM3()));
 					}
 				} else {
@@ -226,8 +254,9 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 		for (Lectura lectura : lecturas) {
 			lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
 			if (lectura.getSinLectura() || !lectura.getEsModificable()) {
-				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0)) || lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
-					
+				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0))
+						|| lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
+
 					lectura.setMetros3(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
 					lectura.setMetros3Exceso(0.0);
 					lectura.setValorMetro3Exceso(0.0);
@@ -237,7 +266,8 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 							map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
 							map.put("valor", lectura.getMetros3());
 							map.put("formaPago", esMetodoAnterior ? Formapago.valueOf("A") : Formapago.valueOf("N"));
-							RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
+							RangoConsumo rangoConsumo = rangoConsumoBO
+									.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
 							// Si no esta en algun rango buscamos el exseso
 							if (rangoConsumo == null) {
 								// Para el caso de la modalidad anterior en el
@@ -245,12 +275,18 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 								// viene el valor por metro cubico y el valor de
 								// la
 								// mulata por exceso
-								rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
-								Double exceso = esMetodoAnterior ? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo())) : 0;
+								rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor",
+										map);
+								Double exceso = esMetodoAnterior
+										? Utilitario.redondear((lectura.getMetros3() - rangoConsumo.getM3Minimo()))
+										: 0;
 								lectura.setMetros3Exceso(exceso);
-								Double valorExceso = esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getValorExceso()) : 0;
+								Double valorExceso = esMetodoAnterior
+										? Utilitario.redondear(rangoConsumo.getValorExceso())
+										: 0;
 								lectura.setValorMetro3Exceso(valorExceso);
-								lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo()) : lectura.getMetros3());// El
+								lectura.setMetros3(esMetodoAnterior ? Utilitario.redondear(rangoConsumo.getM3Minimo())
+										: lectura.getMetros3());// El
 								// valor
 								// basico
 								// consumido
@@ -288,20 +324,68 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 			update(usuario, lectura);
 		}
 		if (!mensaje.isEmpty())
-			mensaje = "Debe registrar las lecturas de las siguientes llaves: \n " + mensaje.substring(0, mensaje.length() - 2);
+			mensaje = "Debe registrar las lecturas de las siguientes llaves: \n "
+					+ mensaje.substring(0, mensaje.length() - 2);
 		if (!mensajeAlerta.isEmpty())
-			mensaje = mensaje + "\n \n " + "Las lecturas de las siguientes llaves posiblemente este ingresadas incorrectamente : \n" + mensajeAlerta.substring(0, mensajeAlerta.length() - 2);
+			mensaje = mensaje + "\n \n "
+					+ "Las lecturas de las siguientes llaves posiblemente este ingresadas incorrectamente : \n"
+					+ mensajeAlerta.substring(0, mensajeAlerta.length() - 2);
 
 		return mensaje;
 
 	}
-	
+
 	@Override
-	public Integer findLecturaAnterior(Llave llave, Boolean usuarioNuevo)throws Exception{
+	public Integer findLecturaAnterior(Llave llave, Boolean usuarioNuevo) throws Exception {
 		HashMap<String, Object> mapAux = new HashMap<>();
 		mapAux.put("idLlave", llave);
 		mapAux.put("usuarioNuevo", usuarioNuevo);
 		Integer idLecturaAnteriorIngresada = findIntegerByNamedQuery("Lectura.findLastByPeridoAndLlave", mapAux);
-		return idLecturaAnteriorIngresada; 
+		return idLecturaAnteriorIngresada;
+	}
+
+	@Override
+	public void iniciarLecturaCero(PeriodoPago periodoPago, Llave llave, Usuario usuario) throws Exception {
+		TipoRegistro registro = tipoRegistroBO.findByPk("CONS");
+		Integer idLecturaAnteriorIngresada = findLecturaAnterior(llave, true);
+		Lectura lecturaAnterior = null;
+		if (idLecturaAnteriorIngresada != null)
+			lecturaAnterior = findByPk(idLecturaAnteriorIngresada);
+		Lectura lectura = new Lectura();
+		lectura.setTipoRegistro(registro);
+		lectura.setIdLlave(llave);
+		lectura.setSinLectura(false);
+		lectura.setUsuarioNuevo(false);
+		lectura.setEsModificable(false);
+		lectura.setIdPeriodoPago(periodoPago);
+		lectura.setEstado("ING");
+		lectura.setDescripcion(
+				"Lectura de " + Utilitario.mes(periodoPago.getMes()) + " - " + periodoPago.getAnio().toString());
+		lectura.setMetros3(0.0);
+		lectura.setFechaRegistro(Calendar.getInstance().getTime());
+		lectura.setLecturaIngresada(0.0);
+		lectura.setValorMetro3Exceso(0.0);
+		lectura.setMetros3Exceso(0.0);
+		lectura.setValorMetro3(0.0);
+		lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
+		if (lecturaAnterior != null) {
+			log.info(String.format("Id Lectura anterior: ", lecturaAnterior.getIdLectura()));
+			Double me3Anterior = Utilitario
+					.redondear(lecturaAnterior.getMetros3() + lecturaAnterior.getMetros3Exceso());
+			log.info(String.format("M3 Anterior: ", me3Anterior));
+			lectura.setMetros3Anterior(me3Anterior);
+			if (!lecturaAnterior.getSinLectura())
+				lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaIngresada() : 0.0);
+			else
+				lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaAnterior() : 0.0);
+		} else
+			lectura.setLecturaAnterior(0.0);
+		lectura.setNumeroMeses(
+				lecturaAnterior != null
+						? (Utilitario.numeroMeses(lecturaAnterior.getIdPeriodoPago().getFechaInicio(),
+								periodoPago.getFechaInicio()))
+						: 1);
+		save(usuario, lectura);
+
 	}
 }

@@ -22,22 +22,9 @@
 					<h:outputLabel for="txtEstado" value="Estado:" />
 					<h:commandLink id="txtEstado"
 						value="#{llaveInsertBean.llave.estado}" disabled="true" />
-					<h:outputLabel for="txtTipoLlave" value="Tipo de Llave:" />
-
-					<h:selectOneMenu id="txtTipoLlave"
-						disabled="#{llaveInsertBean.readOnly1}"
-						valueChangeListener="#{llaveInsertBean.changeTipoLlave}"
-						value="#{llaveInsertBean.tipoLlave}">
-						<f:selectItems value="#{llaveInsertBean.itemTipoLlave}" />
-						<f:ajax render="txtTarifa" event="change" />
-					</h:selectOneMenu>
-					<h:outputLabel for="txtTarifa" value="Tarifa:" />
-					<h:selectOneMenu id="txtTarifa" value="#{llaveInsertBean.idTarifa}"
-						disabled="#{llaveInsertBean.readOnly1}">
-						<f:selectItems value="#{llaveInsertBean.itemTarifa}" />
-					</h:selectOneMenu>
 					<h:outputLabel for="txtUbicacion" value="Ubicación:" />
-					<h:selectOneMenu id="txtUbicacion" value="#{llaveInsertBean.llave.ubicacion}"
+					<h:selectOneMenu id="txtUbicacion"
+						value="#{llaveInsertBean.llave.ubicacion}"
 						disabled="#{llaveInsertBean.readOnly1}">
 						<f:selectItem itemLabel="GRUPO1" itemValue="GRUPO1" />
 						<f:selectItem itemLabel="GRUPO2" itemValue="GRUPO2" />

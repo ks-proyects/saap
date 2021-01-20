@@ -14,7 +14,7 @@ import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.saap.RangoConsumoBO;
 import org.ec.jap.bo.saap.TarifaBO;
 import org.ec.jap.entiti.saap.RangoConsumo;
-import org.ec.jap.enumerations.Formapago;
+import org.ec.jap.enumerations.EpocaEnum;
 
 @ManagedBean
 @ViewScoped
@@ -26,7 +26,7 @@ public class RangoConsumoEditBean extends Bean {
 
 	@EJB
 	RangoConsumoBO rangoConsumoBO;
-	
+
 	@EJB
 	TarifaBO tarifaBO;
 
@@ -95,9 +95,9 @@ public class RangoConsumoEditBean extends Bean {
 		}
 	}
 
-	public List<SelectItem> getFormaPago() {
+	public List<SelectItem> getEpocas() {
 		try {
-			return getSelectItems(Formapago.values());
+			return getSelectItems(EpocaEnum.values(), true);
 		} catch (Exception e) {
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_FATAL);
 		}

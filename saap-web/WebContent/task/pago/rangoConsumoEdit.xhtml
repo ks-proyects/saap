@@ -15,10 +15,12 @@
 				<rich:toolbar styleClass="toolbar" id="toolBar" />
 				<h:panelGrid styleClass="Table" columns="2"
 					columnClasses="label,value,label,value">
-					<h:outputLabel for="txtFormaPago" value="* Forma de Pago:" />
-					<h:selectOneMenu id="txtFormaPago"
-						value="#{rangoConsumoEditBean.rangoConsumo.formaPago}">
-						<f:selectItems value="#{rangoConsumoEditBean.formaPago}" />
+
+
+					<h:outputLabel for="txtEpoca" value="* Epoca:" />
+					<h:selectOneMenu id="txtEpoca"
+						value="#{rangoConsumoEditBean.rangoConsumo.epoca}">
+						<f:selectItems value="#{rangoConsumoEditBean.epocas}" />
 					</h:selectOneMenu>
 
 					<h:outputLabel for="txtValorMinimo" value="* Valor Mínimo:" />
@@ -28,7 +30,8 @@
 					<h:panelGroup>
 						<h:inputText id="txtValorMaximo" size="60"
 							value="#{rangoConsumoEditBean.rangoConsumo.m3Maximo}" />
-							<h:outputLabel value="Si el rango es el último el valor máximo debe ser -1" />
+						<h:outputLabel
+							value="Si el rango es el último el valor máximo debe ser -1" />
 					</h:panelGroup>
 					<h:outputLabel for="txtValorUSDM3" value="* USD/M3:" />
 					<h:inputText id="txtValorUSDM3" size="60"

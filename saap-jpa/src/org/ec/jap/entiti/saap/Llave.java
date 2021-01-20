@@ -32,14 +32,17 @@ public class Llave implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_llave")
 	private Integer idLlave;
+	
 	@Basic(optional = false)
 	@NotNull
 	@Size(min = 1, max = 2147483647)
 	@Column(name = "numero")
 	private String numero;
+	
 	@Size(max = 2147483647)
 	@Column(name = "ubicacion")
 	private String ubicacion;
+	
 	@Basic(optional = false)
 	@NotNull
 	@Size(min = 1, max = 2147483647)
@@ -54,14 +57,18 @@ public class Llave implements Serializable {
 	@Column(name = "fecha_registro")
 	@Temporal(TemporalType.DATE)
 	private Date fechaRegistro;
+	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "idLlave")
 	private List<Lectura> lecturaList;
+	
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
 	@ManyToOne(optional = false)
 	private Usuario idUsuario;
+	
 	@JoinColumn(name = "id_tarifa", referencedColumnName = "id_tarifa")
 	@ManyToOne
 	private Tarifa idTarifa;
+	
 	@OneToMany(mappedBy = "idLlave")
 	private List<CabeceraPlanilla> cabeceraPlanillaList;
 

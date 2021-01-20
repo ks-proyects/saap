@@ -23,7 +23,7 @@ import javax.persistence.NamedQuery;
 		@NamedQuery(name = "ListaValor.findTipoActividad", query = " SELECT new ListaValor(t.tipoActividad,'',t.descripcion,t.descripcion) FROM TipoActividad t ORDER BY t.descripcion "),
 		@NamedQuery(name = "ListaValor.findPeriodoByAnio", query = " SELECT new ListaValor(p.idPeriodoPago,'',CONCAT(p.descripcion,'(',p.estado,')'),p.descripcion) FROM PeriodoPago p WHERE p.estado not in ('ABIE','ING') and (p.anio=:anio) order by p.descripcion"),
 		@NamedQuery(name = "ListaValor.findAnioPeriodo", query = " SELECT new ListaValor(p.anio,'',str(p.anio),'') FROM PeriodoPago p WHERE p.estado in ('ABIE','CERR','FIN','FINI') GROUP BY p.anio"),
-		@NamedQuery(name = "ListaValor.findTarifaConsu", query = " SELECT new ListaValor(p.idTarifa,'',p.descripcion,'') FROM Tarifa p "),
+		@NamedQuery(name = "ListaValor.findTarifaConsu", query = " SELECT new ListaValor(p.idTarifa,'',p.descripcion,'') FROM Tarifa p order by p.descripcion"),
 		
 		@NamedQuery(name = "ListaValor.findPeriododAvalibleGasto", query = " SELECT new ListaValor(p.idPeriodoPago,'',CONCAT(p.descripcion,'(',p.estado,')'),p.descripcion) FROM PeriodoPago p WHERE p.estado in ('ABIE','CERR')"),
 		@NamedQuery(name = "ListaValor.findByCurrentAndEstado", query = " SELECT new ListaValor(t.tipoActividad,'',t.descripcion,t.descripcion) FROM TipoActividad t WHERE t.activo = :activo OR t.tipoActividad=:tipoActividad"),
@@ -41,7 +41,6 @@ import javax.persistence.NamedQuery;
 		@NamedQuery(name = "ListaValor.findParentesco", query = "SELECT new ListaValor(p.idParentesco,'',p.descripcion,p.descripcion)  FROM Parentesco p ORDER BY p.descripcion"),
 		@NamedQuery(name = "ListaValor.findEstadoCivil", query = "select new ListaValor(ec.idEstadoCivil,'',ec.descripcion,ec.descripcion) FROM EstadoCivil ec ORDER BY ec.descripcion"),
 		@NamedQuery(name = "ListaValor.findTipoLlave", query = "SELECT new ListaValor(-1,t.tipoLlave,t.descripcion,t.descripcion)  FROM TipoLlave t ORDER BY t.descripcion"),
-		@NamedQuery(name = "ListaValor.findTarifa", query = "SELECT new ListaValor(t.idTarifa,'',t.descripcion,t.descripcion)  FROM Tarifa t WHERE t.tipoLlave.tipoLlave=:tipoLlave ORDER BY t.descripcion"),
 		@NamedQuery(name = "ListaValor.findUserSystem", query = "SELECT new ListaValor(us.idUsuario,'',CONCAT(us.nombres,' ',us.apellidos),CONCAT(us.nombres,' ',us.apellidos))  FROM Usuario  us WHERE us.tipoUsuario='SIS' ORDER BY us.nombres"),
 		@NamedQuery(name = "ListaValor.findTipoEntidad", query = "SELECT new ListaValor(-1,te.tipoEntidad,te.descripcion,te.descripcion)  FROM TipoEntidad  te WHERE te.grupo='AUD' ORDER BY te.descripcion") })
 public class ListaValor {

@@ -7,6 +7,7 @@ import javax.ejb.Local;
 import org.ec.jap.dao.saap.LecturaDAO;
 import org.ec.jap.entiti.saap.Lectura;
 import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.PeriodoPago;
 import org.ec.jap.entiti.saap.Usuario;
 
 @Local
@@ -44,4 +45,13 @@ public interface LecturaBO extends LecturaDAO {
 	Lectura recalcularLectura(Usuario usuario, Lectura lectura) throws Exception;
 
 	Integer findLecturaAnterior(Llave llave, Boolean usuarioNuevo) throws Exception;
+
+	/**
+	 * Genera una lectura con valores por defecto y la lectura anterior
+	 * @param periodoPago
+	 * @param llave
+	 * @param usuario
+	 * @throws Exception
+	 */
+	void iniciarLecturaCero(PeriodoPago periodoPago, Llave llave, Usuario usuario) throws Exception;
 }

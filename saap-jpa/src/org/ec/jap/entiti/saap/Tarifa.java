@@ -6,7 +6,19 @@ package org.ec.jap.entiti.saap;
 
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.*;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -16,7 +28,8 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "tarifa")
-@NamedQueries({ @NamedQuery(name = "Tarifa.findRangoConsumos", query = "select count(rc.idRangoConsumo) from RangoConsumo rc where rc.idTarifa=:idTarifa ") })
+@NamedQueries({
+		@NamedQuery(name = "Tarifa.findRangoConsumos", query = "select count(rc.idRangoConsumo) from RangoConsumo rc where rc.idTarifa=:idTarifa ") })
 public class Tarifa implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -30,14 +43,25 @@ public class Tarifa implements Serializable {
 	private String descripcion;
 	@OneToMany(mappedBy = "idTarifa")
 	private List<RangoConsumo> rangoConsumoList;
+	
 	@JoinColumn(name = "tipo_llave", referencedColumnName = "tipo_llave")
 	@ManyToOne
 	private TipoLlave tipoLlave;
+	
 	@OneToMany(mappedBy = "idTarifa")
 	private List<Llave> llaveList;
 
+	@OneToMany(mappedBy = "tarifa")
+	private List<Usuario> usuarios;
+
 	@Column(name = "basico_pago")
 	private Double basicoPago;
+
+	@Column(name = "multa_no_pago")
+	private Double multaNoPago;
+	
+	@Column(name = "valor_alcantarillado")
+	private Double valorAlcantarillado;
 
 	public Tarifa() {
 	}
@@ -99,6 +123,31 @@ public class Tarifa implements Serializable {
 		this.basicoPago = basicoPago;
 	}
 
+	public Double getMultaNoPago() {
+		return multaNoPago;
+	}
+
+	public void setMultaNoPago(Double multaNoPago) {
+		this.multaNoPago = multaNoPago;
+	}
+
+	public List<Usuario> getUsuarios() {
+		return usuarios;
+	}
+
+	public void setUsuarios(List<Usuario> usuarios) {
+		this.usuarios = usuarios;
+	}
+	
+
+	public Double getValorAlcantarillado() {
+		return valorAlcantarillado;
+	}
+
+	public void setValorAlcantarillado(Double valorAlcantarillado) {
+		this.valorAlcantarillado = valorAlcantarillado;
+	}
+
 	@Override
 	public int hashCode() {
 		int hash = 0;
@@ -114,7 +163,8 @@ public class Tarifa implements Serializable {
 			return false;
 		}
 		Tarifa other = (Tarifa) object;
-		if ((this.idTarifa == null && other.idTarifa != null) || (this.idTarifa != null && !this.idTarifa.equals(other.idTarifa))) {
+		if ((this.idTarifa == null && other.idTarifa != null)
+				|| (this.idTarifa != null && !this.idTarifa.equals(other.idTarifa))) {
 			return false;
 		}
 		return true;

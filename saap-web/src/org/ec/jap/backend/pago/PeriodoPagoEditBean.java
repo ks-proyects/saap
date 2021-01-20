@@ -17,6 +17,7 @@ import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.saap.PeriodoPagoBO;
 import org.ec.jap.entiti.saap.PeriodoPago;
+import org.ec.jap.enumerations.EpocaEnum;
 import org.ec.jap.utilitario.Utilitario;
 
 @ManagedBean
@@ -31,6 +32,9 @@ public class PeriodoPagoEditBean extends Bean {
 	PeriodoPagoBO periodoPagoBO;
 
 	private PeriodoPago periodoPago;
+
+	private List<SelectItem> epocas;
+	private String epoca;
 
 	public PeriodoPagoEditBean() {
 		super();
@@ -72,6 +76,7 @@ public class PeriodoPagoEditBean extends Bean {
 				periodoPago.setFechaFin(calendarInicio.getTime());
 			} else {
 				periodoPago = periodoPagoBO.findByPk(getParam1Integer());
+				epoca=periodoPago.getEpoca()!=null?periodoPago.getEpoca().name():"-1";
 				puedeAgregarUnPeriodo = Utilitario.puedeAgregarNuevoPeriodo(periodoPago.getFechaFin());
 			}
 			redisplayAction(7, puedeAgregarUnPeriodo);
@@ -87,13 +92,19 @@ public class PeriodoPagoEditBean extends Bean {
 	public String guardar() {
 		try {
 
+			if (epoca.equals("-1")) {
+				displayMessage("Debe seleccionar una epoca.", Mensaje.SEVERITY_WARN);
+				return getPage().getOutcome();
+			}
 			Calendar calendarInicio = Calendar.getInstance();
 			calendarInicio.setTime(periodoPago.getFechaInicio());
 			Calendar calendarFinaliza = Calendar.getInstance();
 			calendarFinaliza.setTime(periodoPago.getFechaFin());
+			periodoPago.setEpoca(EpocaEnum.valueOf(epoca));
 			periodoPago.setAnio(calendarInicio.get(Calendar.YEAR));
 			periodoPago.setMes(calendarInicio.get(Calendar.MONTH));
-			periodoPago.setDescripcion(Utilitario.mes(calendarInicio.get(Calendar.MONTH))+" - "+String.valueOf(calendarInicio.get(Calendar.YEAR)));
+			periodoPago.setDescripcion(Utilitario.mes(calendarInicio.get(Calendar.MONTH)) + " - "
+					+ String.valueOf(calendarInicio.get(Calendar.YEAR)));
 			if ("INS".equals(getAccion())) {
 				periodoPago.setEstado("ING");
 				periodoPagoBO.save(getUsuarioCurrent(), periodoPago);
@@ -168,6 +179,27 @@ public class PeriodoPagoEditBean extends Bean {
 
 	public void setPeriodoPago(PeriodoPago periodoPago) {
 		this.periodoPago = periodoPago;
+	}
+
+	public List<SelectItem> getEpocas() {
+		try {
+			epocas = getSelectItems(EpocaEnum.values(),true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return epocas;
+	}
+
+	public void setEpocas(List<SelectItem> epocas) {
+		this.epocas = epocas;
+	}
+
+	public String getEpoca() {
+		return epoca;
+	}
+
+	public void setEpoca(String epoca) {
+		this.epoca = epoca;
 	}
 
 }
