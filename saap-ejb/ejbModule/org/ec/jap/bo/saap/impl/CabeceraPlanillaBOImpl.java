@@ -226,7 +226,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public void cerrarPeriodoPago(Usuario usuario, Integer idPeriodoPago) throws Exception {
-
 		log.info("----------------cerrarPeriodoPago----------------");
 		HashMap<String, Object> map = new HashMap<>();
 		// Verificamos que todas las lecturas esten correctamente ingresadas
@@ -254,10 +253,9 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		map.clear();
 		map.put("idPeriodoPago", periodoPago);
 		map.put("tipoRegistro", "INASIS");
-		RegistroEconomico registroEconomicoInasistencias = registroEconomicoBO
-				.findByNamedQuery("RegistroEconomico.findByType", map);
+		RegistroEconomico rEconomicoI = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType", map);
 
-		// Cantidad de usuarios CON EL BASICO
+		// Cantidad de usuarios con el basico
 		Integer cantidadBasicoAplicados = 0;
 		Integer cantidadAlcantarilladosAplicados = 0;
 		RegistroEconomico registroEconomicoBasico = registroEconomicoBO.inicializar(periodoPago, "BASCON",
@@ -270,21 +268,23 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		// enasistencia en caso de que no exista ningun registro de ello
 		Boolean eliminarRegistroEconomicoInasistencias = true;
 
-		Parametro parametroValorAlcantarillado = parametroBO.findByPk("VALOR_ALCANT");
-		Double valorAlcantarillado = parametroValorAlcantarillado.getValorNumerico();
 		for (Object[] object : objects) {
 			CabeceraPlanilla cp = (CabeceraPlanilla) object[0];
 			Llave llave = (Llave) object[1];
+			Double vAlcan = cp.getIdUsuario().getTarifa() != null
+					? cp.getIdUsuario().getTarifa().getValorAlcantarillado()
+					: 0.0;
 			// Obtenemos la lectura de la llave
 			if (llave != null) {
+				log.info(String.format("Llave: %s", llave.getNumero()));
 				map = new HashMap<>();
 				map.put("idLlave", llave.getIdLlave());
 				map.put("idPeriodoPago", periodoPago);
-				Lectura lectura = lecturaBO.findByNamedQuery("Lectura.findByPeridoAndLlave", map);
+				Lectura lec = lecturaBO.findByNamedQuery("Lectura.findByPeridoAndLlave", map);
 				if (cp.getIdUsuario() != null && cp.getIdUsuario().getPoseeAlcant() != null
-						&& cp.getIdUsuario().getPoseeAlcant() && valorAlcantarillado > 0) {
+						&& cp.getIdUsuario().getPoseeAlcant() && vAlcan > 0) {
 					DetallePlanilla detalleAlcanta = detallePlanillaBO.crearDetalleAlcantarillado(usuario, cp,
-							registroEconomicoAlcantarillado, cp.getIdUsuario().getCantAlcant(), valorAlcantarillado,
+							registroEconomicoAlcantarillado, cp.getIdUsuario().getCantAlcant(), vAlcan,
 							periodoPago.getDescripcion());
 					cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + detalleAlcanta.getValorTotal()));
 					cp.setTotal(Utilitario.redondear(cp.getTotal() + detalleAlcanta.getValorTotal()));
@@ -294,58 +294,32 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					cantidadAlcantarilladosAplicados++;
 				}
 				Boolean debeRegistrarDetalle = true;
-				if (lectura != null) {
-					DetallePlanilla detallePlanilla = new DetallePlanilla();
-					detallePlanilla.setEstado("ING");
-					detallePlanilla.setIdLectura(lectura);
-					detallePlanilla.setIdCabeceraPlanilla(cp);
-					detallePlanilla.setValorPagado(0.0);
-					detallePlanilla.setValorPendiente(0.0);
-					detallePlanilla.setValorTotal(0.0);
-					detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
-					detallePlanilla.setValorUnidad(0.0);
-					detallePlanilla.setOrdenStr("B");
-
-					if (lectura.getUsuarioNuevo()) {
+				if (lec != null) {
+					DetallePlanilla dpls = detallePlanillaBO.buildInitialDetailLectura(cp, lec);
+					if (lec.getUsuarioNuevo()) {
 						debeRegistrarDetalle = false;
-					} else if (lectura.getSinLectura()) {
+					} else if (lec.getSinLectura()) {
 						debeRegistrarDetalle = false;
 					} else {
-						// Si existe valor en la lectura existe consumo caso
-						// contrario solo se cobra el valor basico acorde al
-						// tipo de
-						// llave
-						if (lectura.getMetros3() > 0) {
-							detallePlanilla.setValorUnidad(Utilitario.redondear(lectura.getValorMetro3()));
-							detallePlanilla.setValorTotal(Utilitario.redondear((lectura.getMetros3() != null
-									&& lectura.getValorMetro3() != null
-											? (lectura.getMetros3() * lectura.getValorMetro3())
-											: 0.0)
-									+ (lectura.getMetros3Exceso() != null && lectura.getValorMetro3Exceso() != null
-											&& lectura.getMetros3Exceso() > 0 && lectura.getValorMetro3Exceso() > 0
-													? (lectura.getMetros3Exceso() * lectura.getValorMetro3Exceso())
-													: 0.0)));
-							detallePlanilla.setValorPagado(0.0);
-							detallePlanilla.setValorPendiente(detallePlanilla.getValorTotal());
-							detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3" + " "
-									+ periodoPago.getDescripcion());
+						if (lec.getMetros3() > 0) {
+							dpls = detallePlanillaBO.builDetailLectura(periodoPago, lec, dpls);
 						}
 					}
 					if (debeRegistrarDetalle) {
-						if (lectura.getMetros3() > 0) {
-							detallePlanilla.setValorTotalOrigen(detallePlanilla.getValorTotal());
-							detallePlanilla.setOrigen(Constantes.origen_mes_Actual);
-							detallePlanillaBO.save(usuario, detallePlanilla);
-							cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + detallePlanilla.getValorTotal()));
-							cp.setTotal(Utilitario.redondear(cp.getTotal() + detallePlanilla.getValorTotal()));
+						if (lec.getMetros3() > 0) {
+							dpls.setValorTotalOrigen(dpls.getValorTotal());
+							dpls.setOrigen(Constantes.origen_mes_Actual);
+							detallePlanillaBO.save(usuario, dpls);
+							cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + dpls.getValorTotal()));
+							cp.setTotal(Utilitario.redondear(cp.getTotal() + dpls.getValorTotal()));
 						}
 					}
 				}
 			} else {
 				if (cp.getIdUsuario() != null && cp.getIdUsuario().getPoseeAlcant() != null
-						&& cp.getIdUsuario().getPoseeAlcant() && valorAlcantarillado > 0) {
+						&& cp.getIdUsuario().getPoseeAlcant() && vAlcan > 0) {
 					DetallePlanilla alcantarillado = detallePlanillaBO.crearDetalleAlcantarillado(usuario, cp,
-							registroEconomicoAlcantarillado, cp.getIdUsuario().getCantAlcant(), valorAlcantarillado,
+							registroEconomicoAlcantarillado, cp.getIdUsuario().getCantAlcant(), vAlcan,
 							periodoPago.getDescripcion());
 					cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + alcantarillado.getValorTotal()));
 					cp.setTotal(Utilitario.redondear(cp.getTotal() + alcantarillado.getValorTotal()));
@@ -362,17 +336,16 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 
 		registroEconomicoAlcantarillado.setCantidadAplicados(cantidadAlcantarilladosAplicados);
 		registroEconomicoBO.update(usuario, registroEconomicoAlcantarillado);
-		if (eliminarRegistroEconomicoInasistencias && registroEconomicoInasistencias != null) {
-			cambioEstadoBO.eliminarEntidad(8, registroEconomicoInasistencias.getIdRegistroEconomico());
-		} else if (registroEconomicoInasistencias != null) {
+		if (eliminarRegistroEconomicoInasistencias && rEconomicoI != null) {
+			cambioEstadoBO.eliminarEntidad(8, rEconomicoI.getIdRegistroEconomico());
+		} else if (rEconomicoI != null) {
 			// Cambiamos el estado a las actividades y ponemos en aplicado para
 			// que no s epueda editar
 			for (Actividad actividad : actividads) {
 				cambioEstadoBO.cambiarEstadoSinVerificar(43, usuario, actividad.getActividad(), "");
 			}
-			registroEconomicoBO.update(usuario, registroEconomicoInasistencias);
-			cambioEstadoBO.cambiarEstadoSinVerificar(40, usuario,
-					registroEconomicoInasistencias.getIdRegistroEconomico(), "");
+			registroEconomicoBO.update(usuario, rEconomicoI);
+			cambioEstadoBO.cambiarEstadoSinVerificar(40, usuario, rEconomicoI.getIdRegistroEconomico(), "");
 
 		}
 
@@ -421,40 +394,14 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				map.put("idPeriodoPago", periodoPago);
 				Lectura lec = lecturaBO.findByNamedQuery("Lectura.findByPeridoAndLlave", map);
 				if (lec != null) {
-					log.info(String.format("Calcula el total llave : %s", llave.getNumero()));
+					log.info(String.format("Calcula consumo : %s", llave.getNumero()));
 					HashMap<String, Object> pama = new HashMap<>();
 					pama.put("idLectura", lec);
 					DetallePlanilla dpls = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByLectura", pama);
-					if (dpls == null) {
-						dpls = new DetallePlanilla();
-						dpls.setEstado("ING");
-						dpls.setOrdenStr("B");
-						dpls.setIdLectura(lec);
-						dpls.setIdCabeceraPlanilla(cp);
-						dpls.setValorPagado(0.0);
-						dpls.setValorPendiente(0.0);
-						dpls.setValorTotal(0.0);
-						dpls.setFechaRegistro(Calendar.getInstance().getTime());
-						dpls.setValorUnidad(0.0);
-					}
-					// Si es mayor a cero realizamos el calculo caso contrario
-					// cobramos el basico
-					if (lec.getMetros3() > 0) {
-						dpls.setValorUnidad(Utilitario.redondear(lec.getValorMetro3()));
-						dpls.setValorTotal(
-								Utilitario.redondear((lec.getMetros3() != null && lec.getValorMetro3() != null
-										? (lec.getMetros3() * lec.getValorMetro3())
-										: 0.0)
-										+ (lec.getMetros3Exceso() != null && lec.getValorMetro3Exceso() != null
-												&& lec.getMetros3Exceso() > 0 && lec.getValorMetro3Exceso() > 0
-														? (lec.getMetros3Exceso() * lec.getValorMetro3Exceso())
-														: 0.0)));
-						dpls.setValorPendiente(dpls.getValorTotal());
-						dpls.setValorPagado(0.0);
-						dpls.setDescripcion(
-								Utilitario.redondear(lec.getMetros3()) + " m3 " + periodoPago.getDescripcion());
-					}
-
+					if (dpls == null)
+						dpls = detallePlanillaBO.buildInitialDetailLectura(cp, lec);
+					if (lec.getMetros3() > 0)
+						dpls = detallePlanillaBO.builDetailLectura(periodoPago, lec, dpls);
 					if (lec.getMetros3() > 0)
 						if (dpls.getIdDetallePlanilla() == null) {
 							dpls.setValorTotalOrigen(dpls.getValorTotal());
@@ -462,7 +409,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 							detallePlanillaBO.save(usuario, dpls);
 						} else
 							detallePlanillaBO.update(usuario, dpls);
-
 					map.clear();
 					map.put("idCabeceraPlanilla", cp);
 					List<DetallePlanilla> detallePlanillas = detallePlanillaBO
@@ -599,7 +545,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			totalPorDevolver = totalPorDevolver
 					+ (cabeceraPlanilla.getAbonoUsd() != null ? cabeceraPlanilla.getAbonoUsd() : 0.0);
 		}
-		
+
 		// AL Valor Total de este mes actual tambien sumamos el valor pendiente
 		// por devolver del mes pasado
 		if (valorRestantePorDevolver > 0.0)
@@ -624,7 +570,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			totalGastos = totalGastos + (gasto.getValor() != null ? gasto.getValor() : 0.0);
 		}
 
-		
 		log.info(String.format("Valor Total Gastos: %s", totalPorDevolver));
 		// Tambiena actualizamos en el registro economico de gastos
 		map.clear();

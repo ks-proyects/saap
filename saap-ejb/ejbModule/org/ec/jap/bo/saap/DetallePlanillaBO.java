@@ -7,7 +7,9 @@ import javax.ejb.Local;
 import org.ec.jap.dao.saap.DetallePlanillaDAO;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
 import org.ec.jap.entiti.saap.DetallePlanilla;
+import org.ec.jap.entiti.saap.Lectura;
 import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.PeriodoPago;
 import org.ec.jap.entiti.saap.RegistroEconomico;
 import org.ec.jap.entiti.saap.Usuario;
 
@@ -60,4 +62,24 @@ public interface DetallePlanillaBO extends DetallePlanillaDAO {
 	 */
 	Double crearMulta(CabeceraPlanilla planillaNoPagada, CabeceraPlanilla planillaNueva,
 			RegistroEconomico multaAtrazoMes, Llave llave, Usuario usuario) throws Exception;
+
+	/**
+	 * Genera un detalle de una lectura de acuerdo al consumo 
+	 * 
+	 * @param periodoPago
+	 * @param lec
+	 * @param dpls
+	 * @return
+	 * @throws Exception
+	 */
+	DetallePlanilla builDetailLectura(PeriodoPago periodoPago, Lectura lec, DetallePlanilla dpls) throws Exception;
+
+	/**
+	 * Crea un detalle inicial de una lectura
+	 * @param cp
+	 * @param lec
+	 * @return
+	 * @throws Exception
+	 */
+	DetallePlanilla buildInitialDetailLectura(CabeceraPlanilla cp, Lectura lec) throws Exception;
 }

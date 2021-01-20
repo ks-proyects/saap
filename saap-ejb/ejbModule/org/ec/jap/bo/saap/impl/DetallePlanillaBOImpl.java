@@ -14,7 +14,9 @@ import org.ec.jap.bo.saap.RegistroEconomicoBO;
 import org.ec.jap.dao.saap.impl.DetallePlanillaDAOImpl;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
 import org.ec.jap.entiti.saap.DetallePlanilla;
+import org.ec.jap.entiti.saap.Lectura;
 import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.PeriodoPago;
 import org.ec.jap.entiti.saap.RegistroEconomico;
 import org.ec.jap.entiti.saap.Usuario;
 import org.ec.jap.utilitario.Constantes;
@@ -64,7 +66,8 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 	@Override
 	public Double crearMulta(CabeceraPlanilla planillaNoPagada, CabeceraPlanilla planillaNueva,
 			RegistroEconomico multaAtrazoMes, Llave llave, Usuario usuario) throws Exception {
-		Double multa = llave.getIdUsuario().getTarifa().getMultaNoPago() != null ? llave.getIdTarifa().getMultaNoPago() : 0.0;
+		Double multa = llave.getIdUsuario().getTarifa().getMultaNoPago() != null ? llave.getIdTarifa().getMultaNoPago()
+				: 0.0;
 		log.info(String.format("Valor Multa: ", multa));
 		if (multa > 0.0) {
 			DetallePlanilla detallePlanilla = new DetallePlanilla();
@@ -127,109 +130,98 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 	}
 
 	@Override
-	public DetallePlanilla crearDetalleAlcantarillado(Usuario currentUser, CabeceraPlanilla cp,
-			RegistroEconomico registroEconomicoAlcantarillado, Integer cantidad, Double valor, String ppDescripcion)
-			throws Exception {
-		DetallePlanilla detallePlanillaBasico = new DetallePlanilla();
-		detallePlanillaBasico.initValue();
-		detallePlanillaBasico.setIdCabeceraPlanilla(cp);
-		detallePlanillaBasico.setIdRegistroEconomico(registroEconomicoAlcantarillado);
-		detallePlanillaBasico.setFechaRegistro(Calendar.getInstance().getTime());
-		detallePlanillaBasico.setValorUnidad(Utilitario.redondear(valor));
-		detallePlanillaBasico.setValorTotal(Utilitario.redondear(valor * cantidad));
-		detallePlanillaBasico.setValorPendiente(detallePlanillaBasico.getValorTotal());
-		detallePlanillaBasico.setDescripcion("Servicio de Alcantarillado " + ppDescripcion + " (" + cantidad + ")");
-		detallePlanillaBasico.setOrdenStr("B");
-		detallePlanillaBasico.setValorTotalOrigen(detallePlanillaBasico.getValorTotal());
-		detallePlanillaBasico.setOrigen(Constantes.origen_mes_Actual);
-		save(currentUser, detallePlanillaBasico);
-		return detallePlanillaBasico;
+	public DetallePlanilla crearDetalleAlcantarillado(Usuario currentUser, CabeceraPlanilla cp, RegistroEconomico rea,
+			Integer cantidad, Double valor, String ppDescripcion) throws Exception {
+		DetallePlanilla dpa = new DetallePlanilla();
+		dpa.initValue();
+		dpa.setIdCabeceraPlanilla(cp);
+		dpa.setIdRegistroEconomico(rea);
+		dpa.setFechaRegistro(Calendar.getInstance().getTime());
+		dpa.setValorUnidad(Utilitario.redondear(valor));
+		dpa.setValorTotal(Utilitario.redondear(valor * cantidad));
+		dpa.setValorPendiente(dpa.getValorTotal());
+		dpa.setDescripcion("Servicio de Alcantarillado " + ppDescripcion + " (" + cantidad + ")");
+		dpa.setOrdenStr("B");
+		dpa.setValorTotalOrigen(dpa.getValorTotal());
+		dpa.setOrigen(Constantes.origen_mes_Actual);
+		save(currentUser, dpa);
+		return dpa;
 	}
 
 	@Override
-	public DetallePlanilla traspasarDetalle(CabeceraPlanilla planillaNueva, DetallePlanilla detallePlanilla) {
-		DetallePlanilla detallePlanillaNuevo = new DetallePlanilla();
-		detallePlanillaNuevo.initValue();
-		detallePlanillaNuevo.setIdLectura(detallePlanilla.getIdLectura());
-		detallePlanillaNuevo.setIdRegistroEconomico(detallePlanilla.getIdRegistroEconomico());
-		detallePlanillaNuevo.setValorTotal(detallePlanilla.getValorTotal());
-		detallePlanillaNuevo
-				.setFechaRegistro(detallePlanilla.getFechaRegistro() != null ? detallePlanilla.getFechaRegistro()
-						: Calendar.getInstance().getTime());
-		detallePlanillaNuevo.setValorUnidad(detallePlanilla.getValorUnidad());
-		detallePlanillaNuevo.setValorPendiente(detallePlanillaNuevo.getValorTotal());
-		if (detallePlanilla.getIdRegistroEconomico() != null) {
-			String tipoRegistro = detallePlanilla.getIdRegistroEconomico().getTipoRegistro().getTipoRegistro();
+	public DetallePlanilla traspasarDetalle(CabeceraPlanilla planillaNueva, DetallePlanilla dpa) {
+		DetallePlanilla dpn = new DetallePlanilla();
+		dpn.initValue();
+		dpn.setIdLectura(dpa.getIdLectura());
+		dpn.setIdRegistroEconomico(dpa.getIdRegistroEconomico());
+		dpn.setValorTotal(dpa.getValorTotal());
+		dpn.setFechaRegistro(
+				dpa.getFechaRegistro() != null ? dpa.getFechaRegistro() : Calendar.getInstance().getTime());
+		dpn.setValorUnidad(dpa.getValorUnidad());
+		dpn.setValorPendiente(dpn.getValorTotal());
+		if (dpa.getIdRegistroEconomico() != null) {
+			String tipoRegistro = dpa.getIdRegistroEconomico().getTipoRegistro().getTipoRegistro();
 			if ("CONS".equals(tipoRegistro)) {
-				detallePlanillaNuevo.setOrdenStr("BB");
+				dpn.setOrdenStr("BB");
 			} else if ("MULAGU".equals(tipoRegistro) || "BASCON".equalsIgnoreCase(tipoRegistro)) {
-				detallePlanillaNuevo.setOrdenStr("A");
+				dpn.setOrdenStr("A");
 			} else if ("CUO".equals(tipoRegistro)) {
-				detallePlanillaNuevo.setOrdenStr("FF");
+				dpn.setOrdenStr("FF");
 			} else if ("CUOINI".equals(tipoRegistro)) {
-				detallePlanillaNuevo.setOrdenStr("GG");
+				dpn.setOrdenStr("GG");
 			} else if ("INASIS".equals(tipoRegistro)) {
-				detallePlanillaNuevo.setOrdenStr("EE");
+				dpn.setOrdenStr("EE");
 			} else {
-				detallePlanillaNuevo.setOrdenStr("HH");
+				dpn.setOrdenStr("HH");
 			}
-		} else if (detallePlanilla.getIdLectura() != null) {
-			detallePlanillaNuevo.setOrdenStr("A");
+		} else if (dpa.getIdLectura() != null) {
+			dpn.setOrdenStr("A");
 		} else {
-			detallePlanillaNuevo
-					.setOrdenStr(detallePlanilla.getOrdenStr() + detallePlanilla.getOrdenStr().substring(0, 1));
+			dpn.setOrdenStr(dpa.getOrdenStr() + dpa.getOrdenStr().substring(0, 1));
 		}
-		detallePlanillaNuevo.setIdCabeceraPlanilla(planillaNueva);
-		detallePlanillaNuevo.setDescripcion(detallePlanilla.getDescripcion());
-		detallePlanillaNuevo
-				.setValorTotalOrigen(detallePlanilla.getValorTotalOrigen() == null ? detallePlanilla.getValorTotal()
-						: detallePlanilla.getValorTotalOrigen());
-
-		return detallePlanillaNuevo;
+		dpn.setIdCabeceraPlanilla(planillaNueva);
+		dpn.setDescripcion(dpa.getDescripcion());
+		dpn.setValorTotalOrigen(dpa.getValorTotalOrigen() == null ? dpa.getValorTotal() : dpa.getValorTotalOrigen());
+		return dpn;
 	}
 
 	@Override
-	public DetallePlanilla traspasarDetalleInconompleto(CabeceraPlanilla planillaNueva,
-			DetallePlanilla detalleIncompleto) {
-		DetallePlanilla detallePlanillaNuevo = new DetallePlanilla();
-		detallePlanillaNuevo.initValue();
-		detallePlanillaNuevo.setIdLectura(detalleIncompleto.getIdLectura());
-		detallePlanillaNuevo.setIdRegistroEconomico(detalleIncompleto.getIdRegistroEconomico());
-		detallePlanillaNuevo.setValorTotal(detalleIncompleto.getValorPendiente());
-		detallePlanillaNuevo
-				.setFechaRegistro(detalleIncompleto.getFechaRegistro() != null ? detalleIncompleto.getFechaRegistro()
-						: Calendar.getInstance().getTime());
-		detallePlanillaNuevo.setValorPendiente(detallePlanillaNuevo.getValorTotal());
-		detallePlanillaNuevo.setValorUnidad(detalleIncompleto.getValorUnidad());
-		detallePlanillaNuevo.setIdCabeceraPlanilla(planillaNueva);
-		detallePlanillaNuevo.setDescripcion(detalleIncompleto.getDescripcion());
-		if (detalleIncompleto.getIdRegistroEconomico() != null) {
-			String tipoRegistro = detalleIncompleto.getIdRegistroEconomico().getTipoRegistro().getTipoRegistro();
+	public DetallePlanilla traspasarDetalleInconompleto(CabeceraPlanilla planillaNueva, DetallePlanilla dpi) {
+		DetallePlanilla dpn = new DetallePlanilla();
+		dpn.initValue();
+		dpn.setIdLectura(dpi.getIdLectura());
+		dpn.setIdRegistroEconomico(dpi.getIdRegistroEconomico());
+		dpn.setValorTotal(dpi.getValorPendiente());
+		dpn.setFechaRegistro(
+				dpi.getFechaRegistro() != null ? dpi.getFechaRegistro() : Calendar.getInstance().getTime());
+		dpn.setValorPendiente(dpn.getValorTotal());
+		dpn.setValorUnidad(dpi.getValorUnidad());
+		dpn.setIdCabeceraPlanilla(planillaNueva);
+		dpn.setDescripcion(dpi.getDescripcion());
+		if (dpi.getIdRegistroEconomico() != null) {
+			String tipoRegistro = dpi.getIdRegistroEconomico().getTipoRegistro().getTipoRegistro();
 			if ("CONS".equals(tipoRegistro)) {
-				detallePlanillaNuevo.setOrdenStr("BB");
+				dpn.setOrdenStr("BB");
 			} else if ("MULAGU".equals(tipoRegistro) || "BASCON".equalsIgnoreCase(tipoRegistro)) {
-				detallePlanillaNuevo.setOrdenStr("A");
+				dpn.setOrdenStr("A");
 			} else if ("CUO".equals(tipoRegistro)) {
-				detallePlanillaNuevo.setOrdenStr("FF");
+				dpn.setOrdenStr("FF");
 			} else if ("CUOINI".equals(tipoRegistro)) {
-				detallePlanillaNuevo.setOrdenStr("GG");
+				dpn.setOrdenStr("GG");
 			} else if ("INASIS".equals(tipoRegistro)) {
-				detallePlanillaNuevo.setOrdenStr("EE");
+				dpn.setOrdenStr("EE");
 			} else {
-				detallePlanillaNuevo.setOrdenStr("HH");
+				dpn.setOrdenStr("HH");
 			}
-		} else if (detalleIncompleto.getIdLectura() != null) {
-			detallePlanillaNuevo.setOrdenStr("A");
+		} else if (dpi.getIdLectura() != null) {
+			dpn.setOrdenStr("A");
 		} else {
-			detallePlanillaNuevo
-					.setOrdenStr(detalleIncompleto.getOrdenStr() + detalleIncompleto.getOrdenStr().substring(0, 1));
+			dpn.setOrdenStr(dpi.getOrdenStr() + dpi.getOrdenStr().substring(0, 1));
 		}
 
-		detallePlanillaNuevo
-				.setValorTotalOrigen(detalleIncompleto.getValorTotalOrigen() == null ? detalleIncompleto.getValorTotal()
-						: detalleIncompleto.getValorTotalOrigen());
-		detallePlanillaNuevo.setOrigen(Constantes.origen_pagado_incompleto);
-		return detallePlanillaNuevo;
+		dpn.setValorTotalOrigen(dpi.getValorTotalOrigen() == null ? dpi.getValorTotal() : dpi.getValorTotalOrigen());
+		dpn.setOrigen(Constantes.origen_pagado_incompleto);
+		return dpn;
 	}
 
 	@Override
@@ -238,5 +230,40 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		p.put("idCabeceraPlanilla", planillaNoPagada);
 		List<DetallePlanilla> detallePlanillasNoPagadas = findAllByNamedQuery(namedQuery, p);
 		return detallePlanillasNoPagadas;
+	}
+
+	@Override
+	public DetallePlanilla builDetailLectura(PeriodoPago periodoPago, Lectura lec, DetallePlanilla dpls)
+			throws Exception {
+		Double base = Utilitario.redondear(
+				(lec.getMetros3() != null && lec.getValorMetro3() != null ? (lec.getMetros3() * lec.getValorMetro3())
+						: 0.0));
+		Double exceso = Utilitario.redondear(
+				(lec.getMetros3Exceso() != null && lec.getValorMetro3Exceso() != null && lec.getMetros3Exceso() > 0
+						&& lec.getValorMetro3Exceso() > 0 ? (lec.getMetros3Exceso() * lec.getValorMetro3Exceso())
+								: 0.0));
+		Double total = Utilitario.redondear(base + exceso);
+		log.info(String.format("Base: %1$s, Exceso: %2$s, Total: %3$s", base, exceso, total));
+		dpls.setValorUnidad(Utilitario.redondear(lec.getValorMetro3()));
+		dpls.setValorTotal(total);
+		dpls.setValorPagado(0.0);
+		dpls.setValorPendiente(dpls.getValorTotal());
+		dpls.setDescripcion(Utilitario.redondear(lec.getMetros3()) + " m3" + " " + periodoPago.getDescripcion());
+		return dpls;
+	}
+
+	@Override
+	public DetallePlanilla buildInitialDetailLectura(CabeceraPlanilla cp, Lectura lec) throws Exception {
+		DetallePlanilla dpls = new DetallePlanilla();
+		dpls.setEstado("ING");
+		dpls.setIdLectura(lec);
+		dpls.setIdCabeceraPlanilla(cp);
+		dpls.setValorPagado(0.0);
+		dpls.setValorPendiente(0.0);
+		dpls.setValorTotal(0.0);
+		dpls.setFechaRegistro(Calendar.getInstance().getTime());
+		dpls.setValorUnidad(0.0);
+		dpls.setOrdenStr("B");
+		return dpls;
 	}
 }
