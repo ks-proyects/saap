@@ -147,10 +147,19 @@ ul#navigation li a {
 	text-align: right;
 	vertical-align: top;
 }
+.columnaBoton{
+	text-align: center;
+}
+.columnaBoton:hover {
+	background-position:inherit !important;
+}
 
 .columnIxquierdo {
 	text-align: left;
 	vertical-align: top;
+}
+.rowTable:hover{
+	background-color: #FFD5A5;
 }
 
 .columnCenter {

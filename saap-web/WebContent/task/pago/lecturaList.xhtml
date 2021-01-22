@@ -33,11 +33,19 @@
 						assignTo="#{lecturaListBean.lecturasSelect}" />
 				</a4j:jsFunction>
 
-				<rich:dataTable columnClasses="columDerecha,columnIxquierdo"
-					onrowdblclick="selectRow(#{lect.idLectura})"
+				<rich:dataTable
+					columnClasses="columnaBoton,columDerecha,columnIxquierdo" rowClasses="rowTable"
 					rows="#{lecturaListBean.numeroFilas}" id="table"
 					value="#{lecturaListBean.lecturas}" var="lect" rowKeyVar="row">
-
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Editar" />
+						</f:facet>
+						<h:commandButton
+							onclick="selectRow(#{lect.idLectura});return false;"
+							style="background-image: url(../../tools/imagenes/editar.png);background-repeat: no-repeat;width:2.2em;cursor: pointer;"
+							styleClass="buton columnaBoton" value="" />
+					</rich:column>
 					<rich:column>
 						<f:facet name="header">
 							<h:outputText value="# Llave" />
@@ -65,7 +73,7 @@
 						<h:outputText title="Tarifa"
 							value="#{lect.idLlave.idUsuario.tarifa.descripcion}" />
 					</rich:column>
-					
+
 
 					<rich:column>
 						<f:facet name="header">
