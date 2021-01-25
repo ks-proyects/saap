@@ -143,44 +143,51 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
 	protected Lectura buildTarifa(Lectura lectura, PeriodoPago pp) throws Exception {
 		log.info(String.format("Llave: %1$s ----------------------", lectura.getIdLlave().getNumero()));
-		Double consumo = Utilitario.redondear(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
-		lectura.setMetros3(consumo);
-		lectura.setValorBasico(0.0);
-		lectura.setValorMetro3Exceso(0.0);
-		lectura.setMetros3Exceso(0.0);
-		if (lectura.getMetros3() > 0) {
-			if (!lectura.getMetros3().equals(0.0)) {
-				map = new HashMap<>(0);
-				map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
-				map.put("valor", lectura.getMetros3());
-				map.put("epoca", pp.getEpoca());
-				RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
-				if (rangoConsumo == null) {
-					// En caso que no exista en la tarifa del usuario buscamos en todas las tarifas
-					// configuradas
-					map.clear();
+		if (pp.getEpoca() != null) {
+
+			Double consumo = Utilitario.redondear(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
+			lectura.setMetros3(consumo);
+			lectura.setValorBasico(0.0);
+			lectura.setValorMetro3Exceso(0.0);
+			lectura.setMetros3Exceso(0.0);
+			if (lectura.getMetros3() > 0) {
+				if (!lectura.getMetros3().equals(0.0)) {
+					map = new HashMap<>(0);
+					map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
 					map.put("valor", lectura.getMetros3());
 					map.put("epoca", pp.getEpoca());
-					RangoConsumo rangoOther = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByValorAndEpoca", map);
-					// Si no existe en ninguna buscamos el rango limite
-					if (rangoOther == null) {
-						RangoConsumo rangoLimite = rangoConsumoBO
-								.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
-						lectura = buildExceso(consumo, rangoLimite, lectura);
+					RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor",
+							map);
+					if (rangoConsumo == null) {
+						// En caso que no exista en la tarifa del usuario buscamos en todas las tarifas
+						// configuradas
+						map.clear();
+						map.put("valor", lectura.getMetros3());
+						map.put("epoca", pp.getEpoca());
+						RangoConsumo rangoOther = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByValorAndEpoca",
+								map);
+						// Si no existe en ninguna buscamos el rango limite
+						if (rangoOther == null) {
+							RangoConsumo rangoLimite = rangoConsumoBO
+									.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
+							lectura = buildExceso(consumo, rangoLimite, lectura);
+						} else {
+							lectura = buildExceso(consumo, rangoOther, lectura);
+						}
 					} else {
-						lectura = buildExceso(consumo, rangoOther, lectura);
+						lectura = buildExceso(consumo, rangoConsumo, lectura);
 					}
-				} else {
-					lectura = buildExceso(consumo, rangoConsumo, lectura);
+					lectura.setBasicoM3(0.0);
 				}
-				lectura.setBasicoM3(0.0);
+			} else {
+				lectura.setLecturaIngresada(lectura.getLecturaAnterior());
+				lectura.setMetros3(0.0);
+				lectura.setMetros3Exceso(0.0);
+				lectura.setValorMetro3(0.0);
+				lectura.setValorMetro3Exceso(0.0);
 			}
-		} else {
-			lectura.setLecturaIngresada(lectura.getLecturaAnterior());
-			lectura.setMetros3(0.0);
-			lectura.setMetros3Exceso(0.0);
-			lectura.setValorMetro3(0.0);
-			lectura.setValorMetro3Exceso(0.0);
+		}else {
+			throw new Exception("No es posible recalcular una lectura antes del 2021");
 		}
 		return lectura;
 	}

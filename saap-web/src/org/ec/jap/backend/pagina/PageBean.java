@@ -101,6 +101,7 @@ public class PageBean extends Bean {
 			FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("skinBean");
 			FacesContext.getCurrentInstance().getExternalContext().getSessionMap().remove("skinBean");
 		} catch (Exception e) {
+			//e.printStackTrace();
 			e.printStackTrace();
 		}
 	}
