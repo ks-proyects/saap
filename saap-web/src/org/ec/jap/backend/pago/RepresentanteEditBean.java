@@ -14,7 +14,7 @@ import javax.faces.model.SelectItem;
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.saap.EstadoCivilBO;
-import org.ec.jap.bo.saap.LlaveBO;
+import org.ec.jap.bo.saap.ServicioBO;
 import org.ec.jap.bo.saap.ParentescoBO;
 import org.ec.jap.bo.saap.RepresentanteBO;
 import org.ec.jap.bo.saap.UsuarioBO;
@@ -41,7 +41,7 @@ public class RepresentanteEditBean extends Bean {
 	EstadoCivilBO estadoCivilBO;
 
 	@EJB
-	LlaveBO llaveBO;
+	ServicioBO llaveBO;
 
 	@EJB
 	RepresentanteBO representanteBO;

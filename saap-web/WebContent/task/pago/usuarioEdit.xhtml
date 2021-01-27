@@ -38,13 +38,7 @@
 						onkeypress="return ValidarNumerico('%d',this,event);"
 						value="#{usuarioEditBean.usuario.cedula}" />
 
-					<h:outputLabel for="txtTarifa" value="* Tarifa:" />
-					<h:selectOneMenu id="txtTarifa"
-						readonly="#{usuarioEditBean.readOnly1}"
-						disabled="#{usuarioEditBean.readOnly1}"
-						value="#{usuarioEditBean.idTarifa}">
-						<f:selectItems value="#{usuarioEditBean.tarifas}" />
-					</h:selectOneMenu>
+
 
 					<h:outputLabel for="txtEsComunero" value="Es Comunero:" />
 					<h:selectOneMenu id="txtEsComunero"
@@ -96,17 +90,6 @@
 					<h:outputText value="" />
 					<h:outputText value="" />
 
-
-					<h:outputLabel for="txtAlcantarillado"
-						value="Tiene Alcantarillado:" />
-					<h:selectBooleanCheckbox id="txtAlcantarillado"
-						disabled="#{usuarioEditBean.readOnly1}"
-						value="#{usuarioEditBean.usuario.poseeAlcant}" />
-					<h:outputLabel for="txtAcometidas" value="Acometidas: " />
-					<h:inputText id="txtAcometidas"
-						value="#{usuarioEditBean.usuario.cantAlcant}"
-						readonly="#{usuarioEditBean.readOnly1}" />
-
 					<h:outputLabel for="txtAplicaDescuento" value="Aplica Descuento:" />
 					<h:selectBooleanCheckbox id="txtAplicaDescuento"
 						disabled="#{usuarioEditBean.readOnly1}"
@@ -116,7 +99,7 @@
 				<rich:dataTable value="#{usuarioEditBean.listLlaves}" var="llave"
 					columnClasses="columDerecha,columnIxquierdo" rowKeyVar="roe">
 					<f:facet name="header">
-						<h:outputText value="Llave" />
+						<h:outputText value="Servicios" />
 					</f:facet>
 					<rich:column>
 						<f:facet name="header">
@@ -126,11 +109,11 @@
 					</rich:column>
 					<rich:column>
 						<f:facet name="header">
-							<h:outputText value="# Medidor" />
+							<h:outputText value="# Medidor o Referencia" />
 						</f:facet>
 						<h:commandLink action="llaveInsert" value="#{llave.numero}">
 							<f:param name="action" value="UPD" />
-							<f:param name="param2" value="#{llave.idLlave}" />
+							<f:param name="param2" value="#{llave.idServicio}" />
 						</h:commandLink>
 					</rich:column>
 					<rich:column>
@@ -145,9 +128,14 @@
 						<f:facet name="header">
 							<h:outputText value="Tarifa" />
 						</f:facet>
-						<h:outputText value="#{llave.idUsuario.tarifa.descripcion}" />
+						<h:outputText value="#{llave.idTarifa.descripcion}" />
 					</rich:column>
-
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Servicio" />
+						</f:facet>
+						<h:outputText value="#{llave.tipoServicio}" />
+					</rich:column>
 					<rich:column>
 						<f:facet name="header">
 							<h:outputText value="Activo" />

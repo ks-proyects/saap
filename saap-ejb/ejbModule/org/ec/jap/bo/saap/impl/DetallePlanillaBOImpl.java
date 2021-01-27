@@ -15,7 +15,6 @@ import org.ec.jap.dao.saap.impl.DetallePlanillaDAOImpl;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
 import org.ec.jap.entiti.saap.DetallePlanilla;
 import org.ec.jap.entiti.saap.Lectura;
-import org.ec.jap.entiti.saap.Llave;
 import org.ec.jap.entiti.saap.PeriodoPago;
 import org.ec.jap.entiti.saap.RegistroEconomico;
 import org.ec.jap.entiti.saap.Usuario;
@@ -65,27 +64,24 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 
 	@Override
 	public Double crearMulta(CabeceraPlanilla planillaNoPagada, CabeceraPlanilla planillaNueva,
-			RegistroEconomico multaAtrazoMes, Llave llave, Usuario usuario) throws Exception {
-		Double multa = llave.getIdUsuario().getTarifa().getMultaNoPago() != null ? llave.getIdTarifa().getMultaNoPago()
-				: 0.0;
-		log.info(String.format("Valor Multa: ", multa));
-		if (multa > 0.0) {
+			RegistroEconomico multaAtrazoMes, Usuario usuario, Double valorMulta) throws Exception {
+		if (valorMulta > 0.0) {
 			DetallePlanilla detallePlanilla = new DetallePlanilla();
 			detallePlanilla.setEstado("ING");
 			detallePlanilla.setIdCabeceraPlanilla(planillaNueva);
 			detallePlanilla.setIdRegistroEconomico(multaAtrazoMes);
-			detallePlanilla.setValorTotal(multa);
+			detallePlanilla.setValorTotal(valorMulta);
 			detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
-			detallePlanilla.setValorUnidad(multa);
+			detallePlanilla.setValorUnidad(valorMulta);
 			detallePlanilla.setValorPagado(0.0);
-			detallePlanilla.setValorPendiente(multa);
+			detallePlanilla.setValorPendiente(valorMulta);
 			detallePlanilla.setOrdenStr("AA");
 			detallePlanilla.setDescripcion("Multa Consumo " + planillaNoPagada.getIdPeriodoPago().getDescripcion());
 			detallePlanilla.setValorTotalOrigen(detallePlanilla.getValorTotal());
 			detallePlanilla.setOrigen(Constantes.origen_mes_Actual);
 			save(usuario, detallePlanilla);
 		}
-		return multa;
+		return valorMulta;
 
 	}
 
@@ -140,7 +136,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		dpa.setValorUnidad(Utilitario.redondear(valor));
 		dpa.setValorTotal(Utilitario.redondear(valor * cantidad));
 		dpa.setValorPendiente(dpa.getValorTotal());
-		dpa.setDescripcion("Servicio de Alcantarillado " + ppDescripcion + " (" + cantidad + ")");
+		dpa.setDescripcion("Servicio de Alcantarillado Lote " + ppDescripcion + "");
 		dpa.setOrdenStr("B");
 		dpa.setValorTotalOrigen(dpa.getValorTotal());
 		dpa.setOrigen(Constantes.origen_mes_Actual);
@@ -243,7 +239,13 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 						&& lec.getValorMetro3Exceso() > 0 ? (lec.getMetros3Exceso() * lec.getValorMetro3Exceso())
 								: 0.0));
 		Double total = Utilitario.redondear(base + exceso);
-		log.info(String.format("Base: %1$s, Exceso: %2$s, Total: %3$s", base, exceso, total));
+		Usuario us = lec.getIdServicio().getIdUsuario();
+		String nombre = us.getApellidos() + " " + us.getNombres();
+		String format = "........................";
+		nombre = nombre.length() > format.length() ? nombre.substring(0, format.length())
+				: nombre + format.substring(nombre.length(), format.length());
+		log.info(String.format("Usuario: %4$s ===> Medidor: %5$s Base: %1$s, Exceso: %2$s, Total: %3$s", base, exceso,
+				total, nombre, lec.getIdServicio().getNumero()));
 		dpls.setValorUnidad(Utilitario.redondear(lec.getValorMetro3()));
 		dpls.setValorTotal(total);
 		dpls.setValorPagado(0.0);

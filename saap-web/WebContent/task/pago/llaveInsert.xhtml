@@ -12,36 +12,75 @@
 				<h:outputText value="#{llaveInsertBean.page.nombre}"
 					styleClass="pageLabel" />
 				<rich:toolbar styleClass="toolbar" id="toolBar" />
+
+
 				<h:panelGrid styleClass="Table" columns="4"
 					columnClasses="label,value,label,value">
-					<h:outputLabel for="txtNumero" value="* # Medidor:" />
-					<h:inputText id="txtNumero" value="#{llaveInsertBean.llave.numero}"
+					<h:outputLabel for="txtNumero" value="Nuevo Servicio:"
+						rendered="#{not empty llaveInsertBean.serviciosInactivos}" />
+					<h:selectBooleanCheckbox value="#{llaveInsertBean.nuevo}"
+						rendered="#{not empty llaveInsertBean.serviciosInactivos}">
+						<f:ajax render="@form" />
+					</h:selectBooleanCheckbox>
+					<h:outputText/>
+					<h:outputText/>
+					<h:outputLabel value="Servicio:"
+						rendered="#{!llaveInsertBean.nuevo}" />
+					<h:selectOneMenu disabled="#{llaveInsertBean.readOnly1}"
+						rendered="#{!llaveInsertBean.nuevo}"
+						value="#{llaveInsertBean.idServicio}">
+						<f:selectItems value="#{llaveInsertBean.serviciosInactivos}" />
+					</h:selectOneMenu>
+					<h:outputLabel rendered="#{llaveInsertBean.nuevo}" for="txtNumero"
+						value="* # Medidor o Lote:" />
+					<h:inputText rendered="#{llaveInsertBean.nuevo}" id="txtNumero"
+						value="#{llaveInsertBean.llave.numero}"
 						readonly="#{llaveInsertBean.readOnly1}"
 						onkeypress="return ValidarNumerico('%d',this,event);" />
-
-					<h:outputLabel for="txtEstado" value="Estado:" />
-					<h:commandLink id="txtEstado"
+					<h:outputLabel rendered="#{llaveInsertBean.nuevo}" for="txtEstado"
+						value="Estado:" />
+					<h:commandLink rendered="#{llaveInsertBean.nuevo}" id="txtEstado"
 						value="#{llaveInsertBean.llave.estado}" disabled="true" />
-					<h:outputLabel for="txtUbicacion" value="Ubicación:" />
-					<h:selectOneMenu id="txtUbicacion"
-						value="#{llaveInsertBean.llave.ubicacion}"
+					<h:outputLabel rendered="#{llaveInsertBean.nuevo}"
+						value="Tipo Servicio:" />
+					<h:selectOneMenu rendered="#{llaveInsertBean.nuevo}"
+						disabled="#{llaveInsertBean.readOnly1}"
+						value="#{llaveInsertBean.llave.tipoServicio}">
+						<f:selectItems value="#{llaveInsertBean.tipoServicios}" />
+					</h:selectOneMenu>
+					<h:outputLabel rendered="#{llaveInsertBean.nuevo}" for="txtTarifa"
+						value="* Tarifa:" />
+					<h:selectOneMenu rendered="#{llaveInsertBean.nuevo}"
+						id="txtTarifa" readonly="#{llaveInsertBean.readOnly1}"
+						disabled="#{llaveInsertBean.readOnly1}"
+						value="#{llaveInsertBean.idTarifa}">
+						<f:selectItems value="#{llaveInsertBean.tarifas}" />
+					</h:selectOneMenu>
+					<h:outputLabel rendered="#{llaveInsertBean.nuevo}"
+						for="txtUbicacion" value="Ubicación:" />
+					<h:selectOneMenu rendered="#{llaveInsertBean.nuevo}"
+						id="txtUbicacion" value="#{llaveInsertBean.llave.ubicacion}"
 						disabled="#{llaveInsertBean.readOnly1}">
 						<f:selectItem itemLabel="GRUPO1" itemValue="GRUPO1" />
 						<f:selectItem itemLabel="GRUPO2" itemValue="GRUPO2" />
 						<f:selectItem itemLabel="GRUPO3" itemValue="GRUPO3" />
 						<f:selectItem itemLabel="GRUPO4" itemValue="GRUPO4" />
 					</h:selectOneMenu>
-					<h:outputLabel value="Fecha de Registro:" />
-					<h:outputText value="#{llaveInsertBean.llave.fechaRegistro}">
+					<h:outputLabel rendered="#{llaveInsertBean.nuevo}"
+						value="Fecha de Registro:" />
+					<h:outputText rendered="#{llaveInsertBean.nuevo}"
+						value="#{llaveInsertBean.llave.fechaRegistro}">
 						<f:convertDateTime pattern="dd/MM/yyyy" />
 					</h:outputText>
-					<h:outputLabel for="txtActivo" value="Activo:" />
-					<h:selectOneMenu id="txtActivo"
-						value="#{llaveInsertBean.llave.activo}">
+					<h:outputLabel rendered="#{llaveInsertBean.nuevo}" for="txtActivo"
+						value="Activo:" />
+					<h:selectOneMenu rendered="#{llaveInsertBean.nuevo}"
+						id="txtActivo" value="#{llaveInsertBean.llave.activo}">
 						<f:selectItem itemLabel="NO" itemValue="NO" />
 						<f:selectItem itemLabel="SI" itemValue="SI" />
 					</h:selectOneMenu>
 				</h:panelGrid>
+
 
 			</h:form>
 		</h:body>

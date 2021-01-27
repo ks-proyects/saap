@@ -11,7 +11,7 @@ import javax.ejb.Stateless;
 
 import org.ec.jap.bo.saap.CabeceraPlanillaBO;
 import org.ec.jap.bo.saap.DetallePlanillaBO;
-import org.ec.jap.bo.saap.LlaveBO;
+import org.ec.jap.bo.saap.ServicioBO;
 import org.ec.jap.bo.saap.RegistroEconomicoBO;
 import org.ec.jap.bo.saap.TipoRegistroBO;
 import org.ec.jap.bo.sistema.CambioEstadoBO;
@@ -41,7 +41,7 @@ public class RegistroEconomicoBOImpl extends RegistroEconomicoDAOImpl implements
 	@EJB
 	DetallePlanillaBO detallePlanillaBO;
 	@EJB
-	LlaveBO llaveBO;
+	ServicioBO llaveBO;
 
 	@EJB
 	TipoRegistroBO tipoRegistroBO;

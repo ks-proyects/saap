@@ -14,11 +14,11 @@ import javax.faces.model.SelectItem;
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.saap.EstadoCivilBO;
-import org.ec.jap.bo.saap.LlaveBO;
+import org.ec.jap.bo.saap.ServicioBO;
 import org.ec.jap.bo.saap.RepresentanteBO;
 import org.ec.jap.bo.saap.UsuarioBO;
 import org.ec.jap.bo.sistema.ComunidadBO;
-import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.Servicio;
 import org.ec.jap.entiti.saap.Representante;
 import org.ec.jap.entiti.saap.Usuario;
 import org.ec.jap.utilitario.Utilitario;
@@ -42,14 +42,14 @@ public class UsuarioSEditBean extends Bean {
 	EstadoCivilBO estadoCivilBO;
 
 	@EJB
-	LlaveBO llaveBO;
+	ServicioBO llaveBO;
 
 	@EJB
 	RepresentanteBO representanteBO;
 
 	private Usuario usuario;
 	private Integer idEstadoCivil;
-	private List<Llave> listLlaves;
+	private List<Servicio> listLlaves;
 	private List<Representante> listRepresentantes;
 
 	private Boolean resetearClave;
@@ -170,11 +170,11 @@ public class UsuarioSEditBean extends Bean {
 		this.idEstadoCivil = idEstadoCivil;
 	}
 
-	public List<Llave> getListLlaves() {
+	public List<Servicio> getListLlaves() {
 		return listLlaves;
 	}
 
-	public void setListLlaves(List<Llave> listLlaves) {
+	public void setListLlaves(List<Servicio> listLlaves) {
 		this.listLlaves = listLlaves;
 	}
 

@@ -16,8 +16,7 @@
 				<h:panelGrid styleClass="Table" columns="4"
 					columnClasses="label,value,label,value">
 					<h:outputLabel value="Usuario:" />
-					<h:outputText
-						value="#{planillaEditBean.cp.usuarioDesc}" />
+					<h:outputText value="#{planillaEditBean.cp.usuarioDesc}" />
 					<h:outputLabel for="txtEstado" value="Estado:" />
 					<h:commandLink id="txtEstado"
 						onclick="javascript:AbrirPagina('../data/entidadCambioEstadoList.jsf',550,420);"
@@ -27,8 +26,8 @@
 					</h:commandLink>
 					<h:outputText value="Num." />
 					<h:outputText value="#{planillaEditBean.cp.observacion}" />
-					<h:outputText value="Llave:" />
-					<h:outputText value="#{planillaEditBean.cp.idLlave.numero}" />
+					<h:outputText />
+					<h:outputText />
 					<h:outputLabel value="Total a Pagar" />
 					<h:outputText value="#{planillaEditBean.cp.total}" />
 					<h:outputLabel value="Abono" />
@@ -61,8 +60,8 @@
 							<f:param name="action" value="UPD" />
 							<f:param name="param4" value="#{detalle.idDetallePlanilla}" />
 						</h:commandLink>
-						<h:commandLink value="#{detalle.descripcion}" action="detalleLectura"
-							rendered="#{not empty detalle.outcome}">
+						<h:commandLink value="#{detalle.descripcion}"
+							action="detalleLectura" rendered="#{not empty detalle.outcome}">
 							<f:param name="param5" value="#{detalle.idLectura.idLectura}" />
 						</h:commandLink>
 					</rich:column>
@@ -105,6 +104,14 @@
 						</f:facet>
 						<h:outputText rendered="#{not empty detalle.outcome}"
 							value="#{detalle.idLectura.descripcion}">
+						</h:outputText>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Llave" />
+						</f:facet>
+						<h:outputText rendered="#{not empty detalle.outcome}"
+							value="#{detalle.idLectura.idServicio.numero}">
 						</h:outputText>
 					</rich:column>
 					<rich:column>

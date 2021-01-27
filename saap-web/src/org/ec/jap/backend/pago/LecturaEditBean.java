@@ -12,7 +12,7 @@ import javax.faces.event.ActionEvent;
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.saap.LecturaBO;
-import org.ec.jap.bo.saap.LlaveBO;
+import org.ec.jap.bo.saap.ServicioBO;
 import org.ec.jap.bo.saap.PeriodoPagoBO;
 import org.ec.jap.bo.saap.TipoRegistroBO;
 import org.ec.jap.entiti.saap.Lectura;
@@ -33,7 +33,7 @@ public class LecturaEditBean extends Bean {
 	TipoRegistroBO tipoRegistroBO;
 
 	@EJB
-	LlaveBO llaveBO;
+	ServicioBO llaveBO;
 
 	@EJB
 	PeriodoPagoBO periodoPagoBO;
@@ -108,7 +108,7 @@ public class LecturaEditBean extends Bean {
 
 			map = new HashMap<>();
 			map.put("idPeriodoPago", peridoPago);
-			map.put("idLlave", getParam2Integer());
+			map.put("idServicio", getParam2Integer());
 
 			if ("INS".equals(getAccion())) {
 				if (lecturaBO.findByNamedQuery("Lectura.findByPeridoAndLlave", map) != null) {
@@ -117,7 +117,7 @@ public class LecturaEditBean extends Bean {
 				}
 				lectura.setFechaRegistro(Calendar.getInstance().getTime());
 				lectura.setTipoRegistro(tipoRegistroBO.findByPk("CONS"));
-				lectura.setIdLlave(llaveBO.findByPk(getParam2Integer()));
+				lectura.setIdServicio(llaveBO.findByPk(getParam2Integer()));
 				lectura.setEstado("ING");
 				lecturaBO.save(getUsuarioCurrent(), lectura);
 				setParam3(lectura.getIdLectura());

@@ -17,6 +17,7 @@ import javax.persistence.NamedQuery;
  */
 @Entity
 @NamedQueries({
+		@NamedQuery(name = "ListaValor.findServicioInactivo", query = " SELECT new ListaValor(p.idServicio,'',UPPER(p.numero),'') FROM Servicio p  WHERE p.activo='NO' ORDER BY p.numero"),
 		@NamedQuery(name = "ListaValor.findTipoRegistro", query = " SELECT new ListaValor(-1,p.tipoRegistro,UPPER(p.descripcion),'') FROM TipoRegistro p ORDER BY p.descripcion"),
 		@NamedQuery(name = "ListaValor.findTipoRegistroByTipo", query = " SELECT new ListaValor(-1,tr.tipoRegistro,tr.descripcion,tr.descripcion) from TipoRegistro tr where tr.accion=:accion ORDER BY tr.descripcion ASC"),
 		@NamedQuery(name = "ListaValor.findActividadByTipoAndPeriodo", query = " SELECT new ListaValor(act.actividad,'',act.descripcion,act.descripcion) FROM Actividad act WHERE act.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND ( act.tipoActividad.tipoActividad=:tipoActividad OR :tipoActividad=0) order by act.descripcion"),
@@ -24,7 +25,7 @@ import javax.persistence.NamedQuery;
 		@NamedQuery(name = "ListaValor.findPeriodoByAnio", query = " SELECT new ListaValor(p.idPeriodoPago,'',CONCAT(p.descripcion,'(',p.estado,')'),p.descripcion) FROM PeriodoPago p WHERE p.estado not in ('ABIE','ING') and (p.anio=:anio) order by p.descripcion"),
 		@NamedQuery(name = "ListaValor.findAnioPeriodo", query = " SELECT new ListaValor(p.anio,'',str(p.anio),'') FROM PeriodoPago p WHERE p.estado in ('ABIE','CERR','FIN','FINI') GROUP BY p.anio"),
 		@NamedQuery(name = "ListaValor.findTarifaConsu", query = " SELECT new ListaValor(p.idTarifa,'',p.descripcion,'') FROM Tarifa p order by p.descripcion"),
-		
+
 		@NamedQuery(name = "ListaValor.findPeriododAvalibleGasto", query = " SELECT new ListaValor(p.idPeriodoPago,'',CONCAT(p.descripcion,'(',p.estado,')'),p.descripcion) FROM PeriodoPago p WHERE p.estado in ('ABIE','CERR')"),
 		@NamedQuery(name = "ListaValor.findByCurrentAndEstado", query = " SELECT new ListaValor(t.tipoActividad,'',t.descripcion,t.descripcion) FROM TipoActividad t WHERE t.activo = :activo OR t.tipoActividad=:tipoActividad"),
 		@NamedQuery(name = "ListaValor.findDestinoByCurrentAndEstado", query = " SELECT new ListaValor(t.idDestino,'',t.descripcion,t.descripcion) FROM Destino t WHERE t.activo = :activo OR t.idDestino=:idDestino "),

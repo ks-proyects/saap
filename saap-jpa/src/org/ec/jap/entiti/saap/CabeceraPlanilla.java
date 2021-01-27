@@ -37,30 +37,27 @@ import org.ec.jap.utilitario.Utilitario;
 @Entity
 @Table(name = "cabecera_planilla")
 @NamedQueries({
-		@NamedQuery(name = "CabeceraPlanilla.findConsulta", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idLlave ll inner join ll.idUsuario u INNER JOIN c.idPeriodoPago per WHERE per.estado='CERR' AND (  ll.numero = :filtro OR u.cedula = :filtro) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
+		@NamedQuery(name = "CabeceraPlanilla.findConsulta", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idServicio ll inner join ll.idUsuario u INNER JOIN c.idPeriodoPago per WHERE per.estado='CERR' AND (  ll.numero = :filtro OR u.cedula = :filtro) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
 		@NamedQuery(name = "CabeceraPlanilla.findConAbono", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND c.valorPagadoAbono!=0.0"),
 		@NamedQuery(name = "CabeceraPlanilla.findSinPagar", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago "),
-		@NamedQuery(name = "CabeceraPlanilla.findAbono", query = "SELECT c FROM CabeceraPlanilla  c INNER JOIN c.idLlave ll   WHERE ll=:llave AND c IN (SELECT MAX(cp) from CabeceraPlanilla cp INNER JOIN cp.idLlave ll WHERE ll=:llave AND cp!=:cp )"),
-		@NamedQuery(name = "CabeceraPlanilla.findByPerAbiertActFilters", query = "SELECT c FROM CabeceraPlanilla  c LEFT OUTER JOIN c.idLlave ll LEFT OUTER join c.idUsuario u  "
+		@NamedQuery(name = "CabeceraPlanilla.findAbono", query = "SELECT c FROM CabeceraPlanilla  c INNER JOIN c.idServicio ll   WHERE ll=:llave AND c IN (SELECT MAX(cp) from CabeceraPlanilla cp INNER JOIN cp.idServicio ll WHERE ll=:llave AND cp!=:cp )"),
+		@NamedQuery(name = "CabeceraPlanilla.findByPerAbiertActFilters", query = "SELECT c FROM CabeceraPlanilla c inner join c.idUsuario u inner join u.llaveList ll "
 				+ "WHERE c IN "
 				+ "	(SELECT dp.idCabeceraPlanilla FROM DetallePlanilla dp INNER JOIN dp.idCabeceraPlanilla cabp "
 				+ "	 	WHERE cabp.idCabeceraPlanilla=c.idCabeceraPlanilla and cabp.idPeriodoPago.estado=:estado ) "
-				+ "AND c.idPeriodoPago.estado=:estado "
-				+ "AND ( "
-				+ "     ll.numero like CONCAT('%',:filtro,'%') "
+				+ "AND c.idPeriodoPago.estado=:estado " + "AND ( " + "     ll.numero like CONCAT('%',:filtro,'%') "
 				+ "     OR UPPER(ll.idUsuario.nombres) like  UPPER(CONCAT('%',:filtro,'%')) "
 				+ "     OR UPPER(ll.idUsuario.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) "
 				+ "     OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) "
-				+ "     OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) "
-				+ " ) "
-				+ " ORDER BY cast(ll.numero,int), c.fechaRegistro,c.observacion DESC"),
+				+ "     OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) " + " ) "
+				+ " ORDER BY u.apellidos,u.apellidos.nombres"),
 		@NamedQuery(name = "CabeceraPlanilla.findNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago"),
-		@NamedQuery(name = "CabeceraPlanilla.findAllNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND c.idLlave=:idLlave "),
+		@NamedQuery(name = "CabeceraPlanilla.findAllNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND ( c.idServicio=:idServicio or c.idUsuario=:idUsuario)"),
 		@NamedQuery(name = "CabeceraPlanilla.findAllNoPagAlcantiralado", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND c.idUsuario=:idUser "),
-		@NamedQuery(name = "CabeceraPlanilla.findNewUser", query = "SELECT COUNT(c.idCabeceraPlanilla) FROM CabeceraPlanilla c WHERE c.idLlave=:idLlave AND c IN ( SELECT dp.idCabeceraPlanilla FROM DetallePlanilla dp INNER JOIN dp.idLectura l WHERE l.idLlave=:idLlave )"),
-		@NamedQuery(name = "CabeceraPlanilla.findByFilters", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idLlave ll inner join ll.idUsuario u WHERE  ll.numero like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%')  OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
+		@NamedQuery(name = "CabeceraPlanilla.findNewUser", query = "SELECT COUNT(c.idCabeceraPlanilla) FROM CabeceraPlanilla c WHERE c.idServicio=:idServicio AND c IN ( SELECT dp.idCabeceraPlanilla FROM DetallePlanilla dp INNER JOIN dp.idLectura l WHERE l.idServicio=:idServicio )"),
+		@NamedQuery(name = "CabeceraPlanilla.findByFilters", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idServicio ll inner join ll.idUsuario u WHERE  ll.numero like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%')  OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
 		@NamedQuery(name = "CabeceraPlanilla.findAllIngresado", query = "SELECT c FROM CabeceraPlanilla c WHERE c.estado='ING'"),
-		@NamedQuery(name = "CabeceraPlanilla.findByUsuarioAndEstado", query = "SELECT c FROM CabeceraPlanilla c inner join c.idLlave  ll where ll.idLlave=:idLlave AND c.estado=:estado") })
+		@NamedQuery(name = "CabeceraPlanilla.findByUsuarioAndEstado", query = "SELECT c FROM CabeceraPlanilla c inner join c.idServicio  ll where ll.idServicio=:idServicio AND c.estado=:estado") })
 @AuditoriaAnot(entityType = "CABPLA")
 public class CabeceraPlanilla implements Serializable {
 
@@ -118,9 +115,10 @@ public class CabeceraPlanilla implements Serializable {
 	private String estado;
 	@OneToMany(mappedBy = "idCabeceraPlanilla")
 	private List<DetallePlanilla> detallePlanillaList;
-	@JoinColumn(name = "id_llave", referencedColumnName = "id_llave")
+	
+	@JoinColumn(name = "id_servicio", referencedColumnName = "id_servicio")
 	@ManyToOne
-	private Llave idLlave;
+	private Servicio idServicio;
 
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
 	@ManyToOne
@@ -169,7 +167,7 @@ public class CabeceraPlanilla implements Serializable {
 
 	@AuditoriaMethod(name = "LLave")
 	public String getIdLlaveNumero() {
-		return idLlave != null ? idLlave.getNumero() : "";
+		return idServicio != null ? idServicio.getNumero() : "";
 	}
 
 	@AuditoriaMethod(name = "Usuario")
@@ -243,12 +241,12 @@ public class CabeceraPlanilla implements Serializable {
 		this.detallePlanillaList = detallePlanillaList;
 	}
 
-	public Llave getIdLlave() {
-		return idLlave;
+	public Servicio getIdServicio() {
+		return idServicio;
 	}
 
-	public void setIdLlave(Llave idLlave) {
-		this.idLlave = idLlave;
+	public void setIdServicio(Servicio idServicio) {
+		this.idServicio = idServicio;
 	}
 
 	public PeriodoPago getIdPeriodoPago() {
@@ -372,8 +370,8 @@ public class CabeceraPlanilla implements Serializable {
 	public String getUsuarioDesc() {
 		if (idUsuario != null) {
 			return idUsuario.getNombres().concat(" ").concat(idUsuario.getApellidos());
-		} else if (idLlave != null) {
-			return idLlave.getIdUsuario().getNombres().concat(" ").concat(idLlave.getIdUsuario().getApellidos());
+		} else if (idServicio != null) {
+			return idServicio.getIdUsuario().getNombres().concat(" ").concat(idServicio.getIdUsuario().getApellidos());
 		}
 		return "";
 	}

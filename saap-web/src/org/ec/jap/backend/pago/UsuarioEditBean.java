@@ -15,13 +15,12 @@ import javax.faces.model.SelectItem;
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.saap.EstadoCivilBO;
-import org.ec.jap.bo.saap.LlaveBO;
 import org.ec.jap.bo.saap.RepresentanteBO;
-import org.ec.jap.bo.saap.TarifaBO;
+import org.ec.jap.bo.saap.ServicioBO;
 import org.ec.jap.bo.saap.UsuarioBO;
 import org.ec.jap.bo.sistema.ComunidadBO;
-import org.ec.jap.entiti.saap.Llave;
 import org.ec.jap.entiti.saap.Representante;
+import org.ec.jap.entiti.saap.Servicio;
 import org.ec.jap.entiti.saap.Usuario;
 import org.ec.jap.utilitario.UtilitarioFecha;
 
@@ -43,18 +42,15 @@ public class UsuarioEditBean extends Bean {
 	EstadoCivilBO estadoCivilBO;
 
 	@EJB
-	LlaveBO llaveBO;
-
-	@EJB
-	TarifaBO tarifaBO;
+	ServicioBO llaveBO;
 
 	@EJB
 	RepresentanteBO representanteBO;
 
 	private Usuario usuario;
 	private Integer idEstadoCivil;
-	private Integer idTarifa;
-	private List<Llave> listLlaves;
+
+	private List<Servicio> listLlaves;
 	private List<Representante> listRepresentantes;
 
 	public UsuarioEditBean() {
@@ -84,10 +80,9 @@ public class UsuarioEditBean extends Bean {
 				usuario = new Usuario();
 			} else {
 				usuario = usuarioBO.findByPk(getParam1Integer());
-				idTarifa = usuario.getTarifa()!=null?usuario.getTarifa().getIdTarifa():-1;
 				map = new HashMap<>();
 				map.put("idUsuario", usuario.getIdUsuario());
-				listLlaves = llaveBO.findAllByNamedQuery("Llave.findByUser", map);
+				listLlaves = llaveBO.findAllByNamedQuery("Servicio.findByUser", map);
 				listRepresentantes = representanteBO.findAllByNamedQuery("Representante.findRepresentado", map);
 				redisplayAction(2, "ING".equals(usuario.getEstado()));// Representante
 				redisplayAction(11, "ACT".equals(usuario.getEstado()));// Llave
@@ -102,16 +97,9 @@ public class UsuarioEditBean extends Bean {
 	public String generalAccion() {
 		// TODO Auto-generated method stub
 		try {
-			Integer numMaxLlaves = parametroBO.getInteger("", getUsuarioCurrent().getIdComunidad().getIdComunidad(),
-					"NUMLLAV");
-			if (listLlaves.size() >= numMaxLlaves) {
-				displayMessage("El número de llaves permitidas por usuario es: " + numMaxLlaves.toString()
-						+ ". No puede asignar más llaves.", Mensaje.SEVERITY_WARN);
-				return getPage().getNombre();
-			} else {
-				setAccion("INS");
-				return "llaveInsert?faces-redirect=true";
-			}
+			setAccion("INS");
+			return "llaveInsert?faces-redirect=true";
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
@@ -129,7 +117,6 @@ public class UsuarioEditBean extends Bean {
 	@Override
 	public String guardar() {
 		try {
-			usuario.setTarifa(tarifaBO.findByPk(idTarifa));
 			usuario.setEdad(UtilitarioFecha.getEdad(usuario.getFechaNacimiento()));
 			usuario.setIdEstadoCivil(estadoCivilBO.findByPk(idEstadoCivil));
 			if ("INS".equals(getAccion())) {
@@ -210,16 +197,6 @@ public class UsuarioEditBean extends Bean {
 		return new ArrayList<SelectItem>(0);
 	}
 
-	public List<SelectItem> getTarifas() {
-		HashMap<String, Object> map = new HashMap<>(0);
-		try {
-			return getSelectItems(getUsuarioCurrent(), map, "ListaValor.findTarifaConsu");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new ArrayList<SelectItem>(0);
-	}
-
 	public Usuario getUsuario() {
 		return usuario;
 	}
@@ -236,11 +213,11 @@ public class UsuarioEditBean extends Bean {
 		this.idEstadoCivil = idEstadoCivil;
 	}
 
-	public List<Llave> getListLlaves() {
+	public List<Servicio> getListLlaves() {
 		return listLlaves;
 	}
 
-	public void setListLlaves(List<Llave> listLlaves) {
+	public void setListLlaves(List<Servicio> listLlaves) {
 		this.listLlaves = listLlaves;
 	}
 
@@ -251,14 +228,5 @@ public class UsuarioEditBean extends Bean {
 	public void setListRepresentantes(List<Representante> listRepresentantes) {
 		this.listRepresentantes = listRepresentantes;
 	}
-
-	public Integer getIdTarifa() {
-		return idTarifa;
-	}
-
-	public void setIdTarifa(Integer idTarifa) {
-		this.idTarifa = idTarifa;
-	}
-	
 
 }

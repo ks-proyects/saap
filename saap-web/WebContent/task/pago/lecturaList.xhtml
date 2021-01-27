@@ -50,28 +50,28 @@
 						<f:facet name="header">
 							<h:outputText value="# Llave" />
 						</f:facet>
-						<h:outputText value="#{lect.idLlave.numero}" />
+						<h:outputText value="#{lect.idServicio.numero}" />
 					</rich:column>
 					<rich:column>
 						<f:facet name="header">
 							<h:outputText value="# Usuario" />
 						</f:facet>
 						<h:outputText title="Usuario"
-							value="#{lect.idLlave.idUsuario.nombres} #{lect.idLlave.idUsuario.apellidos}" />
+							value="#{lect.idServicio.idUsuario.nombres} #{lect.idServicio.idUsuario.apellidos}" />
 					</rich:column>
 					<rich:column>
 						<f:facet name="header">
 							<h:outputText value="# Cédula" />
 						</f:facet>
 						<h:outputText title="Cédula"
-							value="#{lect.idLlave.idUsuario.cedula}" />
+							value="#{lect.idServicio.idUsuario.cedula}" />
 					</rich:column>
 					<rich:column>
 						<f:facet name="header">
 							<h:outputText value="Tarifa" />
 						</f:facet>
 						<h:outputText title="Tarifa"
-							value="#{lect.idLlave.idUsuario.tarifa.descripcion}" />
+							value="#{lect.idServicio.idTarifa.descripcion}" />
 					</rich:column>
 
 

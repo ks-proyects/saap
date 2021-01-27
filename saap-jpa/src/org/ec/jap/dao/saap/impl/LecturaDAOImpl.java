@@ -11,7 +11,7 @@ import javax.persistence.Query;
 import org.ec.jap.dao.saap.LecturaDAO;
 import org.ec.jap.dao.sistema.impl.SistemaImple;
 import org.ec.jap.entiti.saap.Lectura;
-import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.Servicio;
 
 /**
  * Clase de Acceso a Datos de {@link Lectura}
@@ -28,9 +28,9 @@ public class LecturaDAOImpl extends SistemaImple<Lectura, Integer> implements Le
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Lectura> getLast3(Llave idLlave, Lectura actual) throws Exception {
+	public List<Lectura> getLast3(Servicio idServicio, Lectura actual) throws Exception {
 		HashMap<String, Object> p = new HashMap<String, Object>();
-		p.put("idLlave", idLlave);
+		p.put("idServicio", idServicio);
 		p.put("idLectura", actual);
 		Query query = getQuery("Lectura.findLasThree", p);
 		query.setMaxResults(3);

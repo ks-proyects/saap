@@ -16,12 +16,12 @@ import javax.faces.model.SelectItem;
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.saap.LecturaBO;
-import org.ec.jap.bo.saap.LlaveBO;
+import org.ec.jap.bo.saap.ServicioBO;
 import org.ec.jap.bo.saap.TarifaBO;
 import org.ec.jap.bo.saap.TipoLlaveBO;
 import org.ec.jap.bo.saap.UsuarioBO;
 import org.ec.jap.entiti.saap.Lectura;
-import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.Servicio;
 import org.ec.jap.entiti.saap.Usuario;
 
 @ManagedBean
@@ -39,12 +39,12 @@ public class LlaveEditBean extends Bean {
 	@EJB
 	TarifaBO tarifaBO;
 	@EJB
-	LlaveBO llaveBO;
+	ServicioBO llaveBO;
 	@EJB
 	LecturaBO lecturaBO;
 
 	private Integer idPeriodoPago;
-	private Llave llave;
+	private Servicio llave;
 	private Integer idTarifa;
 	private String tipoLlave;
 	private Usuario usuario;
@@ -73,7 +73,7 @@ public class LlaveEditBean extends Bean {
 	public void search(ActionEvent event) {
 		try {
 			if ("INS".equals(getAccion())) {
-				llave = new Llave();
+				llave = new Servicio();
 				usuario = usuarioBO.findByPk(getParam1Integer());
 			} else {
 				llave = llaveBO.findByPk(getParam2Integer());
@@ -81,7 +81,7 @@ public class LlaveEditBean extends Bean {
 				tipoLlave = llave.getIdTarifa().getTipoLlave().getTipoLlave();
 				usuario = llave.getIdUsuario();
 				map = new HashMap<>();
-				map.put("idLlave", llave);
+				map.put("idServicio", llave);
 				map.put("idPeriodoPago", idPeriodoPago != null ? idPeriodoPago : 0);
 				lecturasList = lecturaBO.findAllByNamedQuery("Lectura.findByUser", map);
 			}
@@ -101,7 +101,7 @@ public class LlaveEditBean extends Bean {
 				llave.setFechaRegistro(Calendar.getInstance().getTime());
 				llave.setIdUsuario(usuario);
 				llaveBO.save(getUsuarioCurrent(), llave);
-				setParam2(llave.getIdLlave());
+				setParam2(llave.getIdServicio());
 				setAccion("UPD");
 			} else {
 				llaveBO.update(getUsuarioCurrent(), llave);
@@ -137,11 +137,12 @@ public class LlaveEditBean extends Bean {
 
 	@Override
 	public String nuevo() {
-		// TODO Auto-generated method stub
 		try {
 			map = new HashMap<>();
-			map.put("idUsuario", usuarioBO.findByPk(getParam1Integer()).getIdUsuario());
-			List<Llave> listLlaves = llaveBO.findAllByNamedQuery("Llave.findByUser", map);
+			map.put("idUsuario", usuario.getIdUsuario());
+			map.put("tipoServicio", llave.getTipoServicio());
+			List<Servicio> listLlaves = llaveBO.findAllByNamedQuery("Servicio.findByUserAndType", map);
+			
 			Integer numMaxLlaves = parametroBO.getInteger("", getUsuarioCurrent().getIdComunidad().getIdComunidad(),
 					"NUMLLAV");
 			if (listLlaves.size() >= numMaxLlaves) {
@@ -161,7 +162,7 @@ public class LlaveEditBean extends Bean {
 	public void valueChange(ValueChangeEvent event) {
 		idPeriodoPago = Integer.valueOf(event.getNewValue().toString());
 		map = new HashMap<>();
-		map.put("idLlave", llave);
+		map.put("idServicio", llave);
 		map.put("idPeriodoPago", idPeriodoPago != null ? idPeriodoPago : 0);
 		try {
 			lecturasList = lecturaBO.findAllByNamedQuery("Lectura.findByUser", map);
@@ -180,11 +181,11 @@ public class LlaveEditBean extends Bean {
 		return new ArrayList<SelectItem>(0);
 	}
 
-	public Llave getLlave() {
+	public Servicio getLlave() {
 		return llave;
 	}
 
-	public void setLlave(Llave llave) {
+	public void setLlave(Servicio llave) {
 		this.llave = llave;
 	}
 

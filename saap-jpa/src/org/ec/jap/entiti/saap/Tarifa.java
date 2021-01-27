@@ -29,7 +29,8 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "tarifa")
 @NamedQueries({
-		@NamedQuery(name = "Tarifa.findRangoConsumos", query = "select count(rc.idRangoConsumo) from RangoConsumo rc where rc.idTarifa=:idTarifa ") })
+	@NamedQuery(name = "Tarifa.findMaxMulta", query = "select max(tar.multaNoPago) from Servicio c inner join c.idTarifa tar  where c.idUsuario=:idUsuario "),	
+	@NamedQuery(name = "Tarifa.findRangoConsumos", query = "select count(rc.idRangoConsumo) from RangoConsumo rc where rc.idTarifa=:idTarifa ") })
 public class Tarifa implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -43,25 +44,19 @@ public class Tarifa implements Serializable {
 	private String descripcion;
 	@OneToMany(mappedBy = "idTarifa")
 	private List<RangoConsumo> rangoConsumoList;
-	
+
 	@JoinColumn(name = "tipo_llave", referencedColumnName = "tipo_llave")
 	@ManyToOne
 	private TipoLlave tipoLlave;
-	
-	@OneToMany(mappedBy = "idTarifa")
-	private List<Llave> llaveList;
 
-	@OneToMany(mappedBy = "tarifa")
-	private List<Usuario> usuarios;
+	@OneToMany(mappedBy = "idTarifa")
+	private List<Servicio> llaveList;
 
 	@Column(name = "basico_pago")
 	private Double basicoPago;
 
 	@Column(name = "multa_no_pago")
 	private Double multaNoPago;
-	
-	@Column(name = "valor_alcantarillado")
-	private Double valorAlcantarillado;
 
 	public Tarifa() {
 	}
@@ -107,11 +102,11 @@ public class Tarifa implements Serializable {
 		this.tipoLlave = tipoLlave;
 	}
 
-	public List<Llave> getLlaveList() {
+	public List<Servicio> getLlaveList() {
 		return llaveList;
 	}
 
-	public void setLlaveList(List<Llave> llaveList) {
+	public void setLlaveList(List<Servicio> llaveList) {
 		this.llaveList = llaveList;
 	}
 
@@ -129,23 +124,6 @@ public class Tarifa implements Serializable {
 
 	public void setMultaNoPago(Double multaNoPago) {
 		this.multaNoPago = multaNoPago;
-	}
-
-	public List<Usuario> getUsuarios() {
-		return usuarios;
-	}
-
-	public void setUsuarios(List<Usuario> usuarios) {
-		this.usuarios = usuarios;
-	}
-	
-
-	public Double getValorAlcantarillado() {
-		return valorAlcantarillado;
-	}
-
-	public void setValorAlcantarillado(Double valorAlcantarillado) {
-		this.valorAlcantarillado = valorAlcantarillado;
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.ec.jap.dao.sistema.Sistema;
 import org.ec.jap.entiti.saap.Lectura;
-import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.Servicio;
 
 /**
  * Interfaz de Acceso a Datos de {@link Lectura}
@@ -16,9 +16,9 @@ public interface LecturaDAO extends Sistema<Lectura, Integer> {
 
 	/**
 	 * 
-	 * @param idLlave
+	 * @param idServicio
 	 * @return
 	 * @throws Exception
 	 */
-	List<Lectura> getLast3(Llave idLlave,Lectura actual) throws Exception;
+	List<Lectura> getLast3(Servicio idServicio,Lectura actual) throws Exception;
 }

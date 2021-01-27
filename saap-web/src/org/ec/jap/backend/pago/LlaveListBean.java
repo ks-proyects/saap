@@ -16,9 +16,9 @@ import javax.faces.event.AjaxBehaviorEvent;
 
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.Mensaje;
-import org.ec.jap.bo.saap.LlaveBO;
+import org.ec.jap.bo.saap.ServicioBO;
 import org.ec.jap.bo.sistema.FiltroBO;
-import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.Servicio;
 import org.ec.jap.entiti.sistema.Filtro;
 
 /**
@@ -30,14 +30,14 @@ import org.ec.jap.entiti.sistema.Filtro;
 public class LlaveListBean extends Bean {
 
 	@EJB
-	LlaveBO llaveBO;
+	ServicioBO llaveBO;
 
 	@EJB
 	FiltroBO filtroBO;
 
 	Filtro filtro;
 
-	private List<Llave> listLlaves;
+	private List<Servicio> listLlaves;
 
 	public LlaveListBean() {
 		super();
@@ -60,7 +60,7 @@ public class LlaveListBean extends Bean {
 			map = new HashMap<>();
 			filtro = filtroBO.getFiltro(getUsuarioCurrent(), "FILTRO", getPage(), filtro != null ? filtro.getValorCadena() : "",filtro,false);
 			map.put("filtro", filtro.getValorCadena());
-			listLlaves = llaveBO.findAllByNamedQuery("Llave.findAllByUser", map);
+			listLlaves = llaveBO.findAllByNamedQuery("Servicio.findAllByUser", map);
 		} catch (Exception e) {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
@@ -69,7 +69,7 @@ public class LlaveListBean extends Bean {
 	public void changeName(AjaxBehaviorEvent event) {
 		try {
 			map.put("filtro", filtro != null ? filtro : "");
-			listLlaves = llaveBO.findAllByNamedQuery("Llave.findAllByUser", map);
+			listLlaves = llaveBO.findAllByNamedQuery("Servicio.findAllByUser", map);
 		} catch (Exception e) {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
@@ -92,11 +92,11 @@ public class LlaveListBean extends Bean {
 		this.filtro = filtro;
 	}
 
-	public List<Llave> getListLlaves() {
+	public List<Servicio> getListLlaves() {
 		return listLlaves;
 	}
 
-	public void setListLlaves(List<Llave> listLlaves) {
+	public void setListLlaves(List<Servicio> listLlaves) {
 		this.listLlaves = listLlaves;
 	}
 

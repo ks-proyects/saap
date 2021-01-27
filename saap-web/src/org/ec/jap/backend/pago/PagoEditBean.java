@@ -67,7 +67,7 @@ public class PagoEditBean extends Bean {
 	public void search(ActionEvent event) {
 		try {
 			cp = cabeceraPlanillaBO.findByPk(getIdDocumentoEntidad());
-			anterior = cabeceraPlanillaBO.getAbonoMesAnterior(cp.getIdLlave(), cp);
+			anterior = cabeceraPlanillaBO.getAbonoMesAnterior(cp.getIdServicio(), cp);
 			valorPendiente = Utilitario.redondear(cp.getValorPendiente());
 			valorAPagar = Utilitario.redondear(cp.getValorPendiente());
 			if (anterior.getAbonoUsd() > cp.getValorPendiente()) {

@@ -14,7 +14,7 @@ import org.ec.jap.bo.saap.RangoConsumoBO;
 import org.ec.jap.bo.saap.TipoRegistroBO;
 import org.ec.jap.dao.saap.impl.LecturaDAOImpl;
 import org.ec.jap.entiti.saap.Lectura;
-import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.Servicio;
 import org.ec.jap.entiti.saap.PeriodoPago;
 import org.ec.jap.entiti.saap.RangoConsumo;
 import org.ec.jap.entiti.saap.TipoRegistro;
@@ -43,7 +43,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 	}
 
 	protected Lectura getLastPromedio(Lectura lectura) throws Exception {
-		List<Lectura> list = getLast3(lectura.getIdLlave(), lectura);
+		List<Lectura> list = getLast3(lectura.getIdServicio(), lectura);
 		Double consumoPromedio = 0.0;
 		Double lecturaAnterior = list != null && list.size() > 0 ? list.get(0).getLecturaIngresada() : 0.0;
 		for (Lectura lect : list) {
@@ -112,10 +112,10 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 				Double totalM3 = Utilitario.redondear(lectura.getMetros3() + lectura.getMetros3Exceso());
 				Double diferencia = Math.abs(Utilitario.redondear(totalM3 - lectura.getMetros3Anterior()));
 				if (diferencia >= valorDiferencia) {
-					mensajeAlerta += lectura.getIdLlave().getNumero() + ", ";
+					mensajeAlerta += lectura.getIdServicio().getNumero() + ", ";
 				}
 			} else
-				mensaje += lectura.getIdLlave().getNumero() + ", ";
+				mensaje += lectura.getIdServicio().getNumero() + ", ";
 		}
 		for (Lectura lectura : lecturas) {
 			update(usuario, lectura);
@@ -142,7 +142,6 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 	}
 
 	protected Lectura buildTarifa(Lectura lectura, PeriodoPago pp) throws Exception {
-		log.info(String.format("Llave: %1$s ----------------------", lectura.getIdLlave().getNumero()));
 		if (pp.getEpoca() != null) {
 
 			Double consumo = Utilitario.redondear(lectura.getLecturaIngresada() - lectura.getLecturaAnterior());
@@ -153,7 +152,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 			if (lectura.getMetros3() > 0) {
 				if (!lectura.getMetros3().equals(0.0)) {
 					map = new HashMap<>(0);
-					map.put("idTarifa", lectura.getIdLlave().getIdTarifa());
+					map.put("idTarifa", lectura.getIdServicio().getIdTarifa());
 					map.put("valor", lectura.getMetros3());
 					map.put("epoca", pp.getEpoca());
 					RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor",
@@ -186,7 +185,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 				lectura.setValorMetro3(0.0);
 				lectura.setValorMetro3Exceso(0.0);
 			}
-		}else {
+		} else {
 			throw new Exception("No es posible recalcular una lectura antes del 2021");
 		}
 		return lectura;
@@ -194,7 +193,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
 	public Lectura buildExceso(Double consumo, RangoConsumo rangoConsumo, Lectura lectura) throws Exception {
 		Double consumoExceso = Utilitario.redondear(consumo - rangoConsumo.getM3Minimo());
-		log.info(String.format("Consumo: %1$s, Exceso: %2$s", consumo, consumoExceso));
+		log.info(String.format("Medidor:%3$s Tarifa: %4$s Consumo: %1$s, Exceso: %2$s", consumo, consumoExceso,lectura.getIdServicio().getNumero(),lectura.getIdServicio().getIdTarifa().getDescripcion()));
 		if (!consumoExceso.equals(consumo)) {
 			Double consumoNormal = Utilitario.redondear(consumo - consumoExceso);
 			map.put("idTarifa", rangoConsumo.getIdTarifa());
@@ -228,7 +227,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 		String mensaje = "";
 		String mensajeAlerta = "";
 		for (Lectura lectura : lecturas) {
-			lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
+			lectura.setValorBasico(Utilitario.redondear(lectura.getIdServicio().getIdTarifa().getBasicoPago()));
 			if (lectura.getSinLectura() || !lectura.getEsModificable()) {
 				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0))
 						|| lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
@@ -236,11 +235,11 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 					Double totalM3 = Utilitario.redondear(lectura.getMetros3() + lectura.getMetros3Exceso());
 					Double diferencia = Math.abs(Utilitario.redondear(totalM3 - lectura.getMetros3Anterior()));
 					if (diferencia >= valorDiferencia) {
-						mensajeAlerta += lectura.getIdLlave().getNumero() + ", ";
+						mensajeAlerta += lectura.getIdServicio().getNumero() + ", ";
 					}
 
 				} else
-					mensaje += lectura.getIdLlave().getNumero() + ", ";
+					mensaje += lectura.getIdServicio().getNumero() + ", ";
 			}
 		}
 		for (Lectura lectura : lecturas) {
@@ -258,56 +257,59 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 	}
 
 	@Override
-	public Integer findLecturaAnterior(Llave llave, Boolean usuarioNuevo) throws Exception {
+	public Integer findLecturaAnterior(Servicio servicio, Boolean usuarioNuevo) throws Exception {
 		HashMap<String, Object> mapAux = new HashMap<>();
-		mapAux.put("idLlave", llave);
+		mapAux.put("idServicio", servicio);
 		mapAux.put("usuarioNuevo", usuarioNuevo);
 		Integer idLecturaAnteriorIngresada = findIntegerByNamedQuery("Lectura.findLastByPeridoAndLlave", mapAux);
 		return idLecturaAnteriorIngresada;
 	}
 
 	@Override
-	public void iniciarLecturaCero(PeriodoPago periodoPago, Llave llave, Usuario usuario) throws Exception {
-		TipoRegistro registro = tipoRegistroBO.findByPk("CONS");
-		Integer idLecturaAnteriorIngresada = findLecturaAnterior(llave, true);
-		Lectura lecturaAnterior = null;
-		if (idLecturaAnteriorIngresada != null)
-			lecturaAnterior = findByPk(idLecturaAnteriorIngresada);
-		Lectura lectura = new Lectura();
-		lectura.setTipoRegistro(registro);
-		lectura.setIdLlave(llave);
-		lectura.setSinLectura(false);
-		lectura.setUsuarioNuevo(false);
-		lectura.setEsModificable(false);
-		lectura.setIdPeriodoPago(periodoPago);
-		lectura.setEstado("ING");
-		lectura.setDescripcion(
-				"Lectura de " + Utilitario.mes(periodoPago.getMes()) + " - " + periodoPago.getAnio().toString());
-		lectura.setMetros3(0.0);
-		lectura.setFechaRegistro(Calendar.getInstance().getTime());
-		lectura.setLecturaIngresada(0.0);
-		lectura.setValorMetro3Exceso(0.0);
-		lectura.setMetros3Exceso(0.0);
-		lectura.setValorMetro3(0.0);
-		lectura.setValorBasico(Utilitario.redondear(lectura.getIdLlave().getIdTarifa().getBasicoPago()));
-		if (lecturaAnterior != null) {
-			log.info(String.format("Id Lectura anterior: ", lecturaAnterior.getIdLectura()));
-			Double me3Anterior = Utilitario
-					.redondear(lecturaAnterior.getMetros3() + lecturaAnterior.getMetros3Exceso());
-			log.info(String.format("M3 Anterior: ", me3Anterior));
-			lectura.setMetros3Anterior(me3Anterior);
-			if (!lecturaAnterior.getSinLectura())
-				lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaIngresada() : 0.0);
-			else
-				lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaAnterior() : 0.0);
-		} else
-			lectura.setLecturaAnterior(0.0);
-		lectura.setNumeroMeses(
-				lecturaAnterior != null
-						? (Utilitario.numeroMeses(lecturaAnterior.getIdPeriodoPago().getFechaInicio(),
-								periodoPago.getFechaInicio()))
-						: 1);
-		save(usuario, lectura);
-
+	public void iniciarLecturaCero(PeriodoPago periodoPago, Servicio servicio, Usuario usuario) throws Exception {
+		map.clear();
+		map.put("idServicio", servicio);
+		map.put("idPeriodoPago", periodoPago);
+		List<Lectura> list = findAllByNamedQuery("Lectura.findByPeridoAndService", map);
+		if (list.isEmpty()) {
+			TipoRegistro registro = tipoRegistroBO.findByPk("CONS");
+			Integer idLecturaAnteriorIngresada = findLecturaAnterior(servicio, true);
+			Lectura lecturaAnterior = null;
+			if (idLecturaAnteriorIngresada != null)
+				lecturaAnterior = findByPk(idLecturaAnteriorIngresada);
+			Lectura lectura = new Lectura();
+			lectura.setTipoRegistro(registro);
+			lectura.setIdServicio(servicio);
+			lectura.setSinLectura(false);
+			lectura.setUsuarioNuevo(false);
+			lectura.setEsModificable(false);
+			lectura.setIdPeriodoPago(periodoPago);
+			lectura.setEstado("ING");
+			lectura.setDescripcion(
+					"Lectura de " + Utilitario.mes(periodoPago.getMes()) + " - " + periodoPago.getAnio().toString());
+			lectura.setMetros3(0.0);
+			lectura.setFechaRegistro(Calendar.getInstance().getTime());
+			lectura.setLecturaIngresada(0.0);
+			lectura.setValorMetro3Exceso(0.0);
+			lectura.setMetros3Exceso(0.0);
+			lectura.setValorMetro3(0.0);
+			lectura.setValorBasico(Utilitario.redondear(lectura.getIdServicio().getIdTarifa().getBasicoPago()));
+			if (lecturaAnterior != null) {
+				log.info(String.format("Id Lectura anterior: ", lecturaAnterior.getIdLectura()));
+				Double me3Anterior = Utilitario
+						.redondear(lecturaAnterior.getMetros3() + lecturaAnterior.getMetros3Exceso());
+				log.info(String.format("M3 Anterior: ", me3Anterior));
+				lectura.setMetros3Anterior(me3Anterior);
+				if (!lecturaAnterior.getSinLectura())
+					lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaIngresada() : 0.0);
+				else
+					lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaAnterior() : 0.0);
+			} else
+				lectura.setLecturaAnterior(0.0);
+			lectura.setNumeroMeses(lecturaAnterior != null ? (Utilitario
+					.numeroMeses(lecturaAnterior.getIdPeriodoPago().getFechaInicio(), periodoPago.getFechaInicio()))
+					: 1);
+			save(usuario, lectura);
+		}
 	}
 }

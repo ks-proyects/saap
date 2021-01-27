@@ -14,7 +14,7 @@ import javax.faces.event.ActionEvent;
 import org.ec.jap.backend.utilitario.Mensaje;
 import org.ec.jap.bo.saap.CabeceraPlanillaBO;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
-import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.Servicio;
 
 @ManagedBean
 @ViewScoped
@@ -36,7 +36,7 @@ public class ConsultaConsumoBean {
 	@PostConstruct
 	public void init() {
 		cp = new CabeceraPlanilla();
-		cp.setIdLlave(new Llave());
+		cp.setIdServicio(new Servicio());
 	}
 
 	public void search(ActionEvent event) {
@@ -49,7 +49,7 @@ public class ConsultaConsumoBean {
 				cp = cabeceraPlanillas.get(0);
 			} else {
 				cp = new CabeceraPlanilla();
-				cp.setIdLlave(new Llave());
+				cp.setIdServicio(new Servicio());
 				String msg = "El pago para el beneficioario con la cedula/# llave " + filtro + ", no existe";
 				FacesMessage facesMessage = new FacesMessage(Mensaje.SEVERITY_INFO, msg, msg);
 				FacesContext.getCurrentInstance().addMessage(null, facesMessage);

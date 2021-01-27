@@ -22,6 +22,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
 import org.ec.jap.anotaciones.AuditoriaAnot;
@@ -31,6 +32,7 @@ import org.ec.jap.entiti.sistema.Comunidad;
 import org.ec.jap.entiti.sistema.Filtro;
 import org.ec.jap.entiti.sistema.UsuarioPerfil;
 import org.ec.jap.entiti.sistema.UsuarioRol;
+import org.hibernate.validator.constraints.Email;
 
 /**
  * 
@@ -39,13 +41,15 @@ import org.ec.jap.entiti.sistema.UsuarioRol;
 @Entity
 @Table(name = "usuario", schema = "saap")
 @NamedQueries({
+
+		@NamedQuery(name = "Usuario.findNotHadPlanilla", query = "SELECT u FROM Usuario u WHERE u.estado IN ('ACT','EDI') and u in (SELECT s.idUsuario FROM Servicio s where s.activo in ('SI') and s.idUsuario.idUsuario=u.idUsuario) and u not in (select cp.idUsuario from CabeceraPlanilla cp where cp.idPeriodoPago=:idPeriodoPago) ORDER BY u.apellidos.nombres"),
+		@NamedQuery(name = "Usuario.findAllActivosAndHadService", query = "SELECT u FROM Usuario u WHERE u.estado IN ('ACT','EDI') and u in (SELECT s.idUsuario FROM Servicio s where s.activo in ('SI') and s.idUsuario.idUsuario=u.idUsuario) ORDER BY u.apellidos.nombres"),
 		@NamedQuery(name = "Usuario.findByFilters", query = " SELECT u,(SELECT SUM(asi.numeroRayas) FROM Asistencia asi inner join asi.actividad act inner join act.tipoActividad tact inner join act.idPeriodoPago per WHERE asi.idUsuario=u AND ((act.actividad=:actividad OR :actividad=0) AND (tact.tipoActividad=:tipoActividad OR :tipoActividad=0)) AND (per.idPeriodoPago=:idPeriodoPago OR :idPeriodoPago=0) AND (per.anio=:anio OR :anio=0)) FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario  ORDER BY upper(CONCAT(u.nombres,' ',u.apellidos)), u.fechaIngreso DESC"),
 		@NamedQuery(name = "Usuario.findAllActivos", query = "SELECT u FROM Usuario u WHERE  u.estado='ACT'"),
 		@NamedQuery(name = "Usuario.findByCedNom", query = " SELECT u FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario AND (upper(u.cedula) LIKE upper(CONCAT('%',:filtro,'%'))  OR upper(CONCAT(u.nombres,' ',u.apellidos)) LIKE upper(CONCAT('%',:filtro,'%'))) ORDER BY upper(CONCAT(u.nombres,' ',u.apellidos)), u.fechaIngreso DESC"),
 		@NamedQuery(name = "Usuario.findByCedulaAndId", query = "SELECT COUNT(u.idUsuario) FROM Usuario u WHERE u.cedula = :cedula and u.tipoUsuario=:tipoUsuario and u.idUsuario != :idUsuario"),
 		@NamedQuery(name = "Usuario.findByCedula", query = "SELECT COUNT(u.idUsuario) FROM Usuario u WHERE u.cedula = :cedula and u.tipoUsuario=:tipoUsuario "),
-		@NamedQuery(name = "Usuario.findByUsername", query = "SELECT u FROM Usuario u WHERE u.username = :username and u in (SELECT up.idUsuario FROM UsuarioPerfil up)"),
-		@NamedQuery(name = "Usuario.findBySinLLave", query = "SELECT u FROM Usuario u WHERE u.estado IN ('ACT','EDI') AND u.poseeAlcant=true and u.cantAlcant > 0 and u not in (SELECT ll.idUsuario FROM Llave ll where ll.activo in ('SI') and ll.idUsuario.idUsuario=u.idUsuario) ") })
+		@NamedQuery(name = "Usuario.findByUsername", query = "SELECT u FROM Usuario u WHERE u.username = :username and u in (SELECT up.idUsuario FROM UsuarioPerfil up)") })
 @AuditoriaAnot(entityType = "USU")
 public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -111,7 +115,8 @@ public class Usuario implements Serializable {
 	// using this annotation to enforce field validation
 	// @Pattern(regexp = "[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}", message =
 	// "El correo ingresado no es correcto")
-	@Size(max = 2147483647)
+	@Size(max = 512)
+	@Email(message = "Debe ser un email válido")
 	@Column(name = "email")
 	private String email;
 
@@ -125,13 +130,8 @@ public class Usuario implements Serializable {
 	@Column(name = "es_comunero")
 	private String esComunero;
 
-	@Column(name = "posee_alcant")
-	private Boolean poseeAlcant;
-
-	@Column(name = "cant_alcant")
-	private Integer cantAlcant;
-
 	@NotNull(message = "El campo FECHA NACIMIENTO es obligatorio.")
+	@Past(message = "El campo FECHA NACIMIENTO debe ser menor a la fecha de hoy.")
 	@Column(name = "fecha_nacimiento")
 	private Date fechaNacimiento;;
 
@@ -146,10 +146,6 @@ public class Usuario implements Serializable {
 	@ManyToOne(optional = false)
 	private Comunidad idComunidad;
 
-	@JoinColumn(name = "id_tarifa", referencedColumnName = "id_tarifa")
-	@ManyToOne
-	private Tarifa tarifa;
-
 	@OneToMany(mappedBy = "idUsuario")
 	private List<UsuarioRol> usuarioRolList;
 
@@ -163,7 +159,7 @@ public class Usuario implements Serializable {
 	private List<Representante> representanteList1;
 
 	@OneToMany(mappedBy = "idUsuario")
-	private List<Llave> llaveList;
+	private List<Servicio> llaveList;
 
 	@OneToMany(mappedBy = "idUsuario")
 	private List<CabeceraPlanilla> facturaList;
@@ -372,11 +368,11 @@ public class Usuario implements Serializable {
 		this.representanteList1 = representanteList1;
 	}
 
-	public List<Llave> getLlaveList() {
+	public List<Servicio> getLlaveList() {
 		return llaveList;
 	}
 
-	public void setLlaveList(List<Llave> llaveList) {
+	public void setLlaveList(List<Servicio> llaveList) {
 		this.llaveList = llaveList;
 	}
 
@@ -436,22 +432,6 @@ public class Usuario implements Serializable {
 		this.cantidadRayas = cantidadRayas;
 	}
 
-	public Boolean getPoseeAlcant() {
-		return poseeAlcant;
-	}
-
-	public void setPoseeAlcant(Boolean poseeAlcant) {
-		this.poseeAlcant = poseeAlcant;
-	}
-
-	public Integer getCantAlcant() {
-		return cantAlcant;
-	}
-
-	public void setCantAlcant(Integer cantAlcant) {
-		this.cantAlcant = cantAlcant;
-	}
-
 	public String getAplicaDescuento() {
 		return aplicaDescuento;
 	}
@@ -467,14 +447,6 @@ public class Usuario implements Serializable {
 	public void setTieneDescuento(Boolean tieneDescuento) {
 		aplicaDescuento = tieneDescuento ? "SI" : "NO";
 		this.tieneDescuento = tieneDescuento;
-	}
-
-	public Tarifa getTarifa() {
-		return tarifa;
-	}
-
-	public void setTarifa(Tarifa tarifa) {
-		this.tarifa = tarifa;
 	}
 
 	@Override

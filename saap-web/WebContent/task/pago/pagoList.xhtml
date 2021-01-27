@@ -29,12 +29,6 @@
 					value="#{pagoListBean.cabeceraPlanillas}" var="cab" rowKeyVar="row">
 					<rich:column>
 						<f:facet name="header">
-							<h:outputText value="# Medidor" />
-						</f:facet>
-						<h:outputText value="#{cab.idLlave.numero}" />
-					</rich:column>
-					<rich:column>
-						<f:facet name="header">
 							<h:outputText value="Nro. Recivo" />
 						</f:facet>
 						<h:commandLink style="font-weight:bold;"
@@ -69,7 +63,7 @@
 						<f:facet name="header">
 							<h:outputText value="C&#233;dula" />
 						</f:facet>
-						<h:outputText value="#{cab.idLlave.idUsuario.cedula}" />
+						<h:outputText value="#{cab.idServicio.idUsuario.cedula}" />
 					</rich:column>
 					<rich:column>
 						<f:facet name="header">

@@ -5,7 +5,7 @@ import javax.ejb.Local;
 import org.ec.jap.dao.saap.CabeceraPlanillaDAO;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
 import org.ec.jap.entiti.saap.Lectura;
-import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.Servicio;
 import org.ec.jap.entiti.saap.Usuario;
 
 @Local
@@ -76,7 +76,7 @@ public interface CabeceraPlanillaBO extends CabeceraPlanillaDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	CabeceraPlanilla getAbonoMesAnterior(Llave llave, CabeceraPlanilla actual) throws Exception;
+	CabeceraPlanilla getAbonoMesAnterior(Servicio llave, CabeceraPlanilla actual) throws Exception;
 
 	/**
 	 * Método que cancela un pago realizado

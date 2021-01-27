@@ -3,20 +3,20 @@
  */
 package org.ec.jap.dao.saap.impl;
 
-import org.ec.jap.dao.saap.LlaveDAO;
+import org.ec.jap.dao.saap.ServicioDAO;
 import org.ec.jap.dao.sistema.impl.SistemaImple;
-import org.ec.jap.entiti.saap.Llave;
+import org.ec.jap.entiti.saap.Servicio;
 
 /**
- * Clase de Acceso a Datos de {@link Llave}
+ * Clase de Acceso a Datos de {@link Servicio}
  * 
  * @author Freddy
  * @version {@code 1.0}
  */
-public class LlaveDAOImpl extends SistemaImple<Llave, Integer> implements LlaveDAO {
+public class LlaveDAOImpl extends SistemaImple<Servicio, Integer> implements ServicioDAO {
 
 	public LlaveDAOImpl() {
-		super(Llave.class);
+		super(Servicio.class);
 	}
 
 }

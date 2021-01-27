@@ -17,10 +17,10 @@
 					columnClasses="value,label,value,label,value,label,value">
 					<h:outputText value="" />
 					<h:outputLabel value="Número de LLave:" />
-					<h:outputText value="#{detalleLecturaBean.cp.idLlave.numero}" />
+					<h:outputText value="#{detalleLecturaBean.cp.idServicio.numero}" />
 					<h:outputLabel value="Beneficiario:" />
 					<h:outputText
-						value="#{detalleLecturaBean.cp.idLlave.idUsuario.nombres} #{detalleLecturaBean.cp.idLlave.idUsuario.apellidos}" />
+						value="#{detalleLecturaBean.cp.idServicio.idUsuario.nombres} #{detalleLecturaBean.cp.idServicio.idUsuario.apellidos}" />
 					<h:outputText value="" />
 					<h:outputText value="" />
 					<h:outputText value="" />
@@ -49,7 +49,7 @@
 					<h:outputText
 						value="#{detalleLecturaBean.lectura.valorMetro3Exceso}" />
 					<h:outputText value="#{detalleLecturaBean.lectura.valorBasico}" />
-					<h:outputText value="#{detalleLecturaBean.lectura.idLlave.idTarifa.descripcion}" />
+					<h:outputText value="#{detalleLecturaBean.lectura.idServicio.idTarifa.descripcion}" />
 				</h:panelGrid>
 			</h:form>
 		</h:body>
