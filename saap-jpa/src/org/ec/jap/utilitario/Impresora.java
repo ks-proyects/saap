@@ -2,6 +2,7 @@ package org.ec.jap.utilitario;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
@@ -11,17 +12,18 @@ import javax.print.attribute.standard.Copies;
 
 public class Impresora {
 
+	public static Logger log = Logger.getLogger(Impresora.class.getName());
 	public static PrintService getImpresora(String nombreImpresora, int numCopies) throws Exception {
 		List<PrintService> services = getImpresoras(numCopies);
 		if (services.size() > 0) {
 			for (PrintService printService : services) {
-				System.out.println("Impresora: "+printService.getName());
+				log.info("Impresora: "+printService.getName());
 				if (printService.getName().equalsIgnoreCase(nombreImpresora)) {
 					return printService;
 				}
 			}
 		}
-		System.err.println("No se encuntra la impresora " + nombreImpresora);
+		log.info("No se encuntra la impresora " + nombreImpresora);
 		return null;
 	}
 

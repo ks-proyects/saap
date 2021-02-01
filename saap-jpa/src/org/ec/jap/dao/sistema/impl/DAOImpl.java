@@ -57,7 +57,7 @@ public abstract class DAOImpl<Entiti, Pk extends Serializable> implements DAO<En
 	};
 
 	public final void delete(Usuario user, Entiti entiti) throws Exception {
-		logger.info("Se ha eliminado el entity " + nameEntiti + " por el usuario " + user.getNombres() + " " + user.getApellidos());
+		logger.fine("Se ha eliminado el entity " + nameEntiti + " por el usuario " + user.getNombres() + " " + user.getApellidos());
 		entiti = em().merge(entiti);
 		generateTrace(user, entiti, "DEL");
 		em().remove(entiti);

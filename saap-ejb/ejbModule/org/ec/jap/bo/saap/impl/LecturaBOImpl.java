@@ -3,20 +3,20 @@ package org.ec.jap.bo.saap.impl;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import org.apache.log4j.Logger;
 import org.ec.jap.bo.saap.LecturaBO;
 import org.ec.jap.bo.saap.ParametroBO;
 import org.ec.jap.bo.saap.RangoConsumoBO;
 import org.ec.jap.bo.saap.TipoRegistroBO;
 import org.ec.jap.dao.saap.impl.LecturaDAOImpl;
 import org.ec.jap.entiti.saap.Lectura;
-import org.ec.jap.entiti.saap.Servicio;
 import org.ec.jap.entiti.saap.PeriodoPago;
 import org.ec.jap.entiti.saap.RangoConsumo;
+import org.ec.jap.entiti.saap.Servicio;
 import org.ec.jap.entiti.saap.TipoRegistro;
 import org.ec.jap.entiti.saap.Usuario;
 import org.ec.jap.utilitario.Utilitario;
@@ -27,7 +27,7 @@ import org.ec.jap.utilitario.Utilitario;
 @Stateless
 public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 
-	private static final Logger log = Logger.getLogger(LecturaBOImpl.class.getName());
+	public Logger log = Logger.getLogger(LecturaDAOImpl.class.getName());
 	@EJB
 	private ParametroBO parametroBO;
 	@EJB
@@ -295,10 +295,9 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 			lectura.setValorMetro3(0.0);
 			lectura.setValorBasico(Utilitario.redondear(lectura.getIdServicio().getIdTarifa().getBasicoPago()));
 			if (lecturaAnterior != null) {
-				log.info(String.format("Id Lectura anterior: ", lecturaAnterior.getIdLectura()));
 				Double me3Anterior = Utilitario
 						.redondear(lecturaAnterior.getMetros3() + lecturaAnterior.getMetros3Exceso());
-				log.info(String.format("M3 Anterior: ", me3Anterior));
+				log.info(String.format("Lectura Anterior: %1$s", lecturaAnterior.getLecturaIngresada()));
 				lectura.setMetros3Anterior(me3Anterior);
 				if (!lecturaAnterior.getSinLectura())
 					lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaIngresada() : 0.0);

@@ -3,6 +3,7 @@ package org.ec.jap.bo.sistema.impl;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 import javax.ejb.EJBTransactionRolledbackException;
@@ -126,16 +127,18 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 		entidadCambioEstadoBO.save(usuario, entidadCambioEstado);
 
 	}
+	public Logger log = Logger.getLogger(CambioEstadoDAOImpl.class.getName());
 
 	@Override
 	public void cambiarEstadoSinVerificar(Integer idCambioEstado, Usuario usuario, Object idDocumento, String motivo)
 			throws Exception {
-		// TODO Auto-generated method stub
+		
 		CambioEstado cambioEstado = findByPk(idCambioEstado);
 		if (cambioEstado == null)
 			return;
 
 		String updatEstado = cambioEstado.getTipoEntidad().getSentenciaUpdate();
+		
 		Query query = em().createQuery(updatEstado);
 		query.setParameter("id", idDocumento);
 		query.setParameter("estado", cambioEstado.getIdEstadoNuevo().getEstado());

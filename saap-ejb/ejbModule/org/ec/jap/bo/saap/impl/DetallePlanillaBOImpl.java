@@ -3,11 +3,11 @@ package org.ec.jap.bo.saap.impl;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import org.apache.log4j.Logger;
 import org.ec.jap.bo.saap.CabeceraPlanillaBO;
 import org.ec.jap.bo.saap.DetallePlanillaBO;
 import org.ec.jap.bo.saap.RegistroEconomicoBO;
@@ -27,7 +27,7 @@ import org.ec.jap.utilitario.Utilitario;
 @Stateless
 public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements DetallePlanillaBO {
 
-	private static final Logger log = Logger.getLogger(DetallePlanillaBOImpl.class.getName());
+	public Logger log = Logger.getLogger(DetallePlanillaDAOImpl.class.getName());
 	@EJB
 	CabeceraPlanillaBO cabeceraPlanillaBO;
 
@@ -244,7 +244,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		String format = "........................";
 		nombre = nombre.length() > format.length() ? nombre.substring(0, format.length())
 				: nombre + format.substring(nombre.length(), format.length());
-		log.info(String.format("Usuario: %4$s ===> Medidor: %5$s Base: %1$s, Exceso: %2$s, Total: %3$s", base, exceso,
+		log.info(String.format("%4$s ===> Medidor: %5$s Normal: %1$s, Exceso: %2$s, Total: %3$s", base, exceso,
 				total, nombre, lec.getIdServicio().getNumero()));
 		dpls.setValorUnidad(Utilitario.redondear(lec.getValorMetro3()));
 		dpls.setValorTotal(total);

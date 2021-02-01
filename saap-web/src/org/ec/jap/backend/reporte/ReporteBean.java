@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -18,9 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.j2ee.servlets.BaseHttpServlet;
-
 import org.ec.jap.backend.pagina.Bean;
 import org.ec.jap.backend.utilitario.JassperConfigUtil;
 import org.ec.jap.backend.utilitario.Mensaje;
@@ -28,12 +26,16 @@ import org.ec.jap.bo.saap.ParametroBO;
 import org.ec.jap.enumerations.OutputType;
 import org.ec.jap.utilitario.Impresora;
 
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.j2ee.servlets.BaseHttpServlet;
+
 @ManagedBean
 @ViewScoped
 public class ReporteBean extends Bean {
 
 	@Resource(mappedName = "java:/Saap")
 	DataSource ds;
+	public Logger log = Logger.getLogger(ReporteBean.class.getName());
 
 	@EJB
 	private ParametroBO parametroBO;
@@ -47,6 +49,7 @@ public class ReporteBean extends Bean {
 		try {
 			exportarReporte(getPage().getIdElementoSistema(), formato);
 		} catch (Exception e) {
+			log.info(e.getMessage());
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
 			return getPage().getOutcome();
 		}

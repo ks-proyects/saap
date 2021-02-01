@@ -7,6 +7,8 @@ package org.ec.jap.entiti.saap;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -194,7 +196,6 @@ public class PeriodoPago implements Serializable {
 	public void setGastoList(List<Gasto> gastoList) {
 		this.gastoList = gastoList;
 	}
-	
 
 	public EpocaEnum getEpoca() {
 		return epoca;
@@ -230,6 +231,5 @@ public class PeriodoPago implements Serializable {
 	public String toString() {
 		return "org.ec.jap.entiti.PeriodoPago[ idPeriodoPago=" + idPeriodoPago + " ]";
 	}
-	
 
 }

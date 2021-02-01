@@ -13,9 +13,9 @@ import org.ec.jap.entiti.saap.Servicio;
  * @author Freddy
  * @version {@code 1.0}
  */
-public class LlaveDAOImpl extends SistemaImple<Servicio, Integer> implements ServicioDAO {
+public class ServicioDAOImpl extends SistemaImple<Servicio, Integer> implements ServicioDAO {
 
-	public LlaveDAOImpl() {
+	public ServicioDAOImpl() {
 		super(Servicio.class);
 	}
 

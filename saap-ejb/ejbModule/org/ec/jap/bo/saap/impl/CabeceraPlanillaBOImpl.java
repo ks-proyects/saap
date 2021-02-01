@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -11,7 +12,6 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
 import org.ec.jap.bo.saap.ActividadBO;
 import org.ec.jap.bo.saap.AsientoBO;
 import org.ec.jap.bo.saap.AsistenciaBO;
@@ -51,7 +51,8 @@ import org.ec.jap.utilitario.Utilitario;
 @Stateless
 public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements CabeceraPlanillaBO {
 
-	private static final Logger log = Logger.getLogger(CabeceraPlanillaBOImpl.class.getName());
+	public Logger log = Logger.getLogger(CabeceraPlanillaDAOImpl.class.getName());
+
 	/**
 	 * Default constructor.
 	 */
@@ -196,7 +197,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				multaAtrazoMes = registroEconomicoBO.iniciarMulta(periodoPago, userSystem);
 			}
 			for (Usuario user : usuarios) {
-
 				map.clear();
 				map.put("idUsuario", user);
 				List<Servicio> servicios = llaveBO.findAllByNamedQuery("Servicio.findByUserActivo", map);
@@ -211,10 +211,9 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						for (Servicio servicio : servicios)
 							if (TipoServicioEnum.AGUA_POTABLE.equals(servicio.getTipoServicio())) {
 								llave = servicio;
-								log.info(String.format("Número Lllave: %s", llave.getNumero()));
 								break;
 							}
-					log.info(String.format("Usuario: %1$s ===> Medidor: %2$s Factura: %3$s", nombre,
+					log.info(String.format("%1$s ===> Medidor: %2$s Factura: %3$s", nombre,
 							llave != null ? llave.getNumero() : "NA", numeroFactura));
 
 					CabeceraPlanilla pn = iniciarCabecera(periodoPago.getIdPeriodoPago(), user, path, numeroFactura);
@@ -232,13 +231,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					pn.setValorPendiente(pn.getTotal());
 					update(userSystem, pn);
 					Runtime.getRuntime().gc();
-					if (!existenMultaAtrazos)
-						cambioEstadoBO.eliminarEntidad(8, multaAtrazoMes.getIdRegistroEconomico());
-					else {
-						multaAtrazoMes.setCantidadAplicados(cantidadMultaAtrazosAplicados);
-						registroEconomicoBO.update(userSystem, multaAtrazoMes);
-					}
 				}
+			}
+			if (!existenMultaAtrazos)
+				cambioEstadoBO.eliminarEntidad(8, multaAtrazoMes.getIdRegistroEconomico());
+			else {
+				multaAtrazoMes.setCantidadAplicados(cantidadMultaAtrazosAplicados);
+				registroEconomicoBO.update(userSystem, multaAtrazoMes);
 			}
 			Runtime.getRuntime().gc();
 		}
@@ -694,8 +693,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 
 		update(usuario, cp);
 		String nombre = cp.getIdUsuario().getApellidos() + " " + cp.getIdUsuario().getNombres();
-		log.info(String.format("Usuario: %3$s ===> Factura: %4$s Total: %1$s, Paga: %2$s", cp.getTotal(),
-				cp.getValorPagado(), nombre, cp.getObservacion()));
+		log.info(String.format("%3$s ===> Factura: %4$s Total: %1$s, Paga: %2$s ,Abono: %5$s", cp.getTotal(),
+				cp.getValorPagado(), nombre, cp.getObservacion(), cp.getAbonoUsd()));
 		// DEJAMOS EL ABONO ANTERIOR EN CERO
 		anterior.setAbonoUsd(0.0);
 		if (anterior.getIdCabeceraPlanilla() != null) {
@@ -736,70 +735,60 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	@Override
 	public void recalcularPlanilla(Usuario usuario, CabeceraPlanilla cabeceraPlanilla, Lectura lectura)
 			throws Exception {
-
-		if ("ING".equalsIgnoreCase(cabeceraPlanilla.getEstado())) {
-			lectura = lecturaBO.recalcularLectura(usuario, lectura);
-			CabeceraPlanilla cp = cabeceraPlanilla;
-			lecturaBO.update(usuario, lectura);
-			HashMap<String, Object> pama = new HashMap<>();
-			pama.put("idLectura", lectura);
-			pama.put("idCabeceraPlanilla", cabeceraPlanilla);
-			DetallePlanilla detallePlanilla = detallePlanillaBO
-					.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
-			// Si es mayor a cero realizamos el calculo caso contrario
-			// cobramos el basico
-			detallePlanilla.setValorUnidad(Utilitario.redondear(lectura.getValorMetro3()));
-			detallePlanilla.setValorTotal(
-					Utilitario.redondear((lectura.getMetros3() != null && lectura.getValorMetro3() != null
-							? (lectura.getMetros3() * lectura.getValorMetro3())
-							: 0.0)
-							+ (lectura.getMetros3Exceso() != null && lectura.getValorMetro3Exceso() != null
-									&& lectura.getMetros3Exceso() > 0 && lectura.getValorMetro3Exceso() > 0
-											? (lectura.getMetros3Exceso() * lectura.getValorMetro3Exceso())
-											: 0.0)));
-			detallePlanilla.setValorPendiente(detallePlanilla.getValorTotal());
-			detallePlanilla.setValorPagado(0.0);
-			detallePlanilla.setDescripcion(
-					Utilitario.redondear(lectura.getMetros3()) + " m3 " + lectura.getIdPeriodoPago().getDescripcion());
-			detallePlanillaBO.update(usuario, detallePlanilla);
-			// Recalculamos el valos de la planilla
-			map.clear();
-			map.put("idCabeceraPlanilla", cp);
-			List<DetallePlanilla> detallePlanillas = detallePlanillaBO
-					.findAllByNamedQuery("DetallePlanilla.findByCabecara", map);
-			Double total = 0.0;
-			for (DetallePlanilla dp : detallePlanillas) {
-				total = total + dp.getValorTotal();
-			}
-			cp.setTotal(Utilitario.redondear(total));
-			cp.setSubtotal(Utilitario.redondear(total));
-			if (cp.getValorPagado() > cp.getTotal()) {
-				cp.setAbonoUsd(cp.getAbonoUsd() + (cp.getValorPagado() - cp.getTotal()));
-				cp.setValorPagado(cp.getTotal());
-				cp.setValorPendiente(0.0);
-			} else {
-				cp.setValorPendiente(Utilitario.redondear(cp.getTotal()) - Utilitario.redondear(cp.getValorPagado()));
-			}
-			update(usuario, cp);
-
-		} else {
-			lectura = lecturaBO.recalcularLectura(usuario, lectura);
-			lecturaBO.update(usuario, lectura);
-			HashMap<String, Object> pama = new HashMap<>();
-			pama.put("idLectura", lectura);
-			pama.put("idCabeceraPlanilla", cabeceraPlanilla);
-			DetallePlanilla detallePlanilla = detallePlanillaBO
-					.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
-			// Si es mayor a cero realizamos el calculo caso contrario
-			// cobramos el basico
-			if (lectura.getMetros3() > 0) {
-				detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3 "
-						+ lectura.getIdPeriodoPago().getDescripcion());
-			}
-			if (lectura.getMetros3() > 0)
+		if (cabeceraPlanilla.getIdPeriodoPago().getAnio() > 2021 && cabeceraPlanilla.getIdPeriodoPago().getMes() > 0) {
+			if ("ING".equalsIgnoreCase(cabeceraPlanilla.getEstado())) {
+				lectura = lecturaBO.recalcularLectura(usuario, lectura);
+				CabeceraPlanilla cp = cabeceraPlanilla;
+				lecturaBO.update(usuario, lectura);
+				HashMap<String, Object> pama = new HashMap<>();
+				pama.put("idLectura", lectura);
+				pama.put("idCabeceraPlanilla", cabeceraPlanilla);
+				DetallePlanilla detallePlanilla = detallePlanillaBO
+						.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
+				detallePlanilla=detallePlanillaBO.builDetailLectura(lectura.getIdPeriodoPago(), lectura, detallePlanilla);
 				detallePlanillaBO.update(usuario, detallePlanilla);
+				// Recalculamos el valor de la planilla
+				map.clear();
+				map.put("idCabeceraPlanilla", cp);
+				List<DetallePlanilla> detallePlanillas = detallePlanillaBO
+						.findAllByNamedQuery("DetallePlanilla.findByCabecara", map);
+				Double total = 0.0;
+				for (DetallePlanilla dp : detallePlanillas) {
+					total = total + dp.getValorTotal();
+				}
+				cp.setTotal(Utilitario.redondear(total));
+				cp.setSubtotal(Utilitario.redondear(total));
+				if (cp.getValorPagado() > cp.getTotal()) {
+					cp.setAbonoUsd(cp.getAbonoUsd() + (cp.getValorPagado() - cp.getTotal()));
+					cp.setValorPagado(cp.getTotal());
+					cp.setValorPendiente(0.0);
+				} else {
+					cp.setValorPendiente(
+							Utilitario.redondear(cp.getTotal()) - Utilitario.redondear(cp.getValorPagado()));
+				}
+				update(usuario, cp);
+
+			} else {
+				lectura = lecturaBO.recalcularLectura(usuario, lectura);
+				lecturaBO.update(usuario, lectura);
+				HashMap<String, Object> pama = new HashMap<>();
+				pama.put("idLectura", lectura);
+				pama.put("idCabeceraPlanilla", cabeceraPlanilla);
+				DetallePlanilla detallePlanilla = detallePlanillaBO
+						.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
+				// Si es mayor a cero realizamos el calculo caso contrario
+				// cobramos el basico
+				if (lectura.getMetros3() > 0) {
+					detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3 "
+							+ lectura.getIdPeriodoPago().getDescripcion());
+				}
+				if (lectura.getMetros3() > 0)
+					detallePlanillaBO.update(usuario, detallePlanilla);
+			}
+			Runtime.getRuntime().gc();
+		} else {
+			throw new Exception("No puede recalcular una lectura que fue registrada antes del cambio del reglamento");
 		}
-		Runtime.getRuntime().gc();
 	}
 
 	/**
@@ -863,7 +852,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				pn.setTotal(pn.getTotal() + dpnpn.getValorTotal());
 			}
 			Double valorMulta = tarifaBO.getValorMulta(user);
-			log.info(String.format("Multa Aplicada: %s", valorMulta));
+			log.info(String.format("Multa: %s", valorMulta));
 			Double multa = detallePlanillaBO.crearMulta(pnp, pn, multaAtrazoMes, usuario, valorMulta);
 			if (user.getTieneDescuento())
 				multa = multa * 0.5;
