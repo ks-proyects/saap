@@ -67,7 +67,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	@EJB
 	protected TipoRegistroBO tipoRegistroBO;
 	@EJB
-	protected RegistroEconomicoBO registroEconomicoBO;
+	protected RegistroEconomicoBO reBO;
 	@EJB
 	protected CambioEstadoBO cambioEstadoBO;
 	@EJB
@@ -189,12 +189,12 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		if (usuarios != null && usuarios.size() > 0) {
 			Boolean existenMultaAtrazos = false;
 			Integer cantidadMultaAtrazosAplicados = 0;
-			RegistroEconomico multaAtrazoMes = registroEconomicoBO.getByPeriodo(periodoPago, "MULAGU");
+			RegistroEconomico multaAtrazoMes = reBO.getByPeriodo(periodoPago, "MULAGU");
 			if (multaAtrazoMes != null) {
 				cantidadMultaAtrazosAplicados = multaAtrazoMes.getCantidadAplicados();
 				existenMultaAtrazos = true;
 			} else {
-				multaAtrazoMes = registroEconomicoBO.iniciarMulta(periodoPago, userSystem);
+				multaAtrazoMes = reBO.iniciarMulta(periodoPago, userSystem);
 			}
 			for (Usuario user : usuarios) {
 				map.clear();
@@ -237,7 +237,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				cambioEstadoBO.eliminarEntidad(8, multaAtrazoMes.getIdRegistroEconomico());
 			else {
 				multaAtrazoMes.setCantidadAplicados(cantidadMultaAtrazosAplicados);
-				registroEconomicoBO.update(userSystem, multaAtrazoMes);
+				reBO.update(userSystem, multaAtrazoMes);
 			}
 			Runtime.getRuntime().gc();
 		}
@@ -264,7 +264,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		List<Object[]> objects = lecturaBO.findObjects("Lectura.findByPerido", map);
 
 		Integer cantidadAlcantarilladosAplicados = 0;
-		RegistroEconomico registroEconomicoAlcantarillado = registroEconomicoBO.inicializar(periodoPago, "ALCANCON",
+		RegistroEconomico registroEconomicoAlcantarillado = reBO.inicializar(periodoPago, "ALCANCON",
 				"Alcantarillado " + periodoPago.getDescripcion(), 0, systemUser);
 		for (Object[] object : objects) {
 			CabeceraPlanilla cp = (CabeceraPlanilla) object[0];
@@ -315,14 +315,14 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			cambioEstadoBO.eliminarEntidad(8, registroEconomicoAlcantarillado.getIdRegistroEconomico());
 		else {
 			registroEconomicoAlcantarillado.setCantidadAplicados(cantidadAlcantarilladosAplicados);
-			registroEconomicoBO.update(systemUser, registroEconomicoAlcantarillado);
+			reBO.update(systemUser, registroEconomicoAlcantarillado);
 		}
 		// Cambiamos el estado de las cuotas
 		map.clear();
 		map.put("idPeriodoPago", periodoPago);
 		map.put("tipoRegistro", tipoRegistroBO.findByPk("CUO"));
-		List<RegistroEconomico> registroEconomicos = registroEconomicoBO
-				.findAllByNamedQuery("RegistroEconomico.findByPeriodoAndTipo", map);
+		List<RegistroEconomico> registroEconomicos = reBO.findAllByNamedQuery("RegistroEconomico.findByPeriodoAndTipo",
+				map);
 		for (RegistroEconomico registroEconomico : registroEconomicos) {
 			cambioEstadoBO.cambiarEstadoSinVerificar(40, systemUser, registroEconomico.getIdRegistroEconomico(), "");
 		}
@@ -405,20 +405,14 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
 		HashMap<String, Object> p = new HashMap<>();
 
-		// OBTENEMOS LAS PLANILLAS Y SI EL VALOR PENDIENTE DEL DETALLE ES CERO
-		// LA PONEMOS COMO PAGAD
-
-		// AQUI PAGAMOS LAS PLANILAS QUE NO FUERON PAGADAS Y QUE ANTERIORMENTE
-		// TENIAN UN MONTO DE ABONO LAS PODEMOS PAGARLAS PARCIALEMTE O EN SU
-		// TOTALIDAD
-
+		// Obtenemos las planillas no pagadas
 		p.put("estado", "ING");
 		p.put("estado2", "ING");
 		p.put("idPeriodoPago", idPeriodoPago);
-		List<CabeceraPlanilla> planillasPagadasConAbono = findAllByNamedQuery("CabeceraPlanilla.findSinPagar", p);
-		log.info(String.format("Cantidad de Planillas no Pagadas:%s", planillasPagadasConAbono.size()));
+		List<CabeceraPlanilla> planillasNoPagadas = findAllByNamedQuery("CabeceraPlanilla.findSinPagar", p);
+		log.info(String.format("Cantidad de Planillas no PAGADAS:%s", planillasNoPagadas.size()));
 		int contador = 0;
-		for (CabeceraPlanilla planillaActual : planillasPagadasConAbono) {
+		for (CabeceraPlanilla planillaActual : planillasNoPagadas) {
 			CabeceraPlanilla planillaAnterior = getAbonoMesAnterior(planillaActual.getIdServicio(), planillaActual);
 			if (planillaAnterior != null && planillaAnterior.getAbonoUsd() != 0.0) {
 				Double abonoUsd = planillaAnterior.getAbonoUsd();
@@ -429,13 +423,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				contador++;
 			}
 		}
-		log.info(String.format("Planillas con bono :%s", contador));
-		// Actualizamos de estado a las planillas que no fueron pagadas
-		p.put("estado", "ING");
-		p.put("estado2", "ING");
-		p.put("idPeriodoPago", idPeriodoPago);
-		List<CabeceraPlanilla> planillasNoPagadas = findAllByNamedQuery("CabeceraPlanilla.findNoPag", p);
-		log.info(String.format("Cantidad de Planillas no pagadas :%s", planillasNoPagadas.size()));
+		log.info(String.format("Planillas No Pagadas Con Abono Anterior :%s", contador));
 		for (CabeceraPlanilla cp : planillasNoPagadas) {
 			cambioEstadoBO.cambiarEstadoSinVerificar(20, usuario, cp.getIdCabeceraPlanilla(), "");
 			Query queryDetalle = em().createQuery(
@@ -447,17 +435,15 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			queryDetalle.executeUpdate();
 			queryLecturas.executeUpdate();
 		}
-		Double valorDevuelto = 0.0;
+
 		// AQUI VA EL CALCULO DEL VALOR TOMADO DE LOS ABONOS PARA REDUCIR EL
 		// VALOR DE LAS CUENTAS POR PAGAR
 		p.put("estado", "PAG");
 		p.put("estado2", "INC");
 		p.put("idPeriodoPago", idPeriodoPago);
-		List<CabeceraPlanilla> planillasPagadas = findAllByNamedQuery("CabeceraPlanilla.findConAbono", p);
-		log.info(String.format("Cantidad de Planillas pagadas con abono :%s", planillasPagadas.size()));
-		Double valorRestantePorDevolver = 0.0;
-		Double valorPagadoAbonoIngresado = 0.0;
-		RegistroEconomico registroEconomicoPorDevolverAnterior = null;
+		List<CabeceraPlanilla> planillasPagadasConAbono = findAllByNamedQuery("CabeceraPlanilla.findConAbono", p);
+		log.info(String.format("Planillas pagadas con abono :%s", planillasPagadasConAbono.size()));
+
 		Calendar fechaInicioAnterior = new GregorianCalendar();
 		Calendar fechaFinalAnterior = new GregorianCalendar();
 		fechaInicioAnterior.setTime(periodoPago.getFechaInicio());
@@ -476,57 +462,68 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		map.clear();
 		map.put("idPeriodoPago", periodoPagoAn);
 		map.put("tipoRegistro", "CUEPAG");
-		registroEconomicoPorDevolverAnterior = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType",
-				map);
-
-		for (CabeceraPlanilla planillaActual : planillasPagadas) {
-			valorDevuelto += Utilitario.redondear(planillaActual.getValorPagadoAbono());
-			if (registroEconomicoPorDevolverAnterior != null) {
-				valorPagadoAbonoIngresado += Utilitario.redondear(
-						registroEconomicoPorDevolverAnterior.getValor() - planillaActual.getValorPagadoAbono());
-			}
+		RegistroEconomico rePorDevolverAnterior = reBO.findByNamedQuery("RegistroEconomico.findByType", map);
+		Double valorDevuelto = 0.0;
+		Double valorPorDevolverPendiente = 0.0;
+		for (CabeceraPlanilla cp : planillasPagadasConAbono) {
+			valorDevuelto += Utilitario.redondear(cp.getValorPagadoAbono());
 		}
-		log.info(String.format("Valor Recaudado por abono: %s", valorPagadoAbonoIngresado));
-		if (registroEconomicoPorDevolverAnterior != null) {
-			valorRestantePorDevolver = Utilitario
-					.redondear(registroEconomicoPorDevolverAnterior.getValor() - valorPagadoAbonoIngresado);
-			registroEconomicoPorDevolverAnterior.setValor(0.0);
-			registroEconomicoBO.update(usuario, registroEconomicoPorDevolverAnterior);
-		} else {
-
+		log.info(String.format("Valor Recaudado por abono: %s", valorDevuelto));
+		if (rePorDevolverAnterior != null) {
+			valorPorDevolverPendiente = Utilitario.redondear(rePorDevolverAnterior.getValor() - valorDevuelto);
+			rePorDevolverAnterior.setValor(0.0);
+			reBO.update(usuario, rePorDevolverAnterior);
 		}
-		// Calculamos el valor por devolver y que se encontrara en caja como
-		// capital
+		// Obtenemos los abonos del presente mes
 		p.put("estado", "PAG");
 		p.put("estado2", "INC");
 		p.put("idPeriodoPago", idPeriodoPago);
-		planillasPagadas = findAllByNamedQuery("CabeceraPlanilla.findNoPag", p);
+		List<CabeceraPlanilla> planillasConAbono = findAllByNamedQuery("CabeceraPlanilla.findNoPag", p);
 
-		Double totalIngresoPeriodo = 0.0;
-		Double totalPorDevolver = 0.0;
-		for (CabeceraPlanilla cabeceraPlanilla : planillasPagadas) {
-			totalIngresoPeriodo = totalIngresoPeriodo
-					+ (cabeceraPlanilla.getValorPagado() != null ? cabeceraPlanilla.getValorPagado() : 0.0);
-			totalPorDevolver = totalPorDevolver
-					+ (cabeceraPlanilla.getAbonoUsd() != null ? cabeceraPlanilla.getAbonoUsd() : 0.0);
+		Double totalRecaudado = 0.0;
+		Double valorPorDevolver = 0.0;
+		for (CabeceraPlanilla cabeceraPlanilla : planillasConAbono) {
+			totalRecaudado += (cabeceraPlanilla.getValorPagado() != null ? cabeceraPlanilla.getValorPagado() : 0.0);
+			valorPorDevolver += (cabeceraPlanilla.getAbonoUsd() != null ? cabeceraPlanilla.getAbonoUsd() : 0.0);
 		}
+		log.info(String.format("Recaudado : %1$s Abonos Mes: %2$s", totalRecaudado, valorPorDevolver));
 
 		// AL Valor Total de este mes actual tambien sumamos el valor pendiente
 		// por devolver del mes pasado
-		if (valorRestantePorDevolver > 0.0)
-			totalPorDevolver += valorRestantePorDevolver;
-		log.info(String.format("Valor Pendiente Abono Devolución: %s", totalPorDevolver));
-		// Registramos en caja por parte de servicios el valor pagado del
-		// periodo
-		cuentaBO.registrarAsiento(Constantes.numeroCaja, Constantes.cuentaCaja, Constantes.numeroServicio,
-				Constantes.cuentaServicio, Utilitario.redondear(totalIngresoPeriodo), usuario);
-
+		if (valorPorDevolverPendiente > 0.0)
+			valorPorDevolver += valorPorDevolverPendiente;
+		log.info(String.format("Valor Total Pendiente Por Devolver: %s", valorPorDevolver));
+		
+		map.clear();
+		map.put("idPeriodoPago", periodoPagoBO.findByPk(idPeriodoPago));
+		map.put("tipoRegistro", "CUEPAG");
+		RegistroEconomico rePorDevolver = reBO.findByNamedQuery("RegistroEconomico.findByType", map);
+		
+		// Registramos en caja por parte de servicios el valor pagado del periodo
+		if (totalRecaudado > 0.0)
+			cuentaBO.registrarAsiento(Constantes.numeroCaja, Constantes.cuentaCaja, Constantes.numeroServicio,
+					Constantes.cuentaServicio, Utilitario.redondear(totalRecaudado), usuario);
 		// Registramos en las cuentas por pagar de pero que estan en caja
-		cuentaBO.registrarAsiento(Constantes.numeroCuentasPorPagar, Constantes.cuentaCuentasPorPagar,
-				Constantes.numeroCaja, Constantes.cuentaCaja, Utilitario.redondear(totalPorDevolver), usuario);
+		if (valorPorDevolver > 0.0)
+			cuentaBO.registrarAsiento(Constantes.numeroCuentasPorPagar, Constantes.cuentaCuentasPorPagar,
+					Constantes.numeroCaja, Constantes.cuentaCaja, Utilitario.redondear(valorPorDevolver), usuario);
+		// Registramos en caja el valor devuelto con pago mediante abono
+		if (valorDevuelto > 0.0)
+			cuentaBO.registrarAsiento(Constantes.numeroCaja, Constantes.cuentaCaja, Constantes.numeroCuentasPorPagar,
+					Constantes.cuentaCuentasPorPagar, Utilitario.redondear(valorDevuelto), usuario);
+		// Actualizamos el registro economico del valor por devolver
+		if (rePorDevolver != null) {
+			if (valorPorDevolver.equals(0.0)) {
+				cambioEstadoBO.eliminarEntidad(8, rePorDevolver.getIdRegistroEconomico());
+			} else {
+				rePorDevolver.setValor(valorPorDevolver);
+				reBO.update(usuario, rePorDevolver);
+				cambioEstadoBO.cambiarEstadoSinVerificar(40, usuario, rePorDevolver.getIdRegistroEconomico(), "");
+			}
+		}
 
 		// Registramos en caja el valor total de los gastos
-
+		log.info("Inicia Obtención de Gastos");
 		map.clear();
 		map.put("idPeriodoPago", idPeriodoPago);
 		List<Gasto> gastos = gastoBO.findAllByNamedQuery("Gasto.findAllByUser", map);
@@ -535,50 +532,28 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			totalGastos = totalGastos + (gasto.getValor() != null ? gasto.getValor() : 0.0);
 		}
 
-		log.info(String.format("Valor Total Gastos: %s", totalPorDevolver));
-		// Tambiena actualizamos en el registro economico de gastos
+		log.info(String.format("Valor Total Gastos: %s", totalGastos));
+		// Tambien actualizamos en el registro economico de gastos
 		map.clear();
 		map.put("idPeriodoPago", periodoPagoBO.findByPk(idPeriodoPago));
 		map.put("tipoRegistro", "GAST");
-		RegistroEconomico registroEconomico = registroEconomicoBO.findByNamedQuery("RegistroEconomico.findByType", map);
+		RegistroEconomico registroEconomico = reBO.findByNamedQuery("RegistroEconomico.findByType", map);
 		if (registroEconomico != null) {
-			// Si no existe gastos eliminamos la entidad
-			if (gastos.isEmpty()) {
+			// Si no existe gastos eliminamos el registro economico
+			if (totalGastos.equals(0.0)) {
 				cambioEstadoBO.eliminarEntidad(8, registroEconomico.getIdRegistroEconomico());
 			} else {
 				registroEconomico.setValor(totalGastos);
-				registroEconomicoBO.update(usuario, registroEconomico);
+				registroEconomico.setCantidadAplicados(1);
+				reBO.update(usuario, registroEconomico);
 				cambioEstadoBO.cambiarEstadoSinVerificar(40, usuario, registroEconomico.getIdRegistroEconomico(), "");
 			}
 		}
-
-		// Actualizamos el registro economico del valor por devolver
-		map.clear();
-		map.put("idPeriodoPago", periodoPagoBO.findByPk(idPeriodoPago));
-		map.put("tipoRegistro", "CUEPAG");
-
-		RegistroEconomico registroEconomicoPorDevolver = registroEconomicoBO
-				.findByNamedQuery("RegistroEconomico.findByType", map);
-		if (registroEconomicoPorDevolver != null) {
-			if (totalPorDevolver.equals(0.0)) {
-				cambioEstadoBO.eliminarEntidad(8, registroEconomicoPorDevolver.getIdRegistroEconomico());
-			} else {
-				registroEconomicoPorDevolver.setValor(totalPorDevolver);
-				registroEconomicoBO.update(usuario, registroEconomicoPorDevolver);
-				cambioEstadoBO.cambiarEstadoSinVerificar(40, usuario,
-						registroEconomicoPorDevolver.getIdRegistroEconomico(), "");
-			}
-		}
-
 		// Registramos los gastos en el libro diario
-		cuentaBO.registrarAsiento(Constantes.numeroGasto, Constantes.cuentaGasto, Constantes.numeroCaja,
-				Constantes.cuentaCaja, Utilitario.redondear(totalGastos), usuario);
+		if (totalGastos > 0.0)
+			cuentaBO.registrarAsiento(Constantes.numeroGasto, Constantes.cuentaGasto, Constantes.numeroCaja,
+					Constantes.cuentaCaja, Utilitario.redondear(totalGastos), usuario);
 
-		// Registramos en caja el valor devuelto con pago mediante abono en los
-		// pagos por motivo de
-		// abonos
-		cuentaBO.registrarAsiento(Constantes.numeroCaja, Constantes.cuentaCaja, Constantes.numeroCuentasPorPagar,
-				Constantes.cuentaCuentasPorPagar, Utilitario.redondear(valorDevuelto), usuario);
 		Runtime.getRuntime().gc();
 	}
 
@@ -624,14 +599,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		map.clear();
 		map.put("idPeriodoPago", anterior.getIdPeriodoPago());
 		map.put("tipoRegistro", "CUEPAG");
-		RegistroEconomico registroEconomicoPorDevolver = registroEconomicoBO
-				.findByNamedQuery("RegistroEconomico.findByType", map);
+		RegistroEconomico registroEconomicoPorDevolver = reBO.findByNamedQuery("RegistroEconomico.findByType", map);
 		Double valorAbonoAnterior = Utilitario.redondear(anterior.getAbonoUsd());
 
 		if (registroEconomicoPorDevolver != null) {
 			registroEconomicoPorDevolver
 					.setValor(Utilitario.redondear(registroEconomicoPorDevolver.getValor() + valorAbonoAnterior));
-			registroEconomicoBO.update(usuario, registroEconomicoPorDevolver);
+			reBO.update(usuario, registroEconomicoPorDevolver);
 		}
 
 		cp.setValorCancelado(0.0);
@@ -678,8 +652,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		map.clear();
 		map.put("idPeriodoPago", anterior.getIdPeriodoPago());
 		map.put("tipoRegistro", "CUEPAG");
-		RegistroEconomico registroEconomicoPorDevolver = registroEconomicoBO
-				.findByNamedQuery("RegistroEconomico.findByType", map);
+		RegistroEconomico registroEconomicoPorDevolver = reBO.findByNamedQuery("RegistroEconomico.findByType", map);
 		if (registroEconomicoPorDevolver != null) {
 			if (registroEconomicoPorDevolver.getValor() > 0)
 				registroEconomicoPorDevolver.setValor(
@@ -688,7 +661,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				// Si la cuenta ya no tiene ningun valor le seteamos con valor
 				// cero
 				registroEconomicoPorDevolver.setValor(0.0);
-			registroEconomicoBO.update(usuario, registroEconomicoPorDevolver);
+			reBO.update(usuario, registroEconomicoPorDevolver);
 		}
 
 		update(usuario, cp);
@@ -735,7 +708,11 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	@Override
 	public void recalcularPlanilla(Usuario usuario, CabeceraPlanilla cabeceraPlanilla, Lectura lectura)
 			throws Exception {
-		if (cabeceraPlanilla.getIdPeriodoPago().getAnio() > 2021 && cabeceraPlanilla.getIdPeriodoPago().getMes() > 0) {
+		if (cabeceraPlanilla.getIdPeriodoPago().getAnio() > 2020 && cabeceraPlanilla.getIdPeriodoPago().getMes() > 0) {
+			if ("PAG".equalsIgnoreCase(cabeceraPlanilla.getEstado())
+					|| "TRAS".equalsIgnoreCase(cabeceraPlanilla.getEstado())) {
+				throw new Exception("La factura ya se encuentra pagada o finalizada");
+			}
 			if ("ING".equalsIgnoreCase(cabeceraPlanilla.getEstado())) {
 				lectura = lecturaBO.recalcularLectura(usuario, lectura);
 				CabeceraPlanilla cp = cabeceraPlanilla;
@@ -745,7 +722,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				pama.put("idCabeceraPlanilla", cabeceraPlanilla);
 				DetallePlanilla detallePlanilla = detallePlanillaBO
 						.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
-				detallePlanilla=detallePlanillaBO.builDetailLectura(lectura.getIdPeriodoPago(), lectura, detallePlanilla);
+				detallePlanilla = detallePlanillaBO.builDetailLectura(lectura.getIdPeriodoPago(), lectura,
+						detallePlanilla);
 				detallePlanillaBO.update(usuario, detallePlanilla);
 				// Recalculamos el valor de la planilla
 				map.clear();
@@ -776,8 +754,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				pama.put("idCabeceraPlanilla", cabeceraPlanilla);
 				DetallePlanilla detallePlanilla = detallePlanillaBO
 						.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
-				// Si es mayor a cero realizamos el calculo caso contrario
-				// cobramos el basico
+
 				if (lectura.getMetros3() > 0) {
 					detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3 "
 							+ lectura.getIdPeriodoPago().getDescripcion());

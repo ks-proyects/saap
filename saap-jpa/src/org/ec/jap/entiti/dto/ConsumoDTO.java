@@ -9,7 +9,7 @@ import org.ec.jap.utilitario.Utilitario;
 
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "ConsumoDTO.findConsumo", query = "SELECT new ConsumoDTO(pp.descripcion,count(d),sum(lec.metros3)+sum(lec.metros3Exceso),sum(d.valorTotal),sum(d.valorPagado),sum(lec.valorMetro3)/count(d)) FROM DetallePlanilla d inner join d.idCabeceraPlanilla cp inner join cp.idPeriodoPago pp inner join d.idLectura lec inner join cp.idServicio ll inner join ll.idTarifa tar where lec.idPeriodoPago=pp and (pp.anio=? or ?=0) and (d.ordenStr=? OR d.ordenStr=?) and (tar.idTarifa=? or ?=0) group by pp.anio, pp.mes,pp.descripcion order by pp.anio,pp.mes"), })
+		@NamedQuery(name = "ConsumoDTO.findConsumo", query = "SELECT new ConsumoDTO(pp.descripcion,count(d),sum(lec.metros3)+sum(lec.metros3Exceso),sum(d.valorTotal),sum(d.valorPagado),sum(lec.valorMetro3)/count(d)) FROM DetallePlanilla d inner join d.idCabeceraPlanilla cp inner join cp.idPeriodoPago pp inner join d.idLectura lec inner join lec.idServicio ll inner join ll.idTarifa tar where lec.idPeriodoPago=pp and (pp.anio=? or ?=0) and (d.ordenStr=? OR d.ordenStr=?) and (tar.idTarifa=? or ?=0) group by pp.anio, pp.mes,pp.descripcion order by pp.anio,pp.mes"), })
 public class ConsumoDTO {
 
 	@Id
