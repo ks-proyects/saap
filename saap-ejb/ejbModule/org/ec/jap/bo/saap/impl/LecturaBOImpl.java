@@ -54,6 +54,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 			consumoPromedio = consumoPromedio / list.size();
 		}
 		Integer consumoPromedioint = consumoPromedio.intValue();
+		lectura.setLecturaAnterior(lecturaAnterior);
 		lectura.setLecturaIngresada(Utilitario.redondear(lecturaAnterior + consumoPromedioint));
 		return lectura;
 	}
@@ -227,11 +228,12 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 		String mensaje = "";
 		String mensajeAlerta = "";
 		for (Lectura lectura : lecturas) {
+			
 			lectura.setValorBasico(Utilitario.redondear(lectura.getIdServicio().getIdTarifa().getBasicoPago()));
 			if (lectura.getSinLectura() || !lectura.getEsModificable()) {
 				if ((lectura.getLecturaIngresada() != null && !lectura.getLecturaIngresada().equals(0.0))
 						|| lectura.getLecturaAnterior().equals(lectura.getLecturaIngresada())) {
-					lectura = buildTarifa(lectura, lectura.getIdPeriodoPago());
+					lectura = buildLectura(lectura, lectura.getIdPeriodoPago());
 					Double totalM3 = Utilitario.redondear(lectura.getMetros3() + lectura.getMetros3Exceso());
 					Double diferencia = Math.abs(Utilitario.redondear(totalM3 - lectura.getMetros3Anterior()));
 					if (diferencia >= valorDiferencia) {
@@ -260,7 +262,7 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 	public Integer findLecturaAnterior(Servicio servicio, Boolean usuarioNuevo) throws Exception {
 		HashMap<String, Object> mapAux = new HashMap<>();
 		mapAux.put("idServicio", servicio);
-		mapAux.put("usuarioNuevo", usuarioNuevo);
+		//mapAux.put("usuarioNuevo", usuarioNuevo);
 		Integer idLecturaAnteriorIngresada = findIntegerByNamedQuery("Lectura.findLastByPeridoAndLlave", mapAux);
 		return idLecturaAnteriorIngresada;
 	}
