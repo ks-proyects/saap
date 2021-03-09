@@ -56,7 +56,7 @@ public class LecturaListBean extends Bean {
 
 	public void search(ActionEvent event) {
 		try {
-			periodoPago = periodoPagoBO.findByNamedQuery("PeriodoPago.findAbierto");
+			periodoPago = periodoPagoBO.findByNamedQuery("PeriodoPago.findAbiertoObj");
 			if (periodoPago != null && "CERR".equals(periodoPago.getEstado())) {
 				// redisplayAction(7, false);
 				setNivelBloqueo(1);

@@ -7,9 +7,22 @@ package org.ec.jap.entiti.saap;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -24,10 +37,12 @@ import org.ec.jap.enumerations.EpocaEnum;
 @Entity
 @Table(name = "periodo_pago")
 @NamedQueries({
+		@NamedQuery(name = "PeriodoPago.findById", query = "SELECT new PeriodoPago(p.idPeriodoPago,p.descripcion,p.fechaInicio,p.fechaFin, p.estado,p.epoca) FROM PeriodoPago p WHERE p.idPeriodoPago=:idPeriodoPago"),
 		@NamedQuery(name = "PeriodoPago.findByFechas", query = "SELECT p FROM PeriodoPago p WHERE p.fechaInicio=:fechaInicio and p.fechaFin=:fechaFin ORDER BY p.idPeriodoPago DESC "),
-		@NamedQuery(name = "PeriodoPago.findByAnio", query = "SELECT p FROM PeriodoPago p WHERE  UPPER(p.descripcion) like UPPER(CONCAT('%',:filtro,'%')) ORDER BY p.fechaFin DESC"),
+		@NamedQuery(name = "PeriodoPago.findByAnio", query = "SELECT new PeriodoPago(p.idPeriodoPago,p.descripcion,p.fechaInicio,p.fechaFin, p.estado) FROM PeriodoPago p WHERE  UPPER(p.descripcion) like UPPER(CONCAT('%',:filtro,'%')) ORDER BY p.fechaFin DESC"),
 		@NamedQuery(name = "PeriodoPago.findMaxMes", query = "SELECT MAX(p.fechaFin) FROM PeriodoPago p"),
 		@NamedQuery(name = "PeriodoPago.findAll", query = "SELECT p FROM PeriodoPago p ORDER BY p.fechaFin DESC"),
+		@NamedQuery(name = "PeriodoPago.findAbiertoObj", query = "SELECT new PeriodoPago(p.idPeriodoPago,p.descripcion,p.estado,p.epoca) FROM PeriodoPago p WHERE p.estado in ('ABIE','CERR')"),
 		@NamedQuery(name = "PeriodoPago.findAbierto", query = "SELECT p FROM PeriodoPago p WHERE p.estado in ('ABIE','CERR')"),
 		@NamedQuery(name = "PeriodoPago.findAbiertoCerrado", query = "SELECT p FROM PeriodoPago p WHERE p.estado  in ('ABIE','CERR')") })
 @AuditoriaAnot(entityType = "PERPAG")
@@ -67,7 +82,7 @@ public class PeriodoPago implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private EpocaEnum epoca;
 
-	@OneToMany(mappedBy = "idPeriodoPago")
+	@OneToMany(mappedBy = "idPeriodoPago", fetch = FetchType.EAGER)
 	private List<CabeceraPlanilla> cabeceraPlanillaList;
 
 	@OneToMany(mappedBy = "idPeriodoPago")
@@ -89,6 +104,26 @@ public class PeriodoPago implements Serializable {
 		this.idPeriodoPago = idPeriodoPago;
 	}
 
+	public PeriodoPago(Integer idPeriodoPago, String descripcion, Date fechaInicio, Date fechaFin, String estado) {
+		super();
+		this.idPeriodoPago = idPeriodoPago;
+		this.descripcion = descripcion;
+		this.fechaInicio = fechaInicio;
+		this.fechaFin = fechaFin;
+		this.estado = estado;
+	}
+
+	public PeriodoPago(Integer idPeriodoPago, String descripcion, Date fechaInicio, Date fechaFin, String estado,
+			EpocaEnum epoca) {
+		super();
+		this.idPeriodoPago = idPeriodoPago;
+		this.descripcion = descripcion;
+		this.fechaInicio = fechaInicio;
+		this.fechaFin = fechaFin;
+		this.estado = estado;
+		this.epoca = epoca;
+	}
+
 	public PeriodoPago(Integer idPeriodoPago, String descripcion, Date fechaInicio, Date fechaFin, Integer anio,
 			Integer mes) {
 		this.idPeriodoPago = idPeriodoPago;
@@ -97,6 +132,15 @@ public class PeriodoPago implements Serializable {
 		this.fechaFin = fechaFin;
 		this.anio = anio;
 		this.mes = mes;
+	}
+	
+
+	public PeriodoPago(Integer idPeriodoPago, String descripcion, String estado, EpocaEnum epoca) {
+		super();
+		this.idPeriodoPago = idPeriodoPago;
+		this.descripcion = descripcion;
+		this.estado = estado;
+		this.epoca = epoca;
 	}
 
 	@AuditoriaMethod(isIdEntity = true, disabled = true)

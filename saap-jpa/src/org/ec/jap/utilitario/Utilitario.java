@@ -260,7 +260,7 @@ public class Utilitario {
 
 	public static void main(String[] arg) {
 		
-		System.out.println(Utilitario.getMD5_Base64("hugoramiro"));
+		System.out.println(Utilitario.getMD5_Base64("adminadmin"));
 
 	}
 

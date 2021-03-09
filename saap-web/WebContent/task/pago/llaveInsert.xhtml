@@ -35,8 +35,7 @@
 						value="* # Medidor o Lote:" />
 					<h:inputText rendered="#{llaveInsertBean.nuevo}" id="txtNumero"
 						value="#{llaveInsertBean.llave.numero}"
-						readonly="#{llaveInsertBean.readOnly1}"
-						onkeypress="return ValidarNumerico('%d',this,event);" />
+						readonly="#{llaveInsertBean.readOnly1}" />
 					<h:outputLabel rendered="#{llaveInsertBean.nuevo}" for="txtEstado"
 						value="Estado:" />
 					<h:commandLink rendered="#{llaveInsertBean.nuevo}" id="txtEstado"

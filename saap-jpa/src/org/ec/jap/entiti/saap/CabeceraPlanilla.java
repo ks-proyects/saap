@@ -55,7 +55,7 @@ import org.ec.jap.utilitario.Utilitario;
 		@NamedQuery(name = "CabeceraPlanilla.findAllNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND ( c.idServicio=:idServicio or c.idUsuario=:idUsuario)"),
 		@NamedQuery(name = "CabeceraPlanilla.findAllNoPagAlcantiralado", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND c.idUsuario=:idUser "),
 		@NamedQuery(name = "CabeceraPlanilla.findNewUser", query = "SELECT COUNT(c.idCabeceraPlanilla) FROM CabeceraPlanilla c WHERE c.idServicio=:idServicio AND c IN ( SELECT dp.idCabeceraPlanilla FROM DetallePlanilla dp INNER JOIN dp.idLectura l WHERE l.idServicio=:idServicio )"),
-		@NamedQuery(name = "CabeceraPlanilla.findByFilters", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idServicio ll inner join ll.idUsuario u WHERE  ll.numero like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%')  OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
+		@NamedQuery(name = "CabeceraPlanilla.findByFilters", query = "SELECT c FROM CabeceraPlanilla c LEFT OUTER JOIN c.idServicio ll LEFT OUTER join ll.idUsuario u LEFT OUTER JOIN c.idUsuario us2 WHERE  ll.numero like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%') OR us2.cedula like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%')  OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(us2.nombres) like  UPPER(CONCAT('%',:filtro,'%'))  OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(us2.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
 		@NamedQuery(name = "CabeceraPlanilla.findAllIngresado", query = "SELECT c FROM CabeceraPlanilla c WHERE c.estado='ING'"),
 		@NamedQuery(name = "CabeceraPlanilla.findByUsuarioAndEstado", query = "SELECT c FROM CabeceraPlanilla c inner join c.idServicio  ll where ll.idServicio=:idServicio AND c.estado=:estado") })
 @AuditoriaAnot(entityType = "CABPLA")
@@ -182,6 +182,30 @@ public class CabeceraPlanilla implements Serializable {
 	@AuditoriaMethod(name = "N�mero de Factura")
 	public String getObservacion() {
 		return observacion;
+	}
+	
+	
+	public String getNombreUsuario() {
+		Usuario user=null;
+		if(idServicio!=null) {
+			user=idServicio.getIdUsuario();
+		}else if(idUsuario!=null) {
+			user=idUsuario;
+		}
+		if(user!=null)
+			return user.getNombres()+" "+user.getApellidos();
+		return  "";
+	}
+	public String getCedulaUsuario() {
+		Usuario user=null;
+		if(idServicio!=null) {
+			user=idServicio.getIdUsuario();
+		}else if(idUsuario!=null) {
+			user=idUsuario;
+		}
+		if(user!=null)
+			return user.getCedula();
+		return  "";
 	}
 
 	public void setObservacion(String observacion) {

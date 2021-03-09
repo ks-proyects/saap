@@ -217,7 +217,7 @@ public class Usuario implements Serializable {
 	}
 
 	public String getNombres() {
-		return nombres;
+		return nombres != null ? nombres : "";
 	}
 
 	public void setNombres(String nombres) {
@@ -225,7 +225,7 @@ public class Usuario implements Serializable {
 	}
 
 	public String getApellidos() {
-		return apellidos;
+		return apellidos != null ? apellidos : "";
 	}
 
 	public void setApellidos(String apellidos) {
