@@ -440,7 +440,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					}
 				}
 				update(usuario, cp);
-				enviarEmail(cp, periodoPago);
 				Runtime.getRuntime().gc();
 			}
 			Runtime.getRuntime().gc();
