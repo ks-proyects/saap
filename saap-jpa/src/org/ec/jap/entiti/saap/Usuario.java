@@ -41,9 +41,10 @@ import org.hibernate.validator.constraints.Email;
 @Entity
 @Table(name = "usuario", schema = "saap")
 @NamedQueries({
-
+		@NamedQuery(name = "Usuario.findServiceNotHadDet", query = "SELECT u FROM Usuario u WHERE u.estado IN ('ACT','EDI') and u in (SELECT s.idUsuario FROM Servicio s where s.activo in ('SI') and s.idUsuario=u and s not in ( select dp.idServicio from DetallePlanilla dp where dp.idCabeceraPlanilla.idPeriodoPago=:idPeriodoPago and dp.idCabeceraPlanilla.idUsuario=u AND dp.idServicio=s)) ORDER BY u.apellidos.nombres"),
+		@NamedQuery(name = "Usuario.findAllActivosHadSer", query = "SELECT u FROM Usuario u WHERE u.estado IN ('ACT','EDI') and u in (SELECT s.idUsuario FROM Servicio s where s.activo in ('SI') and s.idUsuario=u) ORDER BY u.apellidos.nombres"),
 		@NamedQuery(name = "Usuario.findNotHadPlanilla", query = "SELECT u FROM Usuario u WHERE u.estado IN ('ACT','EDI') and u in (SELECT s.idUsuario FROM Servicio s where s.activo in ('SI') and s.idUsuario.idUsuario=u.idUsuario) and u not in (select cp.idUsuario from CabeceraPlanilla cp where cp.idPeriodoPago=:idPeriodoPago) ORDER BY u.apellidos.nombres"),
-		@NamedQuery(name = "Usuario.findAllActivosAndHadService", query = "SELECT u FROM Usuario u WHERE u.estado IN ('ACT','EDI') and u in (SELECT s.idUsuario FROM Servicio s where s.activo in ('SI') and s.idUsuario.idUsuario=u.idUsuario) ORDER BY u.apellidos.nombres"),
+		
 		@NamedQuery(name = "Usuario.findByFilters", query = " SELECT u,(SELECT SUM(asi.numeroRayas) FROM Asistencia asi inner join asi.actividad act inner join act.tipoActividad tact inner join act.idPeriodoPago per WHERE asi.idUsuario=u AND ((act.actividad=:actividad OR :actividad=0) AND (tact.tipoActividad=:tipoActividad OR :tipoActividad=0)) AND (per.idPeriodoPago=:idPeriodoPago OR :idPeriodoPago=0) AND (per.anio=:anio OR :anio=0)) FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario  ORDER BY upper(CONCAT(u.nombres,' ',u.apellidos)), u.fechaIngreso DESC"),
 		@NamedQuery(name = "Usuario.findAllActivos", query = "SELECT u FROM Usuario u WHERE  u.estado='ACT'"),
 		@NamedQuery(name = "Usuario.findByCedNom", query = " SELECT u FROM Usuario u WHERE u.tipoUsuario=:tipoUsuario AND (upper(u.cedula) LIKE upper(CONCAT('%',:filtro,'%'))  OR upper(CONCAT(u.nombres,' ',u.apellidos)) LIKE upper(CONCAT('%',:filtro,'%'))) ORDER BY upper(u.apellidos),upper(u.nombres)"),

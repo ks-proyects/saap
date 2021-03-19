@@ -89,7 +89,7 @@ public class RegistroEconomicoEditBean extends Bean {
 				displayMessage("Debe seleccionar un periodo.", Mensaje.SEVERITY_WARN);
 				return getPage().getOutcome();
 			}
-			registroEconomico.setIdPeriodoPago(periodoPagoBO.findByPk(idPeriodoPago));
+			registroEconomico.setIdPeriodoPago(periodoPagoBO.findByIdCustom(idPeriodoPago));
 
 			if ("INS".equals(getAccion())) {
 				registroEconomico.setTipoRegistro(tipoRegistroBO.findByPk(getParam20String()));

@@ -299,7 +299,6 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 			if (lecturaAnterior != null) {
 				Double me3Anterior = Utilitario
 						.redondear(lecturaAnterior.getMetros3() + lecturaAnterior.getMetros3Exceso());
-				log.info(String.format("Lectura Anterior: %1$s", lecturaAnterior.getLecturaIngresada()));
 				lectura.setMetros3Anterior(me3Anterior);
 				if (!lecturaAnterior.getSinLectura())
 					lectura.setLecturaAnterior(lecturaAnterior != null ? lecturaAnterior.getLecturaIngresada() : 0.0);

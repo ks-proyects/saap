@@ -123,40 +123,37 @@ public class RegistroEconomicoBOImpl extends RegistroEconomicoDAOImpl implements
 		p.put("idRegistroEconomico", registroEconomico);
 		p.put("filtro", filtro != null ? filtro.trim() : "");
 		List<Object[]> list = findObjects("RegistroEconomico.finUser", p);
-
 		for (Object[] objects : list) {
 			UsuarioPagoDTO dto = new UsuarioPagoDTO();
 			CabeceraPlanilla cabeceraPlanilla = (CabeceraPlanilla) objects[1];
-			DetallePlanilla detallePlanilla = (DetallePlanilla) objects[4];
-
-			if (detallePlanilla != null) {
-				cabeceraPlanilla.setSubtotal(
-						Utilitario.redondear((cabeceraPlanilla.getSubtotal() - detallePlanilla.getValorTotal())));
-				cabeceraPlanilla
-						.setTotal(Utilitario.redondear(cabeceraPlanilla.getTotal() - detallePlanilla.getValorTotal()));
-
-				detallePlanilla.setValorTotal(Utilitario.redondear(registroEconomico.getValor()));
-				detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
-				detallePlanilla.setValorPendiente(detallePlanilla.getValorTotal());
-				detallePlanilla.setValorUnidad(Utilitario.redondear(registroEconomico.getValor()));
-
-				cabeceraPlanilla.setSubtotal(
-						Utilitario.redondear(cabeceraPlanilla.getSubtotal() + detallePlanilla.getValorTotal()));
-				cabeceraPlanilla
-						.setTotal(Utilitario.redondear(cabeceraPlanilla.getTotal() + detallePlanilla.getValorTotal()));
-
-				detallePlanillaBO.update(usuario, detallePlanilla);
-				cabeceraPlanillaBO.update(usuario, cabeceraPlanilla);
+			if (cabeceraPlanilla != null) {
+				Integer id = (Integer) objects[2];
+				DetallePlanilla detallePlanilla = null;
+				if (id != null) {
+					detallePlanilla = detallePlanillaBO.findByIdCustom(id);
+					if (detallePlanilla != null) {
+						Double valorT = detallePlanilla.getValorTotal();
+						cabeceraPlanilla.setSubtotal(Utilitario.redondear((cabeceraPlanilla.getSubtotal() - valorT)));
+						cabeceraPlanilla.setTotal(Utilitario.redondear(cabeceraPlanilla.getTotal() - valorT));
+						detallePlanilla.setValorTotal(Utilitario.redondear(registroEconomico.getValor()));
+						detallePlanilla.setFechaRegistro(Calendar.getInstance().getTime());
+						detallePlanilla.setValorPendiente(detallePlanilla.getValorTotal());
+						detallePlanilla.setValorUnidad(Utilitario.redondear(registroEconomico.getValor()));
+						cabeceraPlanilla.setSubtotal(Utilitario.redondear(cabeceraPlanilla.getSubtotal() + valorT));
+						cabeceraPlanilla.setTotal(Utilitario.redondear(cabeceraPlanilla.getTotal() + valorT));
+						detallePlanillaBO.update(usuario, detallePlanilla);
+						cabeceraPlanillaBO.update(usuario, cabeceraPlanilla);
+					}
+				}
+				dto.setUsuario((Usuario) objects[0]);
+				dto.setCabeceraPlanilla(cabeceraPlanilla);
+				dto.setSeleccionado(detallePlanilla != null);
+				String estado = (detallePlanilla != null ? detallePlanilla.getEstado() : "");
+				dto.setEstadoDescripcion("PAG".equals(estado) ? "Pagado"
+						: "NOPAG".equals(estado) ? "No Pagado" : "ING".equals(estado) ? "Ingresado" : "");
+				dto.setDetallePlanilla(detallePlanilla);
+				dtos.add(dto);
 			}
-
-			dto.setUsuario((Usuario) objects[0]);
-			dto.setCabeceraPlanilla(cabeceraPlanilla);
-			dto.setSeleccionado("S".equals(objects[2].toString()));
-			String estado = (objects[3] != null ? (String) objects[3] : "");
-			dto.setEstadoDescripcion("PAG".equals(estado) ? "Pagado"
-					: "NOPAG".equals(estado) ? "No Pagado" : "ING".equals(estado) ? "Ingresado" : "");
-			dto.setDetallePlanilla(detallePlanilla);
-			dtos.add(dto);
 		}
 		return dtos;
 	}

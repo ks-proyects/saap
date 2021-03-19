@@ -57,7 +57,7 @@ public interface CabeceraPlanillaBO extends CabeceraPlanillaDAO {
 	 * @param idPeriodoPago
 	 * @throws Exception
 	 */
-	public void regenerarPeriodoPago(Usuario usuario, Integer idPeriodoPago) throws Exception;
+	public void regenerarPeriodoPagoAbierto(Usuario usuario, Integer idPeriodoPago) throws Exception;
 
 	/**
 	 * Método encargado de regenerar los calculos del consumo de agua potable de

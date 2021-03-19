@@ -17,6 +17,7 @@ import org.ec.jap.entiti.saap.DetallePlanilla;
 import org.ec.jap.entiti.saap.Lectura;
 import org.ec.jap.entiti.saap.PeriodoPago;
 import org.ec.jap.entiti.saap.RegistroEconomico;
+import org.ec.jap.entiti.saap.Servicio;
 import org.ec.jap.entiti.saap.Usuario;
 import org.ec.jap.utilitario.Constantes;
 import org.ec.jap.utilitario.Utilitario;
@@ -127,7 +128,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 
 	@Override
 	public DetallePlanilla crearDetalleAlcantarillado(Usuario currentUser, CabeceraPlanilla cp, RegistroEconomico rea,
-			Integer cantidad, Double valor, String ppDescripcion) throws Exception {
+			Integer cantidad, Double valor, String ppDescripcion,Servicio servicio) throws Exception {
 		DetallePlanilla dpa = new DetallePlanilla();
 		dpa.initValue();
 		dpa.setIdCabeceraPlanilla(cp);
@@ -140,6 +141,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		dpa.setOrdenStr("B");
 		dpa.setValorTotalOrigen(dpa.getValorTotal());
 		dpa.setOrigen(Constantes.origen_mes_Actual);
+		dpa.setIdServicio(servicio);
 		save(currentUser, dpa);
 		return dpa;
 	}
@@ -151,6 +153,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		dpn.setIdLectura(dpa.getIdLectura());
 		dpn.setIdRegistroEconomico(dpa.getIdRegistroEconomico());
 		dpn.setValorTotal(dpa.getValorTotal());
+		dpn.setIdServicio(dpa.getIdServicio()!=null?dpa.getIdServicio():(dpa.getIdLectura()!=null?dpa.getIdLectura().getIdServicio():null));
 		dpn.setFechaRegistro(
 				dpa.getFechaRegistro() != null ? dpa.getFechaRegistro() : Calendar.getInstance().getTime());
 		dpn.setValorUnidad(dpa.getValorUnidad());
@@ -188,6 +191,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		dpn.setIdLectura(dpi.getIdLectura());
 		dpn.setIdRegistroEconomico(dpi.getIdRegistroEconomico());
 		dpn.setValorTotal(dpi.getValorPendiente());
+		dpn.setIdServicio(dpi.getIdServicio()!=null?dpi.getIdServicio():(dpi.getIdLectura()!=null?dpi.getIdLectura().getIdServicio():null));
 		dpn.setFechaRegistro(
 				dpi.getFechaRegistro() != null ? dpi.getFechaRegistro() : Calendar.getInstance().getTime());
 		dpn.setValorPendiente(dpn.getValorTotal());
@@ -239,6 +243,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 						&& lec.getValorMetro3Exceso() > 0 ? (lec.getMetros3Exceso() * lec.getValorMetro3Exceso())
 								: 0.0));
 		Double total = Utilitario.redondear(base + exceso);
+		
 		Usuario us = lec.getIdServicio().getIdUsuario();
 		String nombre = us.getApellidos() + " " + us.getNombres();
 		String format = "........................";
@@ -248,6 +253,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 				total, nombre, lec.getIdServicio().getNumero()));
 		dpls.setValorUnidad(Utilitario.redondear(lec.getValorMetro3()));
 		dpls.setValorTotal(total);
+		dpls.setIdServicio(lec.getIdServicio());
 		dpls.setValorPagado(0.0);
 		dpls.setValorPendiente(dpls.getValorTotal());
 		dpls.setDescripcion(Utilitario.redondear(lec.getMetros3()) + " m3" + " " + periodoPago.getDescripcion());
@@ -262,10 +268,18 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		dpls.setIdCabeceraPlanilla(cp);
 		dpls.setValorPagado(0.0);
 		dpls.setValorPendiente(0.0);
+		dpls.setIdServicio(lec.getIdServicio());
 		dpls.setValorTotal(0.0);
 		dpls.setFechaRegistro(Calendar.getInstance().getTime());
 		dpls.setValorUnidad(0.0);
 		dpls.setOrdenStr("B");
 		return dpls;
+	}
+
+	@Override
+	public DetallePlanilla findByIdCustom(Integer idDetalle) throws Exception {
+		map = new HashMap<>(0);
+		map.put("idDetallePlanilla",idDetalle);
+		return findByNamedQuery("DetallePlanilla.findById", map);
 	}
 }

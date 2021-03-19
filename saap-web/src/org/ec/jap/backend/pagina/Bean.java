@@ -138,6 +138,21 @@ public abstract class Bean extends Actions {
 		// TODO Auto-generated method stub
 		return getSelectItems(idUser, map, namedQuerry, false, false, false, TipoListaValor.NQ, null);
 	}
+	/**
+	 * Método que genera un {@link List} de {@link SelectItem} en base a un
+	 * conjunto de parámetros de un {@link NamedQuery}
+	 * 
+	 * @param idUser
+	 * @param map
+	 * @param namedQuerry
+	 * @param mostrarTodos 
+	 * @return
+	 * @throws Exception
+	 */
+	public List<SelectItem> getSelectItemsTodos(Usuario idUser, HashMap<String, Object> map, String namedQuerry, Boolean mostrarTodos) throws Exception {
+		// TODO Auto-generated method stub
+		return getSelectItems(idUser, map, namedQuerry, false, mostrarTodos, false, TipoListaValor.NQ, null);
+	}
 
 	/**
 	 * Método que genera un {@link List} de {@link SelectItem} en base a un

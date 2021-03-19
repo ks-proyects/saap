@@ -97,7 +97,7 @@ public class ActividadEditBean extends Bean {
 	@Override
 	public String guardar() {
 		try {
-			PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
+			PeriodoPago periodoPago = periodoPagoBO.findByIdCustom(idPeriodoPago);
 			TipoActividad tipoActividad = tipoActividadBO.findByPk(idTipoActividad);
 			actividad.setIdPeriodoPago(periodoPago);
 			actividad.setTipoActividad(tipoActividad);

@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
 		@NamedQuery(name = "Gasto.findAllGastosAcum", query = "SELECT SUM(g.valor) FROM Gasto g inner join g.idRegistroEconomico ree inner join ree.tipoRegistro tr inner join g.idPeriodoPago pp WHERE tr=:tipoRegistro AND  (pp.anio<=:anio or :anio=0) AND (pp.mes<=:mes or :mes=-1)"),
 		@NamedQuery(name = "Gasto.findAllGastos", query = "SELECT SUM(g.valor) FROM Gasto g inner join g.idRegistroEconomico ree inner join ree.tipoRegistro tr inner join g.idPeriodoPago pp WHERE tr=:tipoRegistro AND  (pp.anio=:anio or :anio=0) AND (pp.mes=:mes or :mes=-1)"),
-		@NamedQuery(name = "Gasto.findAllByUser", query = "SELECT a FROM Gasto a inner join a.idPeriodoPago pp WHERE pp.idPeriodoPago=:idPeriodoPago OR :idPeriodoPago=0 ORDER BY a.fechaIngreso  "),
+		@NamedQuery(name = "Gasto.findAllByUser", query = "SELECT a FROM Gasto a inner join a.idPeriodoPago pp WHERE pp.idPeriodoPago=:idPeriodoPago OR :idPeriodoPago=0 ORDER BY a.fechaIngreso  DESC"),
 		@NamedQuery(name = "Gasto.findAll", query = "SELECT g FROM Gasto g"), @NamedQuery(name = "Gasto.findByIdGasto", query = "SELECT g FROM Gasto g WHERE g.idGasto = :idGasto"),
 		@NamedQuery(name = "Gasto.findByDescripcion", query = "SELECT g FROM Gasto g WHERE g.descripcion = :descripcion"),
 		@NamedQuery(name = "Gasto.findByValor", query = "SELECT g FROM Gasto g WHERE g.valor = :valor"),

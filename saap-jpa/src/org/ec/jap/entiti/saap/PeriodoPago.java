@@ -37,7 +37,7 @@ import org.ec.jap.enumerations.EpocaEnum;
 @Entity
 @Table(name = "periodo_pago")
 @NamedQueries({
-		@NamedQuery(name = "PeriodoPago.findById", query = "SELECT new PeriodoPago(p.idPeriodoPago,p.descripcion,p.fechaInicio,p.fechaFin, p.estado,p.epoca) FROM PeriodoPago p WHERE p.idPeriodoPago=:idPeriodoPago"),
+		@NamedQuery(name = "PeriodoPago.findById", query = "SELECT new PeriodoPago(p.idPeriodoPago,p.descripcion,p.fechaInicio,p.fechaFin, p.estado,p.epoca,p.anio,p.mes) FROM PeriodoPago p WHERE p.idPeriodoPago=:idPeriodoPago"),
 		@NamedQuery(name = "PeriodoPago.findByFechas", query = "SELECT p FROM PeriodoPago p WHERE p.fechaInicio=:fechaInicio and p.fechaFin=:fechaFin ORDER BY p.idPeriodoPago DESC "),
 		@NamedQuery(name = "PeriodoPago.findByAnio", query = "SELECT new PeriodoPago(p.idPeriodoPago,p.descripcion,p.fechaInicio,p.fechaFin, p.estado) FROM PeriodoPago p WHERE  UPPER(p.descripcion) like UPPER(CONCAT('%',:filtro,'%')) ORDER BY p.fechaFin DESC"),
 		@NamedQuery(name = "PeriodoPago.findMaxMes", query = "SELECT MAX(p.fechaFin) FROM PeriodoPago p"),
@@ -124,6 +124,19 @@ public class PeriodoPago implements Serializable {
 		this.epoca = epoca;
 	}
 
+	public PeriodoPago(Integer idPeriodoPago, String descripcion, Date fechaInicio, Date fechaFin, String estado,
+			EpocaEnum epoca, Integer anio, Integer mes) {
+		super();
+		this.idPeriodoPago = idPeriodoPago;
+		this.descripcion = descripcion;
+		this.fechaInicio = fechaInicio;
+		this.fechaFin = fechaFin;
+		this.anio = anio;
+		this.mes = mes;
+		this.estado = estado;
+		this.epoca = epoca;
+	}
+
 	public PeriodoPago(Integer idPeriodoPago, String descripcion, Date fechaInicio, Date fechaFin, Integer anio,
 			Integer mes) {
 		this.idPeriodoPago = idPeriodoPago;
@@ -133,7 +146,6 @@ public class PeriodoPago implements Serializable {
 		this.anio = anio;
 		this.mes = mes;
 	}
-	
 
 	public PeriodoPago(Integer idPeriodoPago, String descripcion, String estado, EpocaEnum epoca) {
 		super();

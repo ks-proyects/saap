@@ -39,7 +39,7 @@ import org.ec.jap.anotaciones.AuditoriaMethod;
 	@NamedQuery(name = "Lectura.findByPeridoAndService", query = "SELECT r FROM Lectura r where  r.idServicio=:idServicio AND r.idPeriodoPago=:idPeriodoPago"),	
 	@NamedQuery(name = "Lectura.findLasThree", query = "SELECT r FROM Lectura r where  r.idServicio=:idServicio and r!=:idLectura order by r.idLectura DESC"),
 		@NamedQuery(name = "Lectura.findByPeriod", query = "SELECT r FROM Lectura r where  r.idServicio=:idServicio AND  r.idPeriodoPago=:idPeriodoPago "),
-		@NamedQuery(name = "Lectura.findByPeridoCerrModificable", query = "SELECT  cp,ll FROM  CabeceraPlanilla cp inner join cp.idUsuario u inner join u.llaveList ll where cp.estado=:estado AND cp.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND ll.tipoServicio=:tipoServicio AND ll IN (select lect.idServicio FROM Lectura lect WHERE lect.esModificable=:esModificable AND lect.idPeriodoPago=:idPeriodoPago) order by u.apellidos,u.apellidos.nombres"),
+		@NamedQuery(name = "Lectura.findByPeridoCerrModificable", query = "SELECT  cp,ll FROM  CabeceraPlanilla cp inner join cp.idUsuario u inner join u.llaveList ll where cp.estado=:estado AND cp.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND ll.activo='SI' AND ll not in (select dp.idServicio FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=cp ) order by u.apellidos,u.apellidos.nombres"),
 		@NamedQuery(name = "Lectura.findErroneoByPeriodoSN", query = "SELECT r FROM Lectura r where   r.idPeriodoPago.idPeriodoPago=:idPeriodoPago  AND r.sinLectura=:sinLectura AND r.lecturaIngresada<r.lecturaAnterior"),
 		@NamedQuery(name = "Lectura.findErroneoByPeriodo", query = "SELECT r FROM Lectura r where   r.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND r.usuarioNuevo!=:usuarioNuevo  AND r.sinLectura!=:sinLectura AND r.lecturaIngresada<r.lecturaAnterior"),
 		@NamedQuery(name = "Lectura.findLastByPeridoAndLlave", query = "SELECT MAX(r.idLectura) FROM Lectura r where  r.idServicio=:idServicio"),
@@ -47,6 +47,7 @@ import org.ec.jap.anotaciones.AuditoriaMethod;
 		@NamedQuery(name = "Lectura.findByAnioAndMes", query = "SELECT DISTINCT r FROM Lectura r inner join r.idPeriodoPago pp WHERE r.idServicio=:llave AND pp.anio=:anio AND pp.mes=:mes"),
 		@NamedQuery(name = "Lectura.findByPerido", query = "SELECT  cp,ll FROM  CabeceraPlanilla cp inner join cp.idUsuario u inner join  u.llaveList ll   where  cp.estado=:estado AND cp.idPeriodoPago.idPeriodoPago=:idPeriodoPago order by u.apellidos,u.apellidos.nombres"),
 		@NamedQuery(name = "Lectura.findByPeridoAndLlave", query = "SELECT r FROM Lectura r where  r.idServicio.idServicio=:idServicio and r.estado='ING' AND r.idPeriodoPago=:idPeriodoPago"),
+		@NamedQuery(name = "Lectura.findByPeridoAndLlaveInicio", query = "SELECT r FROM Lectura r where  r.idServicio.idServicio=:idServicio and r.estado='ING' AND r.idPeriodoPago=:idPeriodoPago "),
 		@NamedQuery(name = "Lectura.findByUser", query = "SELECT r FROM Lectura r inner join r.idServicio ll where ll=:idServicio AND ( r.idPeriodoPago.idPeriodoPago=:idPeriodoPago or :idPeriodoPago=0) ORDER BY r.fechaRegistro DESC"), })
 @AuditoriaAnot(entityType = "LEC")
 public class Lectura implements Serializable {

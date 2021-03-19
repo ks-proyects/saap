@@ -10,6 +10,7 @@ import org.ec.jap.entiti.saap.DetallePlanilla;
 import org.ec.jap.entiti.saap.Lectura;
 import org.ec.jap.entiti.saap.PeriodoPago;
 import org.ec.jap.entiti.saap.RegistroEconomico;
+import org.ec.jap.entiti.saap.Servicio;
 import org.ec.jap.entiti.saap.Usuario;
 
 @Local
@@ -33,7 +34,7 @@ public interface DetallePlanillaBO extends DetallePlanillaDAO {
 	void descartarPago(CabeceraPlanilla planilla, Usuario usuario) throws Exception;
 
 	DetallePlanilla crearDetalleAlcantarillado(Usuario currentUser, CabeceraPlanilla cp,
-			RegistroEconomico registroEconomicoAlcantarillado, Integer cantidad, Double valor, String ppDescripcion)
+			RegistroEconomico registroEconomicoAlcantarillado, Integer cantidad, Double valor, String ppDescripcion,Servicio servicio)
 			throws Exception;
 
 	DetallePlanilla traspasarDetalle(CabeceraPlanilla planillaNueva, DetallePlanilla detallePlanilla);
@@ -82,4 +83,6 @@ public interface DetallePlanillaBO extends DetallePlanillaDAO {
 	 * @throws Exception
 	 */
 	DetallePlanilla buildInitialDetailLectura(CabeceraPlanilla cp, Lectura lec) throws Exception;
+	
+	DetallePlanilla findByIdCustom(Integer idDetalle) throws Exception;
 }

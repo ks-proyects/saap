@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -45,6 +44,7 @@ public class PeriodoPagoEditBean extends Bean {
 	@Override
 	public void init() {
 		try {
+			System.gc();
 			super.init();
 			setTipoEntidad("PERPAG");
 			search(null);
@@ -76,9 +76,7 @@ public class PeriodoPagoEditBean extends Bean {
 				calendarInicio.set(Calendar.DAY_OF_MONTH, calendarInicio.getActualMaximum(Calendar.DAY_OF_MONTH));
 				periodoPago.setFechaFin(calendarInicio.getTime());
 			} else {
-				map = new HashMap<>(0);
-				map.put("idPeriodoPago",getParam1Integer());
-				periodoPago = periodoPagoBO.findByNamedQuery("PeriodoPago.findById", map);
+				periodoPago = periodoPagoBO.findByIdCustom(getParam1Integer());
 				epoca=periodoPago.getEpoca()!=null?periodoPago.getEpoca().name():"-1";
 				puedeAgregarUnPeriodo = Utilitario.puedeAgregarNuevoPeriodo(periodoPago.getFechaFin());
 			}

@@ -205,7 +205,7 @@ public class CambioEstadoBOImpl extends CambioEstadoDAOImpl implements CambioEst
 					cabeceraPlanillaBO.abrirPeriodoPago(usuario, (Integer) idDocumento);
 					break;
 				case "ABIE":
-					cabeceraPlanillaBO.regenerarPeriodoPago(usuario, (Integer) idDocumento);
+					cabeceraPlanillaBO.regenerarPeriodoPagoAbierto(usuario, (Integer) idDocumento);
 					break;
 				case "CERR":
 					cabeceraPlanillaBO.regenerarPeriodoCerrado(usuario, (Integer) idDocumento);

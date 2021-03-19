@@ -100,7 +100,7 @@ public class GastoEditBean extends Bean {
 	@Override
 	public String guardar() {
 		try {
-			PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
+			PeriodoPago periodoPago = periodoPagoBO.findByIdCustom(idPeriodoPago);
 			Destino destino = destinoBO.findByPk(idDestino);
 			gasto.setIdPeriodoPago(periodoPago);
 			gasto.setIdDestino(destino);

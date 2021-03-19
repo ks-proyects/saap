@@ -37,19 +37,18 @@ import org.ec.jap.utilitario.Utilitario;
 @Entity
 @Table(name = "cabecera_planilla")
 @NamedQueries({
-		@NamedQuery(name = "CabeceraPlanilla.findConsulta", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idServicio ll inner join ll.idUsuario u INNER JOIN c.idPeriodoPago per WHERE per.estado='CERR' AND (  ll.numero = :filtro OR u.cedula = :filtro) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
+	@NamedQuery(name = "CabeceraPlanilla.findByUserPeriodo", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.idPeriodoPago=:idPeriodoPago AND c.idUsuario=:idUsuario"),	
+	@NamedQuery(name = "CabeceraPlanilla.findConsulta", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idServicio ll inner join ll.idUsuario u INNER JOIN c.idPeriodoPago per WHERE per.estado='CERR' AND (  ll.numero = :filtro OR u.cedula = :filtro) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
 		@NamedQuery(name = "CabeceraPlanilla.findConAbono", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND c.valorPagadoAbono!=0.0"),
 		@NamedQuery(name = "CabeceraPlanilla.findSinPagar", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago "),
 		@NamedQuery(name = "CabeceraPlanilla.findAbono", query = "SELECT c FROM CabeceraPlanilla  c INNER JOIN c.idServicio ll   WHERE ll=:llave AND c IN (SELECT MAX(cp) from CabeceraPlanilla cp INNER JOIN cp.idServicio ll WHERE ll=:llave AND cp!=:cp )"),
-		@NamedQuery(name = "CabeceraPlanilla.findByPerAbiertActFilters", query = "SELECT c FROM CabeceraPlanilla c inner join c.idUsuario u inner join u.llaveList ll "
+		@NamedQuery(name = "CabeceraPlanilla.findByPerAbiertActFilters", query = "SELECT c FROM CabeceraPlanilla c inner join c.idUsuario u "
 				+ "WHERE c IN "
 				+ "	(SELECT dp.idCabeceraPlanilla FROM DetallePlanilla dp INNER JOIN dp.idCabeceraPlanilla cabp "
 				+ "	 	WHERE cabp.idCabeceraPlanilla=c.idCabeceraPlanilla and cabp.idPeriodoPago.estado=:estado ) "
-				+ "AND c.idPeriodoPago.estado=:estado " + "AND ( " + "     ll.numero like CONCAT('%',:filtro,'%') "
-				+ "     OR UPPER(ll.idUsuario.nombres) like  UPPER(CONCAT('%',:filtro,'%')) "
-				+ "     OR UPPER(ll.idUsuario.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) "
+				+ "AND c.idPeriodoPago.estado=:estado AND ( u in ( select se.idUsuario from Servicio se where se.numero like CONCAT('%',:filtro,'%') )  "
 				+ "     OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) "
-				+ "     OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) " + " ) "
+				+ "     OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ) "
 				+ " ORDER BY u.apellidos,u.apellidos.nombres"),
 		@NamedQuery(name = "CabeceraPlanilla.findNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago"),
 		@NamedQuery(name = "CabeceraPlanilla.findAllNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND ( c.idServicio=:idServicio or c.idUsuario=:idUsuario)"),

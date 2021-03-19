@@ -31,7 +31,8 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "detalle_planilla")
 @NamedQueries({
-		
+
+		@NamedQuery(name = "DetallePlanilla.findById", query = "SELECT d FROM DetallePlanilla d where d.idDetallePlanilla=:idDetallePlanilla "),
 		@NamedQuery(name = "DetallePlanilla.findByLecturaAndCabcera", query = "SELECT d FROM DetallePlanilla d where d.idLectura=:idLectura and d.idCabeceraPlanilla=:idCabeceraPlanilla "),
 		@NamedQuery(name = "DetallePlanilla.findValorInasistencias", query = "SELECT CASE :tipo WHEN 'I' THEN SUM(dp.valorPagado) ELSE SUM(dp.valorPendiente) END FROM DetallePlanilla dp inner join dp.idAsistencia ina inner join ina.idRegistroEconomico re inner join re.tipoRegistro tr  WHERE tr=:tipoRegistro  AND dp.estado IN (:estado1,:estado2) "),
 		@NamedQuery(name = "DetallePlanilla.findValor", query = "SELECT CASE :tipo WHEN 'I' THEN SUM(dp.valorPagado) ELSE SUM(dp.valorPendiente) END FROM DetallePlanilla dp inner join dp.idRegistroEconomico re inner join re.tipoRegistro tr  WHERE tr=:tipoRegistro AND dp.estado IN (:estado1,:estado2) "),
@@ -54,7 +55,7 @@ import javax.validation.constraints.Size;
 		@NamedQuery(name = "DetallePlanilla.findByLectura", query = "SELECT d FROM DetallePlanilla d where d.idLectura=:idLectura"),
 		@NamedQuery(name = "DetallePlanilla.findByBasico", query = "SELECT d FROM DetallePlanilla d where d.idRegistroEconomico=:regeco and d.idCabeceraPlanilla=:cp and upper(d.descripcion) like concat('%',upper(:desc),'%')"),
 		@NamedQuery(name = "DetallePlanilla.findByUserAndTipoReg", query = "select dp FROM DetallePlanilla dp inner join dp.idCabeceraPlanilla cp inner join cp.idServicio ll inner join ll.idUsuario u inner join dp.idRegistroEconomico re inner join re.idPeriodoPago pp inner join re.tipoRegistro tp WHERE tp.tipoRegistro=:tipoRegistro AND u.idUsuario=:idUsuario AND (pp.idPeriodoPago=:idPeriodoPago OR :idPeriodoPago=0) AND dp.estado not in ('TRAS') ORDER BY re.fechaRegistro,re.descripcion"),
-		@NamedQuery(name = "DetallePlanilla.findByCabecara", query = "SELECT d FROM DetallePlanilla d where d.idCabeceraPlanilla=:idCabeceraPlanilla   ORDER BY d.ordenStr,d.fechaRegistro ASC"),// ,d.idDetallePlanilla
+		@NamedQuery(name = "DetallePlanilla.findByCabecara", query = "SELECT d FROM DetallePlanilla d where d.idCabeceraPlanilla=:idCabeceraPlanilla   ORDER BY d.ordenStr,d.fechaRegistro ASC"), // ,d.idDetallePlanilla
 																																																	// //
 																																																	// ASC
 		@NamedQuery(name = "DetallePlanilla.findByRegistroAndCabecara", query = "SELECT MAX(d) FROM DetallePlanilla d where d.idCabeceraPlanilla=:idCabeceraPlanilla AND d.idRegistroEconomico=:idRegistroEconomico") })
@@ -91,6 +92,10 @@ public class DetallePlanilla implements Serializable {
 	@ManyToOne
 	private Asistencia idAsistencia;
 
+	@JoinColumn(name = "id_servicio", referencedColumnName = "id_servicio")
+	@ManyToOne(optional = false)
+	private Servicio idServicio;
+
 	@Column(name = "es_manual")
 	private Boolean esManual;
 
@@ -123,11 +128,20 @@ public class DetallePlanilla implements Serializable {
 		this.idDetallePlanilla = idDetallePlanilla;
 	}
 
+	public DetallePlanilla(Integer idDetallePlanilla, Double valorTotal, String estado, Double valorPendiente) {
+		super();
+		this.idDetallePlanilla = idDetallePlanilla;
+		this.valorTotal = valorTotal;
+		this.estado = estado;
+		this.valorPendiente = valorPendiente;
+	}
+
 	public DetallePlanilla(Integer idDetallePlanilla, Double valorUnidad, String estado) {
 		this.idDetallePlanilla = idDetallePlanilla;
 		this.valorUnidad = valorUnidad;
 		this.estado = estado;
 	}
+	
 
 	public Integer getIdDetallePlanilla() {
 		return idDetallePlanilla;
@@ -333,7 +347,8 @@ public class DetallePlanilla implements Serializable {
 			return false;
 		}
 		DetallePlanilla other = (DetallePlanilla) object;
-		if ((this.idDetallePlanilla == null && other.idDetallePlanilla != null) || (this.idDetallePlanilla != null && !this.idDetallePlanilla.equals(other.idDetallePlanilla))) {
+		if ((this.idDetallePlanilla == null && other.idDetallePlanilla != null)
+				|| (this.idDetallePlanilla != null && !this.idDetallePlanilla.equals(other.idDetallePlanilla))) {
 			return false;
 		}
 		return true;
@@ -343,9 +358,18 @@ public class DetallePlanilla implements Serializable {
 	public String toString() {
 		return "org.ec.jap.entiti.DetallePlanilla[ idDetallePlanilla=" + idDetallePlanilla + " ]";
 	}
-	public void initValue(){
-		this.estado="ING";
-		this.valorPagado=0.0;
+
+	public void initValue() {
+		this.estado = "ING";
+		this.valorPagado = 0.0;
+	}
+
+	public Servicio getIdServicio() {
+		return idServicio;
+	}
+
+	public void setIdServicio(Servicio idServicio) {
+		this.idServicio = idServicio;
 	}
 
 }

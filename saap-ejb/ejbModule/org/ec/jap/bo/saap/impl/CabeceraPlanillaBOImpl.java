@@ -95,7 +95,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	public CabeceraPlanillaBOImpl() {
 	}
 
-	public List<CabeceraPlanilla> findPlanillasByLLaveAndStatus(Servicio llave, Usuario user, String estatus)
+	public List<CabeceraPlanilla> findPlanillasByServicioAndStatus(Servicio llave, Usuario user, String estatus)
 			throws Exception {
 		HashMap<String, Object> p = new HashMap<>();
 		p.put("estado", estatus);
@@ -121,10 +121,10 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		log.info("----------------abrirPeriodoPago----------------");
 		// Usuarios que poseen llaves
 		log.info("Obtiene todos los usuarios que poseen algun servicio y se encuentren en ACTIVOS o en estado EDISION");
-		List<Usuario> uActivos = usuarioBO.findAllByNamedQuery("Usuario.findAllActivosAndHadService");
+		List<Usuario> uActivos = usuarioBO.findAllByNamedQuery("Usuario.findAllActivosHadSer");
 		log.info(String.format("Cantidad de llaves por usuariso activo %s", uActivos.size()));
 		// Obtenemos el periodo de pago
-		PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
+		PeriodoPago periodoPago = periodoPagoBO.findByIdCustom(idPeriodoPago);
 		Parametro parametro = parametroBO.findByPk("NUMFACT");
 		Integer numeroFactura = parametro.getValorEntero();
 		String path = "0000000000000";
@@ -135,15 +135,15 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	}
 
 	@Override
-	public void regenerarPeriodoPago(Usuario usuario, Integer idPeriodoPago) throws Exception {
+	public void regenerarPeriodoPagoAbierto(Usuario usuario, Integer idPeriodoPago) throws Exception {
 		log.info("----------------regenerarPeriodoPago----------------");
-		PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
+		PeriodoPago periodoPago = periodoPagoBO.findByIdCustom(idPeriodoPago);
 		Parametro parametro = parametroBO.findByPk("NUMFACT");
 		Integer numeroFactura = parametro.getValorEntero();
 		String path = "0000000000000";
 		map = new HashMap<>();
 		map.put("idPeriodoPago", periodoPago);
-		List<Usuario> llaves = usuarioBO.findAllByNamedQuery("Usuario.findNotHadPlanilla", map);
+		List<Usuario> llaves = usuarioBO.findAllByNamedQuery("Usuario.findServiceNotHadDet", map);
 		numeroFactura = iniciarPlanillas(periodoPago, llaves, usuario, numeroFactura, path);
 		parametro.setValorEntero(numeroFactura);
 		parametroBO.update(usuario, parametro);
@@ -153,10 +153,10 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 
 	public List<Usuario> regenerarPlanillasPeriodoCerrado(Usuario usuario, Integer idPeriodoPago) throws Exception {
 		log.info("----------------regenerarPlanillasPeriodoCerrado----------------");
-		PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
+		PeriodoPago periodoPago = periodoPagoBO.findByIdCustom(idPeriodoPago);
 		map = new HashMap<>();
 		map.put("idPeriodoPago", periodoPago);
-		List<Usuario> usuarios = usuarioBO.findAllByNamedQuery("Usuario.findNotHadPlanilla", map);
+		List<Usuario> usuarios = usuarioBO.findAllByNamedQuery("Usuario.findServiceNotHadDet", map);
 		if (usuarios != null && usuarios.size() > 0) {
 			Parametro parametro = parametroBO.findByPk("NUMFACT");
 			Integer numeroFactura = parametro.getValorEntero();
@@ -165,6 +165,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			parametro.setValorEntero(numeroFactura);
 			parametroBO.update(usuario, parametro);
 			Runtime.getRuntime().gc();
+			System.gc();
 			return usuarios;
 		}
 		log.info("----------------regenerarPlanillasPeriodoCerrado Fin--------------");
@@ -199,9 +200,12 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			for (Usuario user : usuarios) {
 				map.clear();
 				map.put("idUsuario", user);
+				map.put("idPeriodoPago", periodoPago);
 				List<Servicio> servicios = llaveBO.findAllByNamedQuery("Servicio.findByUserActivo", map);
+				//Verificamos si ya posee factura, es para el caso que se agregue un servico adiciobnal luego de haber creado la planilla
+				List<CabeceraPlanilla> planillaActual = findAllByNamedQuery("CabeceraPlanilla.findByUserPeriodo", map);
 				if (servicios.size() > 0) {
-					numeroFactura++;
+					CabeceraPlanilla pn = null;
 					Servicio llave = null;
 					String nombre = user.getApellidos() + " " + user.getNombres();
 					String format = "........................";
@@ -213,19 +217,24 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 								llave = servicio;
 								break;
 							}
+					if (planillaActual.isEmpty()) {
+						numeroFactura++;
+						pn = iniciarCabecera(periodoPago.getIdPeriodoPago(), user, path, numeroFactura);
+						save(userSystem, pn);
+						cambioEstadoBO.cambiarEstadoSinVerificar(18, userSystem, pn.getIdCabeceraPlanilla(), "");
+						CabeceraPlanilla cpnpg = verificarMultNoPago(llave, user, pn, userSystem, multaAtrazoMes);
+						if (cpnpg != null) {
+							pn = cpnpg;
+							cantidadMultaAtrazosAplicados++;
+							existenMultaAtrazos = true;
+						}
+						pn = verificarPlanillasIncompletas(llave, user, pn, userSystem);
+					} else {
+						pn=planillaActual.get(0);
+					}
+
 					log.info(String.format("%1$s ===> Medidor: %2$s Factura: %3$s", nombre,
 							llave != null ? llave.getNumero() : "NA", numeroFactura));
-
-					CabeceraPlanilla pn = iniciarCabecera(periodoPago.getIdPeriodoPago(), user, path, numeroFactura);
-					save(userSystem, pn);
-					cambioEstadoBO.cambiarEstadoSinVerificar(18, userSystem, pn.getIdCabeceraPlanilla(), "");
-					CabeceraPlanilla cpnpg = verificarMultNoPago(llave, user, pn, userSystem, multaAtrazoMes);
-					if (cpnpg != null) {
-						pn = cpnpg;
-						cantidadMultaAtrazosAplicados++;
-						existenMultaAtrazos = true;
-					}
-					pn = verificarPlanillasIncompletas(llave, user, pn, userSystem);
 					if (llave != null)
 						lecturaBO.iniciarLecturaCero(periodoPago, llave, userSystem);
 					pn.setValorPendiente(pn.getTotal());
@@ -256,7 +265,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		if (!lecturas.isEmpty())
 			throw new Exception("Existen lecturas mal ingresadas, revice las lecturas.");
 		// Obtenemos el periodo de pago
-		PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
+		PeriodoPago periodoPago = periodoPagoBO.findByIdCustom(idPeriodoPago);
 		// Obtenemso las lecturas del mes, incluido la llave y las facturas
 		map.clear();
 		map.put("estado", "ING");
@@ -270,12 +279,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			CabeceraPlanilla cp = (CabeceraPlanilla) object[0];
 			Servicio servicio = (Servicio) object[1];
 			Double vAlcan = servicio.getIdTarifa() != null ? servicio.getIdTarifa().getBasicoPago() : 0.0;
+			
 			// Obtenemos la lectura de la llave
 			if (servicio != null && TipoServicioEnum.AGUA_POTABLE.equals(servicio.getTipoServicio())) {
 				map = new HashMap<>();
 				map.put("idServicio", servicio.getIdServicio());
 				map.put("idPeriodoPago", periodoPago);
-				Lectura lec = lecturaBO.findByNamedQuery("Lectura.findByPeridoAndLlave", map);
+				Lectura lec = lecturaBO.findByNamedQuery("Lectura.findByPeridoAndLlaveInicio", map);
 				Boolean debeRegistrarDetalle = true;
 				if (lec != null) {
 					DetallePlanilla dpls = detallePlanillaBO.buildInitialDetailLectura(cp, lec);
@@ -303,7 +313,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				}
 			} else if (servicio != null && TipoServicioEnum.ALCANTARILLADO.equals(servicio.getTipoServicio())) {
 				DetallePlanilla alcantarillado = detallePlanillaBO.crearDetalleAlcantarillado(systemUser, cp,
-						registroEconomicoAlcantarillado, 1, vAlcan, periodoPago.getDescripcion());
+						registroEconomicoAlcantarillado, 1, vAlcan, periodoPago.getDescripcion(), servicio);
 				cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + alcantarillado.getValorTotal()));
 				cp.setTotal(Utilitario.redondear(cp.getTotal() + alcantarillado.getValorTotal()));
 				registroEconomicoAlcantarillado
@@ -335,28 +345,29 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	public void regenerarPeriodoCerrado(Usuario usuario, Integer idPeriodoPago) throws Exception {
+		PeriodoPago periodoPago = periodoPagoBO.findByIdCustom(idPeriodoPago);
 		regenerarPlanillasPeriodoCerrado(usuario, idPeriodoPago);
+
 		HashMap<String, Object> map = new HashMap<>();
 		map.clear();
 		map.put("estado", "ING");
 		map.put("idPeriodoPago", idPeriodoPago);
-		map.put("esModificable", false);
-		map.put("tipoServicio", TipoServicioEnum.AGUA_POTABLE);
 		log.info("-----regenerarPeriodoCerrado");
 		List<Object[]> objects = lecturaBO.findObjects("Lectura.findByPeridoCerrModificable", map);
+		Integer cantidadAlcantarilladosAplicados = 0;
+		RegistroEconomico registroEconomicoAlcantarillado = reBO.inicializar(periodoPago, "ALCANCON",
+				"Alcantarillado " + periodoPago.getDescripcion(), 0, usuario);
 		log.info(String.format("-----Cantidad Usuarios: %s", objects.size()));
 		if (!objects.isEmpty()) {
-			PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
-			map.clear();
-			map.put("idPeriodoPago", periodoPago);
-			map.put("tipoRegistro", "BASCON");
 			for (Object[] object : objects) {
 				CabeceraPlanilla cp = (CabeceraPlanilla) object[0];
-				Servicio llave = (Servicio) object[1];
-				if (llave != null) {
+				Servicio servicio = (Servicio) object[1];
+				Double vAlcan = servicio.getIdTarifa() != null ? servicio.getIdTarifa().getBasicoPago() : 0.0;
+				// Obtenemos la lectura de la llave
+				if (servicio != null && TipoServicioEnum.AGUA_POTABLE.equals(servicio.getTipoServicio())) {
 					// Obtenemos la lectura
 					map = new HashMap<>();
-					map.put("idServicio", llave.getIdServicio());
+					map.put("idServicio", servicio.getIdServicio());
 					map.put("idPeriodoPago", periodoPago);
 					Lectura lec = lecturaBO.findByNamedQuery("Lectura.findByPeridoAndLlave", map);
 					if (lec != null) {
@@ -393,6 +404,15 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						}
 						update(usuario, cp);
 					}
+				} else if (servicio != null && TipoServicioEnum.ALCANTARILLADO.equals(servicio.getTipoServicio())) {
+					DetallePlanilla alcantarillado = detallePlanillaBO.crearDetalleAlcantarillado(usuario, cp,
+							registroEconomicoAlcantarillado, 1, vAlcan, periodoPago.getDescripcion(), servicio);
+					cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + alcantarillado.getValorTotal()));
+					cp.setTotal(Utilitario.redondear(cp.getTotal() + alcantarillado.getValorTotal()));
+					registroEconomicoAlcantarillado
+							.setValor(registroEconomicoAlcantarillado.getValor() + alcantarillado.getValorTotal());
+					detallePlanillaBO.save(usuario, alcantarillado);
+					cantidadAlcantarilladosAplicados++;
 				}
 				Runtime.getRuntime().gc();
 			}
@@ -405,7 +425,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
 	@Override
 	public void finalizarPlanilla(Usuario usuario, Integer idPeriodoPago) throws Exception {
-		PeriodoPago periodoPago = periodoPagoBO.findByPk(idPeriodoPago);
+		PeriodoPago periodoPago = periodoPagoBO.findByIdCustom(idPeriodoPago);
 		HashMap<String, Object> p = new HashMap<>();
 
 		// Obtenemos las planillas no pagadas
@@ -496,12 +516,12 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		if (valorPorDevolverPendiente > 0.0)
 			valorPorDevolver += valorPorDevolverPendiente;
 		log.info(String.format("Valor Total Pendiente Por Devolver: %s", valorPorDevolver));
-		
+
 		map.clear();
-		map.put("idPeriodoPago", periodoPagoBO.findByPk(idPeriodoPago));
+		map.put("idPeriodoPago", periodoPagoBO.findByIdCustom(idPeriodoPago));
 		map.put("tipoRegistro", "CUEPAG");
 		RegistroEconomico rePorDevolver = reBO.findByNamedQuery("RegistroEconomico.findByType", map);
-		
+
 		// Registramos en caja por parte de servicios el valor pagado del periodo
 		if (totalRecaudado > 0.0)
 			cuentaBO.registrarAsiento(Constantes.numeroCaja, Constantes.cuentaCaja, Constantes.numeroServicio,
@@ -538,7 +558,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		log.info(String.format("Valor Total Gastos: %s", totalGastos));
 		// Tambien actualizamos en el registro economico de gastos
 		map.clear();
-		map.put("idPeriodoPago", periodoPagoBO.findByPk(idPeriodoPago));
+		map.put("idPeriodoPago", periodoPagoBO.findByIdCustom(idPeriodoPago));
 		map.put("tipoRegistro", "GAST");
 		RegistroEconomico registroEconomico = reBO.findByNamedQuery("RegistroEconomico.findByType", map);
 		if (registroEconomico != null) {
@@ -576,6 +596,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		queryDetalle.executeUpdate();
 		queryLecturas.executeUpdate();
 		Runtime.getRuntime().gc();
+		System.gc();
 	}
 
 	@Override
@@ -798,7 +819,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		planillaNueva.setIdUsuario(responsable);
 		planillaNueva.setObservacion(
 				path.substring(0, path.length() - numeroFactura.toString().length()) + numeroFactura.toString());
-		planillaNueva.setIdPeriodoPago(periodoPagoBO.findByPk(idPeriodoPago));
+		planillaNueva.setIdPeriodoPago(periodoPagoBO.findByIdCustom(idPeriodoPago));
 		return planillaNueva;
 	}
 
@@ -816,7 +837,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	protected CabeceraPlanilla verificarMultNoPago(Servicio llave, Usuario user, CabeceraPlanilla pn, Usuario usuario,
 			RegistroEconomico multaAtrazoMes) throws Exception {
 		Integer contador = 0;
-		List<CabeceraPlanilla> pnps = findPlanillasByLLaveAndStatus(llave, user, "NOPAG");
+		List<CabeceraPlanilla> pnps = findPlanillasByServicioAndStatus(llave, user, "NOPAG");
 
 		for (CabeceraPlanilla pnp : pnps) {
 			List<DetallePlanilla> dpnps = detallePlanillaBO.findDetalles(pnp, "DetallePlanilla.findByCabecaraNoPag");
@@ -832,7 +853,6 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				pn.setTotal(pn.getTotal() + dpnpn.getValorTotal());
 			}
 			Double valorMulta = tarifaBO.getValorMulta(user);
-			log.info(String.format("Multa: %s", valorMulta));
 			Double multa = detallePlanillaBO.crearMulta(pnp, pn, multaAtrazoMes, usuario, valorMulta);
 			if (user.getTieneDescuento())
 				multa = multa * 0.5;
@@ -867,7 +887,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	 */
 	protected CabeceraPlanilla verificarPlanillasIncompletas(Servicio llave, Usuario user, CabeceraPlanilla pn,
 			Usuario usuario) throws Exception {
-		List<CabeceraPlanilla> pnps = findPlanillasByLLaveAndStatus(llave, user, "INC");
+		List<CabeceraPlanilla> pnps = findPlanillasByServicioAndStatus(llave, user, "INC");
 		for (CabeceraPlanilla planillasIncompletas : pnps) {
 			List<DetallePlanilla> detalleIncomepletos = detallePlanillaBO.findDetalles(planillasIncompletas,
 					"DetallePlanilla.findByCabecaraNoPagInc");
