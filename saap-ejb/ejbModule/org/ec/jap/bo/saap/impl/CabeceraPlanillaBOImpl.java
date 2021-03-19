@@ -30,6 +30,7 @@ import org.ec.jap.bo.saap.TarifaBO;
 import org.ec.jap.bo.saap.TipoRegistroBO;
 import org.ec.jap.bo.saap.UsuarioBO;
 import org.ec.jap.bo.sistema.CambioEstadoBO;
+import org.ec.jap.bo.sistema.EmailBO;
 import org.ec.jap.dao.saap.impl.CabeceraPlanillaDAOImpl;
 import org.ec.jap.entiti.saap.CabeceraPlanilla;
 import org.ec.jap.entiti.saap.DetallePlanilla;
@@ -91,6 +92,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 
 	@EJB
 	protected TarifaBO tarifaBO;
+	@EJB
+	EmailBO emailBo;
 
 	public CabeceraPlanillaBOImpl() {
 	}
@@ -202,7 +205,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				map.put("idUsuario", user);
 				map.put("idPeriodoPago", periodoPago);
 				List<Servicio> servicios = llaveBO.findAllByNamedQuery("Servicio.findByUserActivo", map);
-				//Verificamos si ya posee factura, es para el caso que se agregue un servico adiciobnal luego de haber creado la planilla
+				// Verificamos si ya posee factura, es para el caso que se agregue un servico
+				// adiciobnal luego de haber creado la planilla
 				List<CabeceraPlanilla> planillaActual = findAllByNamedQuery("CabeceraPlanilla.findByUserPeriodo", map);
 				if (servicios.size() > 0) {
 					CabeceraPlanilla pn = null;
@@ -230,7 +234,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						}
 						pn = verificarPlanillasIncompletas(llave, user, pn, userSystem);
 					} else {
-						pn=planillaActual.get(0);
+						pn = planillaActual.get(0);
 					}
 
 					log.info(String.format("%1$s ===> Medidor: %2$s Factura: %3$s", nombre,
@@ -279,7 +283,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			CabeceraPlanilla cp = (CabeceraPlanilla) object[0];
 			Servicio servicio = (Servicio) object[1];
 			Double vAlcan = servicio.getIdTarifa() != null ? servicio.getIdTarifa().getBasicoPago() : 0.0;
-			
+
 			// Obtenemos la lectura de la llave
 			if (servicio != null && TipoServicioEnum.AGUA_POTABLE.equals(servicio.getTipoServicio())) {
 				map = new HashMap<>();
@@ -322,6 +326,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				cantidadAlcantarilladosAplicados++;
 			}
 			update(systemUser, cp);
+			enviarEmail(cp, periodoPago);
 			Runtime.getRuntime().gc();
 		}
 		if (cantidadAlcantarilladosAplicados == 0)
@@ -341,6 +346,18 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		}
 		Runtime.getRuntime().gc();
 		log.info("----------------cerrarPeriodoPago Fin----------------");
+	}
+
+	void enviarEmail(CabeceraPlanilla cp, PeriodoPago periodoPago) {
+		try {
+			map.clear();
+			map.put("idCabeceraPlanilla", cp);
+			List<DetallePlanilla> del = detallePlanillaBO.findAllByNamedQuery("DetallePlanilla.findByCabecaraSinPagar",
+					map);
+			emailBo.enviarEmailUsuario(cp, del, periodoPago);
+		} catch (Exception e) {
+			log.info(e.getMessage());
+		}
 	}
 
 	@TransactionAttribute(TransactionAttributeType.MANDATORY)
@@ -373,6 +390,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					if (lec != null) {
 						HashMap<String, Object> pama = new HashMap<>();
 						pama.put("idLectura", lec);
+						pama.put("idCabeceraPlanilla", cp);
+
 						DetallePlanilla dpls = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByLectura",
 								pama);
 						if (dpls == null)
@@ -405,15 +424,23 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						update(usuario, cp);
 					}
 				} else if (servicio != null && TipoServicioEnum.ALCANTARILLADO.equals(servicio.getTipoServicio())) {
-					DetallePlanilla alcantarillado = detallePlanillaBO.crearDetalleAlcantarillado(usuario, cp,
-							registroEconomicoAlcantarillado, 1, vAlcan, periodoPago.getDescripcion(), servicio);
-					cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + alcantarillado.getValorTotal()));
-					cp.setTotal(Utilitario.redondear(cp.getTotal() + alcantarillado.getValorTotal()));
-					registroEconomicoAlcantarillado
-							.setValor(registroEconomicoAlcantarillado.getValor() + alcantarillado.getValorTotal());
-					detallePlanillaBO.save(usuario, alcantarillado);
-					cantidadAlcantarilladosAplicados++;
+					HashMap<String, Object> pama = new HashMap<>();
+					pama.put("idServicio", servicio);
+					pama.put("idCabeceraPlanilla", cp);
+					DetallePlanilla dpls = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByServicio", pama);
+					if (dpls != null) {
+						DetallePlanilla alcantarillado = detallePlanillaBO.crearDetalleAlcantarillado(usuario, cp,
+								registroEconomicoAlcantarillado, 1, vAlcan, periodoPago.getDescripcion(), servicio);
+						cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + alcantarillado.getValorTotal()));
+						cp.setTotal(Utilitario.redondear(cp.getTotal() + alcantarillado.getValorTotal()));
+						registroEconomicoAlcantarillado
+								.setValor(registroEconomicoAlcantarillado.getValor() + alcantarillado.getValorTotal());
+						detallePlanillaBO.save(usuario, alcantarillado);
+						cantidadAlcantarilladosAplicados++;
+					}
 				}
+				update(usuario, cp);
+				enviarEmail(cp, periodoPago);
 				Runtime.getRuntime().gc();
 			}
 			Runtime.getRuntime().gc();

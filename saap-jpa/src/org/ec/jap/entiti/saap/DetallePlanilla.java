@@ -31,7 +31,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "detalle_planilla")
 @NamedQueries({
-
+	@NamedQuery(name = "DetallePlanilla.findByServicio", query = "SELECT d FROM DetallePlanilla d where d.idServicio=:idServicio and d.idCabeceraPlanilla=:idCabeceraPlanilla"),
 		@NamedQuery(name = "DetallePlanilla.findById", query = "SELECT d FROM DetallePlanilla d where d.idDetallePlanilla=:idDetallePlanilla "),
 		@NamedQuery(name = "DetallePlanilla.findByLecturaAndCabcera", query = "SELECT d FROM DetallePlanilla d where d.idLectura=:idLectura and d.idCabeceraPlanilla=:idCabeceraPlanilla "),
 		@NamedQuery(name = "DetallePlanilla.findValorInasistencias", query = "SELECT CASE :tipo WHEN 'I' THEN SUM(dp.valorPagado) ELSE SUM(dp.valorPendiente) END FROM DetallePlanilla dp inner join dp.idAsistencia ina inner join ina.idRegistroEconomico re inner join re.tipoRegistro tr  WHERE tr=:tipoRegistro  AND dp.estado IN (:estado1,:estado2) "),
@@ -52,7 +52,7 @@ import javax.validation.constraints.Size;
 		@NamedQuery(name = "DetallePlanilla.findConsumos", query = "SELECT SUM(dp.valorPagado) FROM DetallePlanilla dp inner join dp.idLectura lec inner join lec.tipoRegistro tr inner join dp.idCabeceraPlanilla cp inner join cp.idPeriodoPago  pp WHERE tr=:tipoRegistro AND  (pp.anio=:anio or :anio=0) AND (pp.mes=:mes or :mes=-1) AND dp.estado IN ('PAG','INC') "),
 		@NamedQuery(name = "DetallePlanilla.findByCabecaraSinPagar", query = "SELECT d FROM DetallePlanilla d where d.idCabeceraPlanilla=:idCabeceraPlanilla AND d.estado IN ('ING','INC') and coalesce(d.valorPagado,0.0)<d.valorTotal ORDER BY d.ordenStr,d.fechaRegistro ASC"),
 		@NamedQuery(name = "DetallePlanilla.findByCabecaraNoPag", query = "SELECT d FROM DetallePlanilla d where d.idCabeceraPlanilla=:idCabeceraPlanilla AND d.estado IN ('NOPAG') AND d.valorPendiente != 0 ORDER BY d.ordenStr,d.fechaRegistro ASC"),
-		@NamedQuery(name = "DetallePlanilla.findByLectura", query = "SELECT d FROM DetallePlanilla d where d.idLectura=:idLectura"),
+		@NamedQuery(name = "DetallePlanilla.findByLectura", query = "SELECT d FROM DetallePlanilla d where d.idLectura=:idLectura and d.idCabeceraPlanilla=:idCabeceraPlanilla"),
 		@NamedQuery(name = "DetallePlanilla.findByBasico", query = "SELECT d FROM DetallePlanilla d where d.idRegistroEconomico=:regeco and d.idCabeceraPlanilla=:cp and upper(d.descripcion) like concat('%',upper(:desc),'%')"),
 		@NamedQuery(name = "DetallePlanilla.findByUserAndTipoReg", query = "select dp FROM DetallePlanilla dp inner join dp.idCabeceraPlanilla cp inner join cp.idServicio ll inner join ll.idUsuario u inner join dp.idRegistroEconomico re inner join re.idPeriodoPago pp inner join re.tipoRegistro tp WHERE tp.tipoRegistro=:tipoRegistro AND u.idUsuario=:idUsuario AND (pp.idPeriodoPago=:idPeriodoPago OR :idPeriodoPago=0) AND dp.estado not in ('TRAS') ORDER BY re.fechaRegistro,re.descripcion"),
 		@NamedQuery(name = "DetallePlanilla.findByCabecara", query = "SELECT d FROM DetallePlanilla d where d.idCabeceraPlanilla=:idCabeceraPlanilla   ORDER BY d.ordenStr,d.fechaRegistro ASC"), // ,d.idDetallePlanilla

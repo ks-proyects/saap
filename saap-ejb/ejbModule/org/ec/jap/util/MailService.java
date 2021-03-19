@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -16,6 +17,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 public class MailService {
+
+	public static Logger log = Logger.getLogger(MailService.class.getName());
 
 	/**
 	 * Método que envia en email a cualquier servidor
@@ -50,11 +53,11 @@ public class MailService {
 
 		Session session = Session.getDefaultInstance(props);
 		MimeMessage message = new MimeMessage(session);
-
+		String emailsTo = "";
 		try {
 			message.setFrom(new InternetAddress(from));
 			for (String to : tos) {
-				System.out.println("Enviando email a " + to);
+				emailsTo = emailsTo.concat(to).concat(",");
 				message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
 			}
 			for (String cc : ccs) {
@@ -78,14 +81,14 @@ public class MailService {
 				}
 				message.setContent(multipart);
 			} else {
-				message.setText(msg, "ISO-8859-1", "html");
+				message.setContent(msg, "text/html");
 			}
 
 			Transport transport = session.getTransport("smtp");
 			transport.connect("smtp.gmail.com", username, password);
 			transport.sendMessage(message, message.getAllRecipients());
 			transport.close();
-			System.out.println("Email envido OK");
+			log.info("Email eviado exitosamente a " + emailsTo);
 		} catch (MessagingException me) {
 			me.printStackTrace();
 		}

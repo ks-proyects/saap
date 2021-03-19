@@ -4,6 +4,10 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import org.ec.jap.entiti.saap.CabeceraPlanilla;
+import org.ec.jap.entiti.saap.DetallePlanilla;
+import org.ec.jap.entiti.saap.PeriodoPago;
+
 @Local
 public interface EmailBO {
 
@@ -29,5 +33,9 @@ public interface EmailBO {
 	 * @throws Exception
 	 */
 	void enviarBackupDB(String pathFile) throws Exception;
+
+	void enviarEmailUsuario(CabeceraPlanilla cp, List<DetallePlanilla> del, PeriodoPago p) throws Exception;
+
+
 
 }
