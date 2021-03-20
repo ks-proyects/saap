@@ -1,13 +1,25 @@
 package org.ec.jap.bo.sistema.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.ec.jap.bo.saap.ParametroBO;
 import org.ec.jap.bo.sistema.EmailBO;
@@ -25,6 +37,9 @@ public class EmailBOImpl implements EmailBO {
 
 	@EJB
 	ParametroBO parameter;
+
+	@Resource(name = "java:/Mail")
+	private Session mailSession;
 
 	/**
 	 * Default constructor.
@@ -59,6 +74,51 @@ public class EmailBOImpl implements EmailBO {
 			smtCliente.interrupt();
 		}
 		return Boolean.TRUE;
+	}
+
+	private Session getEmailSession() throws Exception {
+		return mailSession;
+	}
+
+	@Override
+	@PermitAll()
+	public boolean sendMail(String msg, List<String> files, List<String> tos, List<String> ccs, String subject,
+			String filePath) {
+		try {
+			List<InternetAddress> list = new ArrayList<InternetAddress>();
+			for (String emails : tos) {
+				list.add(new InternetAddress(emails));
+			}
+			MimeMessage m = new MimeMessage(getEmailSession());
+			InternetAddress[] to = new InternetAddress[list.size()];
+			to = list.toArray(to);
+			m.setRecipients(Message.RecipientType.TO, to);
+			m.setSubject(subject);
+			m.setSentDate(new java.util.Date());
+
+			if (filePath != null && !filePath.isEmpty()) {
+				Multipart multipart = new MimeMultipart();
+				MimeBodyPart attachmentPart = new MimeBodyPart();
+				MimeBodyPart textPart = new MimeBodyPart();
+				try {
+					File f = new File(filePath);
+					attachmentPart.attachFile(f);
+					textPart.setText(msg, "ISO-8859-1", "html");
+					multipart.addBodyPart(textPart);
+					multipart.addBodyPart(attachmentPart);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				m.setContent(multipart);
+			} else {
+				m.setText(msg, "utf-8", "html");
+			}
+			Transport.send(m);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
@@ -104,7 +164,7 @@ public class EmailBOImpl implements EmailBO {
 		email.append("<div>Sistema de Administración de Agua Potable</div>");
 		email.append("</div>");
 
-		enviarEmail(email.toString(), new ArrayList<String>(), tos, ccs, subject, pathFile);
+		sendMail(email.toString(), new ArrayList<String>(), tos, ccs, subject, pathFile);
 
 	}
 
@@ -113,13 +173,15 @@ public class EmailBOImpl implements EmailBO {
 		if (cp.getIdUsuario() != null) {
 			Usuario user = cp.getIdUsuario();
 			if (user.getEmail() != null && !user.getEmail().isEmpty()) {
-				String tosParam = this.parameter.getString("", 1, "DB_TO_BACKUP");
-				String[] arrayTos = tosParam.split(";");
 				List<String> tos = new ArrayList<String>();
-				for (int i = 0; i < arrayTos.length; i++) {
-					tos.add(user.getEmail());
+				
+				String[] emailUsers = user.getEmail().split(";");
+				for (int i = 0; i < emailUsers.length; i++) {
+					tos.add(emailUsers[i]);
 				}
-
+				
+				String copias = this.parameter.getString("", 1, "DB_TO_BACKUP");
+				String[] arrayTos = copias.split(";");
 				List<String> ccs = new ArrayList<String>();
 				for (String cc : arrayTos) {
 					ccs.add(cc);
@@ -221,7 +283,7 @@ public class EmailBOImpl implements EmailBO {
 				email.append("<div>Sistema de Administración de Agua Potable</div>");
 				email.append("<p>Por favor no responder a este correo.</p></div>");
 
-				enviarEmail(email.toString(), new ArrayList<String>(), tos, ccs, subject, null);
+				sendMail(email.toString(), new ArrayList<String>(), tos, ccs, subject, null);
 			}
 
 		}

@@ -37,6 +37,7 @@ import org.ec.jap.utilitario.Utilitario;
 @Entity
 @Table(name = "cabecera_planilla")
 @NamedQueries({
+	@NamedQuery(name = "CabeceraPlanilla.findCero", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago and c.total=0 and c not in (select df.idCabeceraPlanilla from DetallePlanilla df inner join df.idCabeceraPlanilla cp where cp.idPeriodoPago=c.idPeriodoPago)"),
 	@NamedQuery(name = "CabeceraPlanilla.findByUserPeriodo", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.idPeriodoPago=:idPeriodoPago AND c.idUsuario=:idUsuario"),	
 	@NamedQuery(name = "CabeceraPlanilla.findConsulta", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idServicio ll inner join ll.idUsuario u INNER JOIN c.idPeriodoPago per WHERE per.estado='CERR' AND (  ll.numero = :filtro OR u.cedula = :filtro) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
 		@NamedQuery(name = "CabeceraPlanilla.findConAbono", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND c.valorPagadoAbono!=0.0"),

@@ -454,6 +454,23 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		PeriodoPago periodoPago = periodoPagoBO.findByIdCustom(idPeriodoPago);
 		HashMap<String, Object> p = new HashMap<>();
 
+		// Obtenemos las planillas en cero y las actualziamos en cero
+		// Obtenemos las planillas no pagadas
+		p.put("estado", "ING");
+		p.put("estado2", "ING");
+		p.put("idPeriodoPago", idPeriodoPago);
+		List<CabeceraPlanilla> planillasEncero = findAllByNamedQuery("CabeceraPlanilla.findCero", p);
+		log.info(String.format("Planillas con valor Cero :%s", planillasEncero.size()));
+		for (CabeceraPlanilla cp : planillasEncero) {
+			cambioEstadoBO.cambiarEstadoSinVerificar(21, usuario, cp.getIdCabeceraPlanilla(), "");
+			Query queryDetalle = em().createQuery(
+					" UPDATE DetallePlanilla SET estado='PAG',valorPendiente=0.0,valorPagado=valorTotal where idCabeceraPlanilla=:idCabeceraPlanilla");
+			queryDetalle.setParameter("idCabeceraPlanilla", cp);
+			Query queryLecturas = em().createQuery(
+					" UPDATE Lectura SET estado='PAG' where idLectura IN (SELECT dp.idLectura.idLectura FROM DetallePlanilla dp WHERE dp.idCabeceraPlanilla=:idCabeceraPlanilla)");
+			queryLecturas.setParameter("idCabeceraPlanilla", cp);
+		}
+
 		// Obtenemos las planillas no pagadas
 		p.put("estado", "ING");
 		p.put("estado2", "ING");

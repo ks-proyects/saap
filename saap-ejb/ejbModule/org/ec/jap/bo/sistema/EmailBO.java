@@ -36,6 +36,9 @@ public interface EmailBO {
 
 	void enviarEmailUsuario(CabeceraPlanilla cp, List<DetallePlanilla> del, PeriodoPago p) throws Exception;
 
+	boolean sendMail(String msg, List<String> files, List<String> tos, List<String> ccs, String subject,
+			String filePath);
+
 
 
 }
