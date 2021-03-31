@@ -5,11 +5,10 @@
 #saap-web/.settings*
 #saap-ear/.settings*
 
-saap-jpa/build/*
-saap-ejb/build/*
-saap-web/build/*
-saap-ear/build/*
-*/build/*
+/saap-jpa/build
+/saap-ejb/build
+/saap-web/build
+/saap-ear/build
 
 saap-jpa/.tern-project*
 saap-ejb/.tern-project*
