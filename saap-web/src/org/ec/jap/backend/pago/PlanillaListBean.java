@@ -41,7 +41,6 @@ public class PlanillaListBean extends Bean {
 	public void init() {
 		try {
 			super.init();
-			search(null);
 		} catch (Exception e) {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
@@ -50,7 +49,6 @@ public class PlanillaListBean extends Bean {
 
 	public void search(ActionEvent event) {
 		try {
-
 			map = new HashMap<>();
 			map.put("filtro", filtro != null ? filtro : "%");
 			map.put("filtro", filtro != null ? filtro : "%");

@@ -105,6 +105,8 @@ public class ReporteBean extends Bean {
 			// Parametro que indica el método de calculo de los metros
 			// consumidos
 			return "SI".equalsIgnoreCase(getAtribute("aplicaMA").toString()) ? "ReciboPagoA" : "ReciboPago";
+		case 58:
+			return "Usuario";
 		case 18:
 			return "Usuario";
 		case 148:
