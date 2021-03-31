@@ -9,7 +9,7 @@ saap-jpa/build*
 saap-ejb/build*
 saap-web/build*
 saap-ear/build*
-
+*/build/*
 
 saap-jpa/.tern-project*
 saap-ejb/.tern-project*
