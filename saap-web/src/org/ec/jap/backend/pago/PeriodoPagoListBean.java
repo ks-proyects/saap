@@ -51,7 +51,9 @@ public class PeriodoPagoListBean extends Bean {
 	public void init() {
 		try {
 			super.init();
+			setNombreArchivo("Usuarios de Corte");
 			search(null);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);

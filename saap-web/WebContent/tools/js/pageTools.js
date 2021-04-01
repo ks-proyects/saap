@@ -182,6 +182,8 @@ function onClic(idAction) {
 		break;
 	case "12":
 		return true;
+	case "9":
+		return true;
 	default:
 		showLoader();
 		break;

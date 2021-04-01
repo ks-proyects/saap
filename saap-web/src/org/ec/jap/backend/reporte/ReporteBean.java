@@ -106,7 +106,7 @@ public class ReporteBean extends Bean {
 			// consumidos
 			return "SI".equalsIgnoreCase(getAtribute("aplicaMA").toString()) ? "ReciboPagoA" : "ReciboPago";
 		case 58:
-			return "Usuario";
+			return "UsuarioCorte";
 		case 18:
 			return "Usuario";
 		case 148:
