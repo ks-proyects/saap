@@ -116,6 +116,14 @@
 					</rich:column>
 					<rich:column>
 						<f:facet name="header">
+							<h:outputText value="Tarifa" />
+						</f:facet>
+						<h:outputText rendered="#{not empty detalle.outcome}"
+							value="#{detalle.idLectura.idServicio.idTarifa.descripcion}">
+						</h:outputText>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
 							<h:outputText value="Origen" />
 						</f:facet>
 						<h:outputText value="#{detalle.origen}" />

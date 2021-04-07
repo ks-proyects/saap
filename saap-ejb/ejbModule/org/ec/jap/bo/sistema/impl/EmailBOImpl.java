@@ -38,8 +38,8 @@ public class EmailBOImpl implements EmailBO {
 	@EJB
 	ParametroBO parameter;
 
-	@Resource(name = "java:/Mail")
-	private Session mailSession;
+	//@Resource(name = "java:/Mail")
+	//private Session mailSession;
 
 	/**
 	 * Default constructor.
@@ -76,9 +76,9 @@ public class EmailBOImpl implements EmailBO {
 		return Boolean.TRUE;
 	}
 
-	private Session getEmailSession() throws Exception {
-		return mailSession;
-	}
+	//private Session getEmailSession() throws Exception {
+		//return mailSession;
+	//}
 
 	@Override
 	@PermitAll()
@@ -89,7 +89,7 @@ public class EmailBOImpl implements EmailBO {
 			for (String emails : tos) {
 				list.add(new InternetAddress(emails));
 			}
-			MimeMessage m = new MimeMessage(getEmailSession());
+			MimeMessage m = null;//new MimeMessage(getEmailSession());
 			InternetAddress[] to = new InternetAddress[list.size()];
 			to = list.toArray(to);
 			m.setRecipients(Message.RecipientType.TO, to);
@@ -164,7 +164,7 @@ public class EmailBOImpl implements EmailBO {
 		email.append("<div>Sistema de Administración de Agua Potable</div>");
 		email.append("</div>");
 
-		sendMail(email.toString(), new ArrayList<String>(), tos, ccs, subject, pathFile);
+		enviarEmail(email.toString(), new ArrayList<String>(), tos, ccs, subject, pathFile);
 
 	}
 
@@ -283,7 +283,7 @@ public class EmailBOImpl implements EmailBO {
 				email.append("<div>Sistema de Administración de Agua Potable</div>");
 				email.append("<p>Por favor no responder a este correo.</p></div>");
 
-				sendMail(email.toString(), new ArrayList<String>(), tos, ccs, subject, null);
+				enviarEmail(email.toString(), new ArrayList<String>(), tos, ccs, subject, null);
 			}
 
 		}

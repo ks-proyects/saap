@@ -61,7 +61,7 @@ public class PlanillaListBean extends Bean {
 
 	public void changeName(AjaxBehaviorEvent event) {
 		try {
-
+			map= new HashMap<String, Object>();
 			map.put("filtro", filtro != null ? filtro : "%");
 			map.put("filtro", filtro != null ? filtro : "%");
 			cabeceraPlanillas = cabeceraPlanillaBO.findAllByNamedQuery("CabeceraPlanilla.findByFilters", map);

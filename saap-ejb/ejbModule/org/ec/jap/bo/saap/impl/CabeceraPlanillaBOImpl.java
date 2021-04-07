@@ -824,7 +824,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
 
 				if (lectura.getMetros3() > 0) {
-					detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()) + " m3 "
+					detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()+lectura.getMetros3Exceso()) + " m3 "
 							+ lectura.getIdPeriodoPago().getDescripcion());
 				}
 				if (lectura.getMetros3() > 0)

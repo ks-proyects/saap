@@ -23,7 +23,7 @@ import javax.persistence.NamedQuery;
 		@NamedQuery(name = "ListaValor.findActividadByTipoAndPeriodo", query = " SELECT new ListaValor(act.actividad,'',act.descripcion,act.descripcion) FROM Actividad act WHERE act.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND ( act.tipoActividad.tipoActividad=:tipoActividad OR :tipoActividad=0) order by act.descripcion"),
 		@NamedQuery(name = "ListaValor.findTipoActividad", query = " SELECT new ListaValor(t.tipoActividad,'',t.descripcion,t.descripcion) FROM TipoActividad t ORDER BY t.descripcion "),
 		@NamedQuery(name = "ListaValor.findPeriodoByAnio", query = " SELECT new ListaValor(p.idPeriodoPago,'',CONCAT(p.descripcion,'(',p.estado,')'),p.descripcion) FROM PeriodoPago p WHERE p.estado not in ('ABIE','ING') and (p.anio=:anio) order by p.descripcion"),
-		@NamedQuery(name = "ListaValor.findAnioPeriodo", query = " SELECT new ListaValor(p.anio,'',str(p.anio),'') FROM PeriodoPago p WHERE p.estado in ('ABIE','CERR','FIN','FINI') GROUP BY p.anio"),
+		@NamedQuery(name = "ListaValor.findAnioPeriodo", query = " SELECT new ListaValor(p.anio,'',str(p.anio),'') FROM PeriodoPago p WHERE p.estado in ('ABIE','CERR','FIN','FINI') GROUP BY p.anio order by p.anio desc"),
 		@NamedQuery(name = "ListaValor.findTarifaConsu", query = " SELECT new ListaValor(p.idTarifa,'',p.descripcion,'') FROM Tarifa p order by p.descripcion"),
 
 		@NamedQuery(name = "ListaValor.findPeriododAvalibleGasto", query = " SELECT new ListaValor(p.idPeriodoPago,'',CONCAT(p.descripcion,'(',p.estado,')'),p.descripcion) FROM PeriodoPago p WHERE p.estado in ('ABIE','CERR')"),

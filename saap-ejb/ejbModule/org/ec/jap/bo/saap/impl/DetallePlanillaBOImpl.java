@@ -128,7 +128,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 
 	@Override
 	public DetallePlanilla crearDetalleAlcantarillado(Usuario currentUser, CabeceraPlanilla cp, RegistroEconomico rea,
-			Integer cantidad, Double valor, String ppDescripcion,Servicio servicio) throws Exception {
+			Integer cantidad, Double valor, String ppDescripcion, Servicio servicio) throws Exception {
 		DetallePlanilla dpa = new DetallePlanilla();
 		dpa.initValue();
 		dpa.setIdCabeceraPlanilla(cp);
@@ -153,7 +153,8 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		dpn.setIdLectura(dpa.getIdLectura());
 		dpn.setIdRegistroEconomico(dpa.getIdRegistroEconomico());
 		dpn.setValorTotal(dpa.getValorTotal());
-		dpn.setIdServicio(dpa.getIdServicio()!=null?dpa.getIdServicio():(dpa.getIdLectura()!=null?dpa.getIdLectura().getIdServicio():null));
+		dpn.setIdServicio(dpa.getIdServicio() != null ? dpa.getIdServicio()
+				: (dpa.getIdLectura() != null ? dpa.getIdLectura().getIdServicio() : null));
 		dpn.setFechaRegistro(
 				dpa.getFechaRegistro() != null ? dpa.getFechaRegistro() : Calendar.getInstance().getTime());
 		dpn.setValorUnidad(dpa.getValorUnidad());
@@ -191,7 +192,8 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		dpn.setIdLectura(dpi.getIdLectura());
 		dpn.setIdRegistroEconomico(dpi.getIdRegistroEconomico());
 		dpn.setValorTotal(dpi.getValorPendiente());
-		dpn.setIdServicio(dpi.getIdServicio()!=null?dpi.getIdServicio():(dpi.getIdLectura()!=null?dpi.getIdLectura().getIdServicio():null));
+		dpn.setIdServicio(dpi.getIdServicio() != null ? dpi.getIdServicio()
+				: (dpi.getIdLectura() != null ? dpi.getIdLectura().getIdServicio() : null));
 		dpn.setFechaRegistro(
 				dpi.getFechaRegistro() != null ? dpi.getFechaRegistro() : Calendar.getInstance().getTime());
 		dpn.setValorPendiente(dpn.getValorTotal());
@@ -243,20 +245,21 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 						&& lec.getValorMetro3Exceso() > 0 ? (lec.getMetros3Exceso() * lec.getValorMetro3Exceso())
 								: 0.0));
 		Double total = Utilitario.redondear(base + exceso);
-		
+
 		Usuario us = lec.getIdServicio().getIdUsuario();
 		String nombre = us.getApellidos() + " " + us.getNombres();
 		String format = "........................";
 		nombre = nombre.length() > format.length() ? nombre.substring(0, format.length())
 				: nombre + format.substring(nombre.length(), format.length());
-		log.info(String.format("%4$s ===> Medidor: %5$s Normal: %1$s, Exceso: %2$s, Total: %3$s", base, exceso,
-				total, nombre, lec.getIdServicio().getNumero()));
+		log.info(String.format("%4$s ===> Medidor: %5$s Normal: %1$s, Exceso: %2$s, Total: %3$s", base, exceso, total,
+				nombre, lec.getIdServicio().getNumero()));
 		dpls.setValorUnidad(Utilitario.redondear(lec.getValorMetro3()));
 		dpls.setValorTotal(total);
 		dpls.setIdServicio(lec.getIdServicio());
 		dpls.setValorPagado(0.0);
 		dpls.setValorPendiente(dpls.getValorTotal());
-		dpls.setDescripcion(Utilitario.redondear(lec.getMetros3()) + " m3" + " " + periodoPago.getDescripcion());
+		dpls.setDescripcion(Utilitario.redondear(lec.getMetros3() + lec.getMetros3Exceso()) + " m3" + " "
+				+ periodoPago.getDescripcion());
 		return dpls;
 	}
 
@@ -279,7 +282,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 	@Override
 	public DetallePlanilla findByIdCustom(Integer idDetalle) throws Exception {
 		map = new HashMap<>(0);
-		map.put("idDetallePlanilla",idDetalle);
+		map.put("idDetallePlanilla", idDetalle);
 		return findByNamedQuery("DetallePlanilla.findById", map);
 	}
 }
