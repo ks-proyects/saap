@@ -56,7 +56,7 @@ import org.ec.jap.utilitario.Utilitario;
 		@NamedQuery(name = "CabeceraPlanilla.findAllNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND ( c.idServicio=:idServicio or c.idUsuario=:idUsuario)"),
 		@NamedQuery(name = "CabeceraPlanilla.findAllNoPagAlcantiralado", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND c.idUsuario=:idUser "),
 		@NamedQuery(name = "CabeceraPlanilla.findNewUser", query = "SELECT COUNT(c.idCabeceraPlanilla) FROM CabeceraPlanilla c WHERE c.idServicio=:idServicio AND c IN ( SELECT dp.idCabeceraPlanilla FROM DetallePlanilla dp INNER JOIN dp.idLectura l WHERE l.idServicio=:idServicio )"),
-		@NamedQuery(name = "CabeceraPlanilla.findByFilters", query = "SELECT new CabeceraPlanilla(c.idCabeceraPlanilla,c.total,c.estado,c.idUsuario,c.idPeriodoPago,(select s from Servicio s where s.idUsuario=u and  s.tipoServicio='AGUA_POTABLE' and s.activo='SI')) FROM CabeceraPlanilla c inner join c.idUsuario u inner join u.llaveList ll WHERE  ll.numero like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%')  OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
+		@NamedQuery(name = "CabeceraPlanilla.findByFilters", query = "SELECT new CabeceraPlanilla(c.idCabeceraPlanilla,c.total,c.estado,c.idUsuario,c.idPeriodoPago,(select s from Servicio s where s.idUsuario=u and  s.tipoServicio='AGUA_POTABLE' and s.activo='SI'),c.observacion) FROM CabeceraPlanilla c inner join c.idUsuario u inner join u.llaveList ll WHERE  ll.numero like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%')  OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
 		@NamedQuery(name = "CabeceraPlanilla.findAllIngresado", query = "SELECT c FROM CabeceraPlanilla c WHERE c.estado='ING'"),
 		@NamedQuery(name = "CabeceraPlanilla.findByUsuarioAndEstado", query = "SELECT c FROM CabeceraPlanilla c inner join c.idServicio  ll where ll.idServicio=:idServicio AND c.estado=:estado") })
 @AuditoriaAnot(entityType = "CABPLA")
@@ -154,10 +154,11 @@ public class CabeceraPlanilla implements Serializable {
 		this.base = base;
 		this.total = total;
 		this.estado = estado;
+		
 	}
 
 	public CabeceraPlanilla(Integer idCabeceraPlanilla, Double total, String estado, Usuario idUsuario,
-			PeriodoPago idPeriodoPago,Servicio idServicio) {
+			PeriodoPago idPeriodoPago,Servicio idServicio,String observacion) {
 		super();
 		this.idCabeceraPlanilla = idCabeceraPlanilla;
 		this.total = total;
@@ -165,6 +166,7 @@ public class CabeceraPlanilla implements Serializable {
 		this.idUsuario = idUsuario;
 		this.idPeriodoPago = idPeriodoPago;
 		this.idServicio=idServicio;
+		this.observacion=observacion;
 	}
 
 	@AuditoriaMethod(methodToAudit = true, disabled = true)
