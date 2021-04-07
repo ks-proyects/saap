@@ -37,10 +37,10 @@ import org.ec.jap.utilitario.Utilitario;
 @Entity
 @Table(name = "cabecera_planilla")
 @NamedQueries({
-	@NamedQuery(name = "CabeceraPlanilla.findUsuariosCorte", query = "SELECT dp FROM DetallePlanilla dp inner join dp.idCabeceraPlanilla cp "),
-	@NamedQuery(name = "CabeceraPlanilla.findCero", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago and c.total=0 and c not in (select df.idCabeceraPlanilla from DetallePlanilla df inner join df.idCabeceraPlanilla cp where cp.idPeriodoPago=c.idPeriodoPago)"),
-	@NamedQuery(name = "CabeceraPlanilla.findByUserPeriodo", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.idPeriodoPago=:idPeriodoPago AND c.idUsuario=:idUsuario"),	
-	@NamedQuery(name = "CabeceraPlanilla.findConsulta", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idServicio ll inner join ll.idUsuario u INNER JOIN c.idPeriodoPago per WHERE per.estado='CERR' AND (  ll.numero = :filtro OR u.cedula = :filtro) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
+		@NamedQuery(name = "CabeceraPlanilla.findUsuariosCorte", query = "SELECT dp FROM DetallePlanilla dp inner join dp.idCabeceraPlanilla cp "),
+		@NamedQuery(name = "CabeceraPlanilla.findCero", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago and c.total=0 and c not in (select df.idCabeceraPlanilla from DetallePlanilla df inner join df.idCabeceraPlanilla cp where cp.idPeriodoPago=c.idPeriodoPago)"),
+		@NamedQuery(name = "CabeceraPlanilla.findByUserPeriodo", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.idPeriodoPago=:idPeriodoPago AND c.idUsuario=:idUsuario"),
+		@NamedQuery(name = "CabeceraPlanilla.findConsulta", query = "SELECT c FROM CabeceraPlanilla c INNER JOIN c.idServicio ll inner join ll.idUsuario u INNER JOIN c.idPeriodoPago per WHERE per.estado='CERR' AND (  ll.numero = :filtro OR u.cedula = :filtro) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
 		@NamedQuery(name = "CabeceraPlanilla.findConAbono", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago AND c.valorPagadoAbono!=0.0"),
 		@NamedQuery(name = "CabeceraPlanilla.findSinPagar", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado in (:estado,:estado2) AND c.idPeriodoPago.idPeriodoPago=:idPeriodoPago "),
 		@NamedQuery(name = "CabeceraPlanilla.findAbono", query = "SELECT c FROM CabeceraPlanilla  c INNER JOIN c.idServicio ll   WHERE ll=:llave AND c IN (SELECT MAX(cp) from CabeceraPlanilla cp INNER JOIN cp.idServicio ll WHERE ll=:llave AND cp!=:cp )"),
@@ -56,7 +56,7 @@ import org.ec.jap.utilitario.Utilitario;
 		@NamedQuery(name = "CabeceraPlanilla.findAllNoPag", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND ( c.idServicio=:idServicio or c.idUsuario=:idUsuario)"),
 		@NamedQuery(name = "CabeceraPlanilla.findAllNoPagAlcantiralado", query = "SELECT c FROM CabeceraPlanilla c WHERE  c.estado=:estado AND c.idUsuario=:idUser "),
 		@NamedQuery(name = "CabeceraPlanilla.findNewUser", query = "SELECT COUNT(c.idCabeceraPlanilla) FROM CabeceraPlanilla c WHERE c.idServicio=:idServicio AND c IN ( SELECT dp.idCabeceraPlanilla FROM DetallePlanilla dp INNER JOIN dp.idLectura l WHERE l.idServicio=:idServicio )"),
-		@NamedQuery(name = "CabeceraPlanilla.findByFilters", query = "SELECT c FROM CabeceraPlanilla c LEFT OUTER JOIN c.idServicio ll LEFT OUTER join ll.idUsuario u LEFT OUTER JOIN c.idUsuario us2 WHERE  ll.numero like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%') OR us2.cedula like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%')  OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(us2.nombres) like  UPPER(CONCAT('%',:filtro,'%'))  OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(us2.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
+		@NamedQuery(name = "CabeceraPlanilla.findByFilters", query = "SELECT new CabeceraPlanilla(c.idCabeceraPlanilla,c.total,c.estado,c.idUsuario,c.idPeriodoPago,(select s from Servicio s where s.idUsuario=u and  s.tipoServicio='AGUA_POTABLE' and s.activo='SI')) FROM CabeceraPlanilla c inner join c.idUsuario u inner join u.llaveList ll WHERE  ll.numero like CONCAT('%',:filtro,'%') OR u.cedula like CONCAT('%',:filtro,'%')  OR UPPER(u.nombres) like  UPPER(CONCAT('%',:filtro,'%')) OR UPPER(u.apellidos) like  UPPER(CONCAT('%',:filtro,'%')) ORDER BY cast(ll.numero,int),c.fechaRegistro,c.observacion DESC"),
 		@NamedQuery(name = "CabeceraPlanilla.findAllIngresado", query = "SELECT c FROM CabeceraPlanilla c WHERE c.estado='ING'"),
 		@NamedQuery(name = "CabeceraPlanilla.findByUsuarioAndEstado", query = "SELECT c FROM CabeceraPlanilla c inner join c.idServicio  ll where ll.idServicio=:idServicio AND c.estado=:estado") })
 @AuditoriaAnot(entityType = "CABPLA")
@@ -116,7 +116,7 @@ public class CabeceraPlanilla implements Serializable {
 	private String estado;
 	@OneToMany(mappedBy = "idCabeceraPlanilla")
 	private List<DetallePlanilla> detallePlanillaList;
-	
+
 	@JoinColumn(name = "id_servicio", referencedColumnName = "id_servicio")
 	@ManyToOne
 	private Servicio idServicio;
@@ -156,6 +156,17 @@ public class CabeceraPlanilla implements Serializable {
 		this.estado = estado;
 	}
 
+	public CabeceraPlanilla(Integer idCabeceraPlanilla, Double total, String estado, Usuario idUsuario,
+			PeriodoPago idPeriodoPago,Servicio idServicio) {
+		super();
+		this.idCabeceraPlanilla = idCabeceraPlanilla;
+		this.total = total;
+		this.estado = estado;
+		this.idUsuario = idUsuario;
+		this.idPeriodoPago = idPeriodoPago;
+		this.idServicio=idServicio;
+	}
+
 	@AuditoriaMethod(methodToAudit = true, disabled = true)
 	public Boolean getValidToAudit() {
 		return valorPagado != null && valorPagado > 0.0;
@@ -184,29 +195,29 @@ public class CabeceraPlanilla implements Serializable {
 	public String getObservacion() {
 		return observacion;
 	}
-	
-	
+
 	public String getNombreUsuario() {
-		Usuario user=null;
-		if(idServicio!=null) {
-			user=idServicio.getIdUsuario();
-		}else if(idUsuario!=null) {
-			user=idUsuario;
+		Usuario user = null;
+		if (idUsuario != null) {
+			user = idUsuario;
+		} else if (idServicio != null) {
+			user = idServicio.getIdUsuario();
 		}
-		if(user!=null)
-			return user.getNombres()+" "+user.getApellidos();
-		return  "";
+		if (user != null)
+			return user.getNombres() + " " + user.getApellidos();
+		return "";
 	}
+
 	public String getCedulaUsuario() {
-		Usuario user=null;
-		if(idServicio!=null) {
-			user=idServicio.getIdUsuario();
-		}else if(idUsuario!=null) {
-			user=idUsuario;
+		Usuario user = null;
+		if (idUsuario != null) {
+			user = idUsuario;
+		} else if (idServicio != null) {
+			user = idServicio.getIdUsuario();
 		}
-		if(user!=null)
+		if (user != null)
 			return user.getCedula();
-		return  "";
+		return "";
 	}
 
 	public void setObservacion(String observacion) {
