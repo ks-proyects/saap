@@ -180,11 +180,13 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 					lectura.setBasicoM3(0.0);
 				}
 			} else {
+				Double basico= Utilitario.redondear(lectura.getIdServicio().getIdTarifa().getBasicoPago());
 				lectura.setLecturaIngresada(lectura.getLecturaAnterior());
 				lectura.setMetros3(0.0);
 				lectura.setMetros3Exceso(0.0);
-				lectura.setValorMetro3(0.0);
+				lectura.setValorMetro3(basico);
 				lectura.setValorMetro3Exceso(0.0);
+				
 			}
 		} else {
 			throw new Exception("No es posible recalcular una lectura antes del 2021");

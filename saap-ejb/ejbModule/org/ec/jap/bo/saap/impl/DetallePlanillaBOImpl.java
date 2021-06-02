@@ -237,15 +237,23 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 	@Override
 	public DetallePlanilla builDetailLectura(PeriodoPago periodoPago, Lectura lec, DetallePlanilla dpls)
 			throws Exception {
-		Double base = Utilitario.redondear(
-				(lec.getMetros3() != null && lec.getValorMetro3() != null ? (lec.getMetros3() * lec.getValorMetro3())
-						: 0.0));
-		Double exceso = Utilitario.redondear(
-				(lec.getMetros3Exceso() != null && lec.getValorMetro3Exceso() != null && lec.getMetros3Exceso() > 0
-						&& lec.getValorMetro3Exceso() > 0 ? (lec.getMetros3Exceso() * lec.getValorMetro3Exceso())
-								: 0.0));
-		Double total = Utilitario.redondear(base + exceso);
 
+		Double base = 0.0;
+		Double exceso = 0.0;
+		Double total = 0.0;
+		if (lec.getMetros3() > 0) {
+			base = Utilitario.redondear((lec.getMetros3() != null && lec.getValorMetro3() != null
+					? (lec.getMetros3() * lec.getValorMetro3())
+					: 0.0));
+			exceso = Utilitario.redondear(
+					(lec.getMetros3Exceso() != null && lec.getValorMetro3Exceso() != null && lec.getMetros3Exceso() > 0
+							&& lec.getValorMetro3Exceso() > 0 ? (lec.getMetros3Exceso() * lec.getValorMetro3Exceso())
+									: 0.0));
+			total = Utilitario.redondear(base + exceso);
+
+		} else {
+			total=lec.getValorMetro3();
+		}
 		Usuario us = lec.getIdServicio().getIdUsuario();
 		String nombre = us.getApellidos() + " " + us.getNombres();
 		String format = "........................";
@@ -253,6 +261,28 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 				: nombre + format.substring(nombre.length(), format.length());
 		log.info(String.format("%4$s ===> Medidor: %5$s Normal: %1$s, Exceso: %2$s, Total: %3$s", base, exceso, total,
 				nombre, lec.getIdServicio().getNumero()));
+		dpls.setValorUnidad(Utilitario.redondear(lec.getValorMetro3()));
+		dpls.setValorTotal(total);
+		dpls.setIdServicio(lec.getIdServicio());
+		dpls.setValorPagado(0.0);
+		dpls.setValorPendiente(dpls.getValorTotal());
+		dpls.setDescripcion(Utilitario.redondear(lec.getMetros3() + lec.getMetros3Exceso()) + " m3" + " "
+				+ periodoPago.getDescripcion());
+		return dpls;
+	}
+
+	@Override
+	public DetallePlanilla builDetailLecturaCero(PeriodoPago periodoPago, Lectura lec, DetallePlanilla dpls)
+			throws Exception {
+
+		Double total = Utilitario.redondear(lec.getBasicoM3());
+		Usuario us = lec.getIdServicio().getIdUsuario();
+		String nombre = us.getApellidos() + " " + us.getNombres();
+		String format = "........................";
+		nombre = nombre.length() > format.length() ? nombre.substring(0, format.length())
+				: nombre + format.substring(nombre.length(), format.length());
+		log.info(String.format("%4$s ===> Medidor: %5$s Normal: %1$s, Exceso: %2$s, Total: %3$s", 0, total, nombre,
+				lec.getIdServicio().getNumero()));
 		dpls.setValorUnidad(Utilitario.redondear(lec.getValorMetro3()));
 		dpls.setValorTotal(total);
 		dpls.setIdServicio(lec.getIdServicio());

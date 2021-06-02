@@ -52,11 +52,16 @@ public class Tarifa implements Serializable {
 	@OneToMany(mappedBy = "idTarifa")
 	private List<Servicio> llaveList;
 
-	@Column(name = "basico_pago")
-	private Double basicoPago;
+	@Column(name = "alcantarillado")
+	private Double alcantarillado;
 
 	@Column(name = "multa_no_pago")
 	private Double multaNoPago;
+	
+	
+	@Column(name = "basico_pago")
+	private Double basicoPago;
+	
 
 	public Tarifa() {
 	}
@@ -124,6 +129,15 @@ public class Tarifa implements Serializable {
 
 	public void setMultaNoPago(Double multaNoPago) {
 		this.multaNoPago = multaNoPago;
+	}
+	
+
+	public Double getAlcantarillado() {
+		return alcantarillado;
+	}
+
+	public void setAlcantarillado(Double alcantarillado) {
+		this.alcantarillado = alcantarillado;
 	}
 
 	@Override

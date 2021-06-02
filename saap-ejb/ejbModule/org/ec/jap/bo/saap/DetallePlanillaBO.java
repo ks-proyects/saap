@@ -37,9 +37,9 @@ public interface DetallePlanillaBO extends DetallePlanillaDAO {
 			RegistroEconomico registroEconomicoAlcantarillado, Integer cantidad, Double valor, String ppDescripcion,Servicio servicio)
 			throws Exception;
 
-	DetallePlanilla traspasarDetalle(CabeceraPlanilla planillaNueva, DetallePlanilla detallePlanilla);
+	DetallePlanilla traspasarDetalle(CabeceraPlanilla planillaNueva, DetallePlanilla detallePlanilla) throws Exception;
 
-	DetallePlanilla traspasarDetalleInconompleto(CabeceraPlanilla planillaNueva, DetallePlanilla detalleIncompleto);
+	DetallePlanilla traspasarDetalleInconompleto(CabeceraPlanilla planillaNueva, DetallePlanilla detalleIncompleto) throws Exception;
 
 	/**
 	 * Obtiene los detalles de la plnilla no pagadas
@@ -85,4 +85,13 @@ public interface DetallePlanillaBO extends DetallePlanillaDAO {
 	DetallePlanilla buildInitialDetailLectura(CabeceraPlanilla cp, Lectura lec) throws Exception;
 	
 	DetallePlanilla findByIdCustom(Integer idDetalle) throws Exception;
+	/**
+	 * 
+	 * @param periodoPago
+	 * @param lec
+	 * @param dpls
+	 * @return
+	 * @throws Exception
+	 */
+	DetallePlanilla builDetailLecturaCero(PeriodoPago periodoPago, Lectura lec, DetallePlanilla dpls) throws Exception;
 }

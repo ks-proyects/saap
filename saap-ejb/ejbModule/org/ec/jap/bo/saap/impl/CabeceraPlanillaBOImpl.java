@@ -206,7 +206,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 				map.put("idPeriodoPago", periodoPago);
 				List<Servicio> servicios = llaveBO.findAllByNamedQuery("Servicio.findByUserActivo", map);
 				// Verificamos si ya posee factura, es para el caso que se agregue un servico
-				// adiciobnal luego de haber creado la planilla
+				// adicional luego de haber creado la planilla
 				List<CabeceraPlanilla> planillaActual = findAllByNamedQuery("CabeceraPlanilla.findByUserPeriodo", map);
 				if (servicios.size() > 0) {
 					CabeceraPlanilla pn = null;
@@ -262,12 +262,13 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		log.info("----------------cerrarPeriodoPago----------------");
 		HashMap<String, Object> map = new HashMap<>();
 		// Verificamos que todas las lecturas esten correctamente ingresadas
-		map.put("idPeriodoPago", idPeriodoPago);
-		map.put("usuarioNuevo", true);
-		map.put("sinLectura", true);
-		List<Lectura> lecturas = lecturaBO.findAllByNamedQuery("Lectura.findErroneoByPeriodo", map);
-		if (!lecturas.isEmpty())
-			throw new Exception("Existen lecturas mal ingresadas, revice las lecturas.");
+		// map.put("idPeriodoPago", idPeriodoPago);
+		// map.put("usuarioNuevo", true);
+		// map.put("sinLectura", true);
+		// List<Lectura> lecturas =
+		// lecturaBO.findAllByNamedQuery("Lectura.findErroneoByPeriodo", map);
+		// if (!lecturas.isEmpty())
+		// throw new Exception("Existen lecturas mal ingresadas, revice las lecturas.");
 		// Obtenemos el periodo de pago
 		PeriodoPago periodoPago = periodoPagoBO.findByIdCustom(idPeriodoPago);
 		// Obtenemso las lecturas del mes, incluido la llave y las facturas
@@ -282,7 +283,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		for (Object[] object : objects) {
 			CabeceraPlanilla cp = (CabeceraPlanilla) object[0];
 			Servicio servicio = (Servicio) object[1];
-			Double vAlcan = servicio.getIdTarifa() != null ? servicio.getIdTarifa().getBasicoPago() : 0.0;
+			Double vAlcan = servicio.getIdTarifa() != null ? servicio.getIdTarifa().getAlcantarillado() : 0.0;
 
 			// Obtenemos la lectura de la llave
 			if (servicio != null && TipoServicioEnum.AGUA_POTABLE.equals(servicio.getTipoServicio())) {
@@ -296,17 +297,14 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					if (lec.getUsuarioNuevo()) {
 						debeRegistrarDetalle = false;
 					} else if (lec.getSinLectura()) {
-						debeRegistrarDetalle = true;
 						if (lec.getMetros3() > 0) {
 							dpls = detallePlanillaBO.builDetailLectura(periodoPago, lec, dpls);
 						}
 					} else {
-						if (lec.getMetros3() > 0) {
-							dpls = detallePlanillaBO.builDetailLectura(periodoPago, lec, dpls);
-						}
+						dpls = detallePlanillaBO.builDetailLectura(periodoPago, lec, dpls);
 					}
 					if (debeRegistrarDetalle) {
-						if (lec.getMetros3() > 0) {
+						if (lec.getMetros3() > 0 || lec.getValorMetro3() > 0) {
 							dpls.setValorTotalOrigen(dpls.getValorTotal());
 							dpls.setOrigen(Constantes.origen_mes_Actual);
 							detallePlanillaBO.save(systemUser, dpls);
@@ -379,7 +377,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 			for (Object[] object : objects) {
 				CabeceraPlanilla cp = (CabeceraPlanilla) object[0];
 				Servicio servicio = (Servicio) object[1];
-				Double vAlcan = servicio.getIdTarifa() != null ? servicio.getIdTarifa().getBasicoPago() : 0.0;
+				Double vAlcan = servicio.getIdTarifa() != null ? servicio.getIdTarifa().getAlcantarillado() : 0.0;
 				// Obtenemos la lectura de la llave
 				if (servicio != null && TipoServicioEnum.AGUA_POTABLE.equals(servicio.getTipoServicio())) {
 					// Obtenemos la lectura
@@ -396,10 +394,8 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 								pama);
 						if (dpls == null)
 							dpls = detallePlanillaBO.buildInitialDetailLectura(cp, lec);
-						if (lec.getMetros3() > 0)
-							dpls = detallePlanillaBO.builDetailLectura(periodoPago, lec, dpls);
-
-						if (lec.getMetros3() > 0)
+						dpls = detallePlanillaBO.builDetailLectura(periodoPago, lec, dpls);
+						if (lec.getMetros3() > 0 || lec.getValorMetro3() > 0)
 							if (dpls.getIdDetallePlanilla() == null) {
 								dpls.setValorTotalOrigen(dpls.getValorTotal());
 								dpls.setOrigen(Constantes.origen_mes_Actual);
@@ -428,7 +424,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					pama.put("idServicio", servicio);
 					pama.put("idCabeceraPlanilla", cp);
 					DetallePlanilla dpls = detallePlanillaBO.findByNamedQuery("DetallePlanilla.findByServicio", pama);
-					if (dpls != null) {
+					if (dpls == null) {
 						DetallePlanilla alcantarillado = detallePlanillaBO.crearDetalleAlcantarillado(usuario, cp,
 								registroEconomicoAlcantarillado, 1, vAlcan, periodoPago.getDescripcion(), servicio);
 						cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + alcantarillado.getValorTotal()));
@@ -824,8 +820,9 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
 
 				if (lectura.getMetros3() > 0) {
-					detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()+lectura.getMetros3Exceso()) + " m3 "
-							+ lectura.getIdPeriodoPago().getDescripcion());
+					detallePlanilla
+							.setDescripcion(Utilitario.redondear(lectura.getMetros3() + lectura.getMetros3Exceso())
+									+ " m3 " + lectura.getIdPeriodoPago().getDescripcion());
 				}
 				if (lectura.getMetros3() > 0)
 					detallePlanillaBO.update(usuario, detallePlanilla);

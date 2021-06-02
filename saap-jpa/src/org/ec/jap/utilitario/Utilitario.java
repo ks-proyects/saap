@@ -241,11 +241,11 @@ public class Utilitario {
 			Calendar fechaAnterior = Calendar.getInstance();
 			fechaAnterior.setTime(fechaInicio);
 			Calendar fechaActual = Calendar.getInstance();
-			fechaActual.add(Calendar.MONTH, 0);
+			fechaActual.add(Calendar.MONTH, -1);
 			if (fechaAnterior.before(fechaActual)) {
 				if (fechaAnterior.get(Calendar.YEAR) != fechaActual.get(Calendar.YEAR))
 					puedeAgregarUnPeriodo = true;
-				else if (fechaAnterior.get(Calendar.MONTH) != fechaActual.get(Calendar.MONTH))
+				else if (fechaAnterior.get(Calendar.MONTH) <= fechaActual.get(Calendar.MONTH))
 					puedeAgregarUnPeriodo = true;
 				else
 					puedeAgregarUnPeriodo = false;
