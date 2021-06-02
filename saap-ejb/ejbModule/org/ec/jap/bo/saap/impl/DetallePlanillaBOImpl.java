@@ -266,7 +266,7 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 		dpls.setIdServicio(lec.getIdServicio());
 		dpls.setValorPagado(0.0);
 		dpls.setValorPendiente(dpls.getValorTotal());
-		dpls.setDescripcion(Utilitario.redondear(lec.getMetros3() + lec.getMetros3Exceso()) + " m3" + " "
+		dpls.setDescripcion(Utilitario.redondear(lec.getMetros3() + lec.getMetros3Exceso()) + " m3 de "
 				+ periodoPago.getDescripcion());
 		return dpls;
 	}
