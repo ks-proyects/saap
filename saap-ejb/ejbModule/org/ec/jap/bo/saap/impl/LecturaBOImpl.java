@@ -159,23 +159,17 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 					RangoConsumo rangoConsumo = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor",
 							map);
 					if (rangoConsumo == null) {
-						// En caso que no exista en la tarifa del usuario buscamos en todas las tarifas
-						// configuradas
-						map.clear();
-						map.put("valor", lectura.getMetros3());
-						map.put("epoca", pp.getEpoca());
-						RangoConsumo rangoOther = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByValorAndEpoca",
-								map);
+						// En caso que no exista en la tarifa por rango obtenemos de la tarifa limite
+						RangoConsumo rangoLimite = rangoConsumoBO
+								.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
 						// Si no existe en ninguna buscamos el rango limite
-						if (rangoOther == null) {
-							RangoConsumo rangoLimite = rangoConsumoBO
-									.findByNamedQuery("RangoConsumo.findByMaxTarifaAndValor", map);
-							lectura = buildExceso(consumo, rangoLimite, lectura);
+						if (rangoLimite == null) {
+							throw new Exception(String.format("No esta definido los rangos para la tarifa %1$s en el periodo %2$s con valor %3$s", lectura.getIdServicio().getIdTarifa().getDescripcion(),pp.getEpoca().getDescripcion(),lectura.getMetros3()));
 						} else {
-							lectura = buildExceso(consumo, rangoOther, lectura);
+							lectura = buildValores(consumo, rangoLimite, lectura);
 						}
 					} else {
-						lectura = buildExceso(consumo, rangoConsumo, lectura);
+						lectura = buildValores(consumo, rangoConsumo, lectura);
 					}
 					lectura.setBasicoM3(0.0);
 				}
@@ -192,33 +186,12 @@ public class LecturaBOImpl extends LecturaDAOImpl implements LecturaBO {
 		return lectura;
 	}
 
-	public Lectura buildExceso(Double consumo, RangoConsumo rangoConsumo, Lectura lectura) throws Exception {
-		Double consumoExceso = Utilitario.redondear(consumo - rangoConsumo.getM3Minimo());
-		log.info(String.format("Medidor:%3$s Tarifa: %4$s Consumo: %1$s, Exceso: %2$s", consumo, consumoExceso,lectura.getIdServicio().getNumero(),lectura.getIdServicio().getIdTarifa().getDescripcion()));
-		if (!consumoExceso.equals(consumo)) {
-			Double consumoNormal = Utilitario.redondear(consumo - consumoExceso);
-			map.put("idTarifa", rangoConsumo.getIdTarifa());
-			map.put("valor", consumoNormal);
-			RangoConsumo rangoNormal = rangoConsumoBO.findByNamedQuery("RangoConsumo.findByTarifaAndValor", map);
-			if (rangoNormal != null) {
-				log.info(String.format("Valor Exceso: %1$s, Valor Normal: %2$s", rangoConsumo.getValorM3(),
-						rangoNormal.getValorM3()));
-				lectura.setValorMetro3Exceso(Utilitario.redondear(rangoConsumo.getValorM3()));
-				lectura.setMetros3Exceso(consumoExceso);
-				lectura.setValorMetro3(Utilitario.redondear(rangoNormal.getValorM3()));
-				lectura.setMetros3(consumoNormal);
-			} else {
-				lectura.setValorMetro3Exceso(0.0);
-				lectura.setMetros3Exceso(0.0);
-				lectura.setValorMetro3(Utilitario.redondear(rangoConsumo.getValorM3()));
-				lectura.setMetros3(consumo);
-			}
-		} else {
-			lectura.setValorMetro3Exceso(0.0);
-			lectura.setMetros3Exceso(0.0);
-			lectura.setValorMetro3(Utilitario.redondear(rangoConsumo.getValorM3()));
-			lectura.setMetros3(consumo);
-		}
+	public Lectura buildValores(Double consumo, RangoConsumo rangoConsumo, Lectura lectura) throws Exception {
+		log.info(String.format("Medidor:%2$s Tarifa: %3$s Consumo: %1$s", consumo,lectura.getIdServicio().getNumero(),lectura.getIdServicio().getIdTarifa().getDescripcion()));
+		lectura.setValorMetro3Exceso(0.0);
+		lectura.setMetros3Exceso(0.0);
+		lectura.setValorMetro3(Utilitario.redondear(rangoConsumo.getValorM3()));
+		lectura.setMetros3(consumo);
 		return lectura;
 	}
 

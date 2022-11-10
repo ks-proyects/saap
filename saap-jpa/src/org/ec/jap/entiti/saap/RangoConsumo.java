@@ -31,9 +31,9 @@ import org.ec.jap.enumerations.Formapago;
 @Entity
 @Table(name = "rango_consumo")
 @NamedQueries({
-		@NamedQuery(name = "RangoConsumo.findByMaxTarifaAndValor", query = "SELECT r FROM RangoConsumo r WHERE  :valor > r.m3Minimo AND r.m3Maximo=-1 AND r.epoca=:epoca"),
+		@NamedQuery(name = "RangoConsumo.findByMaxTarifaAndValor", query = "SELECT r FROM RangoConsumo r WHERE r.idTarifa=:idTarifa AND  :valor > r.m3Minimo AND r.m3Maximo=-1 AND r.epoca=:epoca"),
 		@NamedQuery(name = "RangoConsumo.findByTarifaAndValor", query = "SELECT r FROM RangoConsumo r WHERE r.idTarifa=:idTarifa AND :valor > r.m3Minimo AND :valor <= r.m3Maximo AND r.epoca=:epoca"),
-		@NamedQuery(name = "RangoConsumo.findByValorAndEpoca", query = "SELECT r FROM RangoConsumo r WHERE  :valor > r.m3Minimo AND :valor <= r.m3Maximo AND r.epoca=:epoca"),
+
 		@NamedQuery(name = "RangoConsumo.findByTarifa", query = "select rac from RangoConsumo rac where rac.idTarifa=:idTarifa ORDER BY rac.epoca, rac.orden") })
 public class RangoConsumo implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -43,12 +43,12 @@ public class RangoConsumo implements Serializable {
 	private Integer idRangoConsumo;
 
 	@Basic(optional = false)
-	@NotNull(message = "El campo VALOR MÍNIMO es obligatorio.")
+	@NotNull(message = "El campo VALOR Mï¿½NIMO es obligatorio.")
 	@Column(name = "m3_minimo")
 	private Double m3Minimo;
 
 	@Basic(optional = false)
-	@NotNull(message = "El campo VALOR MÁXIMO es obligatorio.")
+	@NotNull(message = "El campo VALOR Mï¿½XIMO es obligatorio.")
 	@Column(name = "m3_maximo")
 	private Double m3Maximo;
 
