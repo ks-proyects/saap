@@ -85,4 +85,7 @@ public interface DetallePlanillaBO extends DetallePlanillaDAO {
 	DetallePlanilla buildInitialDetailLectura(CabeceraPlanilla cp, Lectura lec) throws Exception;
 	
 	DetallePlanilla findByIdCustom(Integer idDetalle) throws Exception;
+
+	DetallePlanilla builDetailLecturaBasico(PeriodoPago periodoPago, Lectura lec, DetallePlanilla dpls)
+			throws Exception;
 }

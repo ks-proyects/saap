@@ -264,6 +264,27 @@ public class DetallePlanillaBOImpl extends DetallePlanillaDAOImpl implements Det
 	}
 
 	@Override
+	public DetallePlanilla builDetailLecturaBasico(PeriodoPago periodoPago, Lectura lec, DetallePlanilla dpls)
+			throws Exception {
+		Double total = Utilitario.redondear(lec.getIdServicio().getIdTarifa().getBasicoPago());
+
+		Usuario us = lec.getIdServicio().getIdUsuario();
+		String nombre = us.getApellidos() + " " + us.getNombres();
+		String format = "........................";
+		nombre = nombre.length() > format.length() ? nombre.substring(0, format.length())
+				: nombre + format.substring(nombre.length(), format.length());
+		log.info(String.format("%2$s ===> Medidor: %3$s Básico: %1$s", total, nombre, lec.getIdServicio().getNumero()));
+		dpls.setValorUnidad(Utilitario.redondear(lec.getValorMetro3()));
+		dpls.setValorTotal(total);
+		dpls.setIdServicio(lec.getIdServicio());
+		dpls.setValorPagado(0.0);
+		dpls.setValorPendiente(dpls.getValorTotal());
+		dpls.setDescripcion(Utilitario.redondear(lec.getMetros3() + lec.getMetros3Exceso()) + " m3" + " "
+				+ periodoPago.getDescripcion());
+		return dpls;
+	}
+
+	@Override
 	public DetallePlanilla buildInitialDetailLectura(CabeceraPlanilla cp, Lectura lec) throws Exception {
 		DetallePlanilla dpls = new DetallePlanilla();
 		dpls.setEstado("ING");

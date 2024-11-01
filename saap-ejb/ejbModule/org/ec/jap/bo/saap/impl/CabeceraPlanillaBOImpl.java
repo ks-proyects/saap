@@ -303,16 +303,17 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 					} else {
 						if (lec.getMetros3() > 0) {
 							dpls = detallePlanillaBO.builDetailLectura(periodoPago, lec, dpls);
+						} else {
+							dpls = detallePlanillaBO.builDetailLecturaBasico(periodoPago, lec, dpls);
 						}
 					}
 					if (debeRegistrarDetalle) {
-						if (lec.getMetros3() > 0) {
-							dpls.setValorTotalOrigen(dpls.getValorTotal());
-							dpls.setOrigen(Constantes.origen_mes_Actual);
-							detallePlanillaBO.save(systemUser, dpls);
-							cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + dpls.getValorTotal()));
-							cp.setTotal(Utilitario.redondear(cp.getTotal() + dpls.getValorTotal()));
-						}
+						dpls.setValorTotalOrigen(dpls.getValorTotal());
+						dpls.setOrigen(Constantes.origen_mes_Actual);
+						detallePlanillaBO.save(systemUser, dpls);
+						cp.setSubtotal(Utilitario.redondear(cp.getSubtotal() + dpls.getValorTotal()));
+						cp.setTotal(Utilitario.redondear(cp.getTotal() + dpls.getValorTotal()));
+
 					}
 				}
 			} else if (servicio != null && TipoServicioEnum.ALCANTARILLADO.equals(servicio.getTipoServicio())) {
@@ -398,14 +399,15 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 							dpls = detallePlanillaBO.buildInitialDetailLectura(cp, lec);
 						if (lec.getMetros3() > 0)
 							dpls = detallePlanillaBO.builDetailLectura(periodoPago, lec, dpls);
-
-						if (lec.getMetros3() > 0)
-							if (dpls.getIdDetallePlanilla() == null) {
-								dpls.setValorTotalOrigen(dpls.getValorTotal());
-								dpls.setOrigen(Constantes.origen_mes_Actual);
-								detallePlanillaBO.save(usuario, dpls);
-							} else
-								detallePlanillaBO.update(usuario, dpls);
+						else {
+							dpls = detallePlanillaBO.builDetailLecturaBasico(periodoPago, lec, dpls);
+						}
+						if (dpls.getIdDetallePlanilla() == null) {
+							dpls.setValorTotalOrigen(dpls.getValorTotal());
+							dpls.setOrigen(Constantes.origen_mes_Actual);
+							detallePlanillaBO.save(usuario, dpls);
+						} else
+							detallePlanillaBO.update(usuario, dpls);
 						map.clear();
 						map.put("idCabeceraPlanilla", cp);
 						List<DetallePlanilla> detallePlanillas = detallePlanillaBO
@@ -590,7 +592,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 		}
 
 		// Registramos en caja el valor total de los gastos
-		log.info("Inicia Obtención de Gastos");
+		log.info("Inicia Obtenciï¿½n de Gastos");
 		map.clear();
 		map.put("idPeriodoPago", idPeriodoPago);
 		List<Gasto> gastos = gastoBO.findAllByNamedQuery("Gasto.findAllByUser", map);
@@ -824,8 +826,9 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 						.findByNamedQuery("DetallePlanilla.findByLecturaAndCabcera", pama);
 
 				if (lectura.getMetros3() > 0) {
-					detallePlanilla.setDescripcion(Utilitario.redondear(lectura.getMetros3()+lectura.getMetros3Exceso()) + " m3 "
-							+ lectura.getIdPeriodoPago().getDescripcion());
+					detallePlanilla
+							.setDescripcion(Utilitario.redondear(lectura.getMetros3() + lectura.getMetros3Exceso())
+									+ " m3 " + lectura.getIdPeriodoPago().getDescripcion());
 				}
 				if (lectura.getMetros3() > 0)
 					detallePlanillaBO.update(usuario, detallePlanilla);

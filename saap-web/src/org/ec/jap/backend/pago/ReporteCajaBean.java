@@ -41,6 +41,8 @@ public class ReporteCajaBean extends Bean {
 	// private Integer mes;
 	private Filtro mes;
 	private List<SelectItem> items;
+	private Filtro tipo;
+	private List<SelectItem> tipos;
 
 	public ReporteCajaBean() {
 		super();
@@ -52,6 +54,9 @@ public class ReporteCajaBean extends Bean {
 			super.init();
 			items = new ArrayList<>(0);
 			items.add(new SelectItem(-1, "Todos", "Todos"));
+			
+			tipos = new ArrayList<>(0);
+			tipos.add(new SelectItem(-1, "Todos", "Todos"));
 			search(null);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -64,6 +69,7 @@ public class ReporteCajaBean extends Bean {
 			setNombreArchivo("ReporteCajaAnual-" + Calendar.getInstance().get(Calendar.YEAR));
 			mes = filtroBO.getFiltro(getUsuarioCurrent(), "MES", getPage(), mes != null ? mes.getValorEntero() : -1, mes, false);
 			anio = filtroBO.getFiltro(getUsuarioCurrent(), "ANIO", getPage(), anio != null ? anio.getValorEntero() : 0, anio, false);
+			anio = filtroBO.getFiltro(getUsuarioCurrent(), "TIPO", getPage(), tipo != null ? tipo.getValorEntero() : 0, tipo, false);
 			if (anio.getValorEntero() != 0) {
 				changeAnio(null);
 			}
@@ -126,6 +132,29 @@ public class ReporteCajaBean extends Bean {
 			e.printStackTrace();
 		}
 		return items;
+	}
+	
+
+	public Filtro getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(Filtro tipo) {
+		this.tipo = tipo;
+	}
+
+	public List<SelectItem> getTipos() {
+		List<SelectItem> tipos = new ArrayList<>();
+		try {
+			tipos = getSelectItems(getUsuarioCurrent(), null, true, "ListaValor.findTipoRegistro");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return tipos;
+	}
+
+	public void setTipos(List<SelectItem> tipos) {
+		this.tipos = tipos;
 	}
 
 	public void changeAnio(AjaxBehaviorEvent event) {
