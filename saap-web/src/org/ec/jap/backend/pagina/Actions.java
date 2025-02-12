@@ -14,6 +14,7 @@ import javax.ejb.EJB;
 import javax.el.MethodExpression;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIForm;
 import javax.faces.component.UIParameter;
 import javax.faces.component.behavior.AjaxBehavior;
 import javax.faces.component.html.HtmlCommandButton;
@@ -101,8 +102,9 @@ public abstract class Actions {
 
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		UIToolbar toolbar = (UIToolbar) FacesContext.getCurrentInstance().getViewRoot().findComponent("WorkPage:toolBar");
-
+		UIForm form = (UIForm) FacesContext.getCurrentInstance().getViewRoot().findComponent("WorkPage");
 		if (toolbar != null) {
+			form.clearInitialState();
 			toolbar.clearInitialState();
 			toolbar.getChildren().clear();
 			toolbarGroup = new UIToolbarGroup();

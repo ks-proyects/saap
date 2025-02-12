@@ -67,8 +67,15 @@
 						<f:facet name="header">
 							<h:outputText value="Valor del Gasto" />
 						</f:facet>
-						<h:outputText value="#{dp.valor}" />
+						<h:outputText value="#{dp.valor}">
+							<f:convertNumber groupingUsed="true" minFractionDigits="2" />
+						</h:outputText>
 					</rich:column>
+					<f:facet name="footer">
+						<h:outputText value="#{gastoListBean.suma()}" style="color:#fff">
+							<f:convertNumber groupingUsed="true" minFractionDigits="2" />
+						</h:outputText>
+					</f:facet>
 				</rich:dataTable>
 			</h:form>
 		</h:body>

@@ -93,6 +93,9 @@ public class ReporteCajaBOImpl implements ReporteCajaBO {
 			case "BASCON":
 				valor = (Double) detallePlanillaBO.findDoubleByNamedQuery("DetallePlanilla.findCuotas", map);
 				break;
+			case "ALCANCON":
+				valor = (Double) detallePlanillaBO.findDoubleByNamedQuery("DetallePlanilla.findCuotas", map);
+				break;
 			default:
 				break;
 			}
@@ -136,13 +139,15 @@ public class ReporteCajaBOImpl implements ReporteCajaBO {
 		Double valor = 0.0;
 		for (TipoRegistro tipoRegistro : ingresos) {
 			Object[] objects = new Object[2];
-			map.put("tipoRegistro", tipoRegistro);
+			
 			objects[0] = tipoRegistro.getDescripcion();
 			switch (tipoRegistro.getTipoRegistro()) {
 			case "GAST":
+				map.remove("tipoRegistro");
 				valor = (Double) gastoBO.findDoubleByNamedQuery("Gasto.findAllGastos", map);
 				break;
 			case "CUEPAG":
+				map.put("tipoRegistro", tipoRegistro);
 				valor = (Double) registroEconomicoBO.findDoubleByNamedQuery("RegistroEconomico.findCuentasPorPaga", map);
 				break;
 
@@ -275,12 +280,14 @@ public class ReporteCajaBOImpl implements ReporteCajaBO {
 		map.put("mes", mes);
 		Double valor = 0.0;
 		for (TipoRegistro tipoRegistro : ingresos) {
-			map.put("tipoRegistro", tipoRegistro);
+			
 			switch (tipoRegistro.getTipoRegistro()) {
 			case "GAST":
+				map.remove("tipoRegistro");
 				valor += (Double) gastoBO.findDoubleByNamedQuery("Gasto.findAllGastosAcum", map);
 				break;
 			case "CUEPAG":
+				map.put("tipoRegistro", tipoRegistro);
 				valor += (Double) registroEconomicoBO.findDoubleByNamedQuery("RegistroEconomico.findCuentasPorPagaAcumul", map);
 				break;
 

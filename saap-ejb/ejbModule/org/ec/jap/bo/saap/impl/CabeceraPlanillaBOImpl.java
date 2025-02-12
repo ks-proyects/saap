@@ -778,7 +778,7 @@ public class CabeceraPlanillaBOImpl extends CabeceraPlanillaDAOImpl implements C
 	@Override
 	public void recalcularPlanilla(Usuario usuario, CabeceraPlanilla cabeceraPlanilla, Lectura lectura)
 			throws Exception {
-		if (lectura.getIdPeriodoPago().getAnio() > 2020 && lectura.getIdPeriodoPago().getMes() > 0) {
+		if (lectura.getIdPeriodoPago().getAnio() > 2020 && lectura.getIdPeriodoPago().getMes() >= 0) {
 			if ("PAG".equalsIgnoreCase(cabeceraPlanilla.getEstado())
 					|| "TRAS".equalsIgnoreCase(cabeceraPlanilla.getEstado())) {
 				throw new Exception("La factura ya se encuentra pagada o finalizada");

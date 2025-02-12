@@ -53,7 +53,7 @@ public class GastoListBean extends Bean {
 
 	public void search(ActionEvent event) {
 		try {
-			periodos = getSelectItemsTodos(getUsuarioCurrent(), null, "ListaValor.findNoEsta",true);
+			periodos = getSelectItemsTodos(getUsuarioCurrent(), null, "ListaValor.findNoEsta", true);
 			map.clear();
 			map.put("idPeriodoPago", idPeriodopago != null ? idPeriodopago : 0);
 			listGastos = gastoBO.findAllByNamedQuery("Gasto.findAllByUser", map);
@@ -71,7 +71,11 @@ public class GastoListBean extends Bean {
 
 	public void valueChange(ValueChangeEvent event) {
 		try {
-			idPeriodopago = event == null ? 0 : Integer.valueOf(event.getNewValue() != null &&!"Todos".equalsIgnoreCase(event.getNewValue().toString()) ? event.getNewValue().toString() : "0");
+			idPeriodopago = event == null ? 0
+					: Integer.valueOf(
+							event.getNewValue() != null && !"Todos".equalsIgnoreCase(event.getNewValue().toString())
+									? event.getNewValue().toString()
+									: "0");
 			map = new HashMap<>();
 			map.put("idPeriodoPago", idPeriodopago != null ? idPeriodopago : 0);
 			listGastos = gastoBO.findAllByNamedQuery("Gasto.findAllByUser", map);
@@ -79,6 +83,14 @@ public class GastoListBean extends Bean {
 			e.printStackTrace();
 			displayMessage(e.getMessage(), Mensaje.SEVERITY_ERROR);
 		}
+	}
+
+	public Double suma() {
+		Double total = 0.0;
+		for (Gasto gasto : listGastos) {
+			total += gasto.getValor();
+		}
+		return total;
 	}
 
 	public Integer getIdPeriodopago() {

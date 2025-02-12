@@ -24,11 +24,13 @@
 							listener="#{reporteCajaBean.changeAnio}" />
 					</h:selectOneMenu>
 					<h:outputText value="Mes:" />
-					<h:selectOneMenu id="cmdMeses" value="#{reporteCajaBean.mes.valorEntero}">
+					<h:selectOneMenu id="cmdMeses"
+						value="#{reporteCajaBean.mes.valorEntero}">
 						<f:selectItems value="#{reporteCajaBean.meses}" />
 					</h:selectOneMenu>
 					<h:outputText value="Tipo Ingreso:" />
-					<h:selectOneMenu id="cmdMeses" value="#{reporteCajaBean.tipo.valorEntero}">
+					<h:selectOneMenu id="cmdTipoIngreso"
+						value="#{reporteCajaBean.tipo.valorCadena}">
 						<f:selectItems value="#{reporteCajaBean.tipos}" />
 					</h:selectOneMenu>
 				</h:panelGrid>

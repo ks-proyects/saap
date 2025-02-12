@@ -69,7 +69,8 @@ public class ReporteCajaBean extends Bean {
 			setNombreArchivo("ReporteCajaAnual-" + Calendar.getInstance().get(Calendar.YEAR));
 			mes = filtroBO.getFiltro(getUsuarioCurrent(), "MES", getPage(), mes != null ? mes.getValorEntero() : -1, mes, false);
 			anio = filtroBO.getFiltro(getUsuarioCurrent(), "ANIO", getPage(), anio != null ? anio.getValorEntero() : 0, anio, false);
-			anio = filtroBO.getFiltro(getUsuarioCurrent(), "TIPO", getPage(), tipo != null ? tipo.getValorEntero() : 0, tipo, false);
+			tipo = filtroBO.getFiltro(getUsuarioCurrent(), "TIPO", getPage(), tipo != null ? tipo.getValorCadena() : 0, tipo, false);
+			FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add(":WorkPage:cmdTipoIngreso");
 			if (anio.getValorEntero() != 0) {
 				changeAnio(null);
 			}
@@ -161,6 +162,7 @@ public class ReporteCajaBean extends Bean {
 		items = new ArrayList<>();
 		try {
 			items.add(new SelectItem(-1, "Todos", "Todos"));
+			
 			if (anio.getValorEntero() != 0) {
 				items.addAll(getSelectItems(getUsuarioCurrent(), null, "MESES", false, false, false, TipoListaValor.F, null));
 			}
